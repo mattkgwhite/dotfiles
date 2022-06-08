@@ -18,8 +18,9 @@ brew "wget"
 brew "pkg-config" # needed for python package builds
 brew "fish"
 brew "wget"
-brwe "aws-vault"
+brew "aws-vault"
 # DevOps Packages
+brew "age"
 brew "fluxcd/tap/flux"
 brew "helm"
 brew "kubectx"
@@ -57,5 +58,6 @@ cask "spotify"
 cask "stats"
 cask "royal-tsx"
 cask "fork"
+cask "slack"
 cask "font-fira-code-nerd-font" # fonts?
 brew "matsuyoshi30/gitsu/gitsu" # git user management
