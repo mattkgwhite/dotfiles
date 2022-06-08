@@ -60,4 +60,3 @@ cask "royal-tsx"
 cask "fork"
 cask "slack"
 cask "font-fira-code-nerd-font" # fonts?
-brew "matsuyoshi30/gitsu/gitsu" # git user management
