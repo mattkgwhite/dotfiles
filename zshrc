@@ -10,7 +10,7 @@ fi
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.zsh/oh-my-zsh"
-
+export ZSH_CUSTOM=$HOME/.zsh/custom
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -71,6 +71,7 @@ plugins=(
 1password
 argocd
 aws
+bat
 docker
 docker-compose
 dotenv
