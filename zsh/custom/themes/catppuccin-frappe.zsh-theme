@@ -1,1 +1,1 @@
-../../catppuccin-frappe.zsh/themes/catppuccin_frappe-zsh-syntax-highlighting.zsh
+../../catppuccin.zsh/themes/catppuccin_frappe-zsh-syntax-highlighting.zsh

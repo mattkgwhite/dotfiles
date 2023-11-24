@@ -28,3 +28,9 @@
 [submodule "tmux.plugins/vim-tmux-navigator"]
 	path = tmux.plugins/vim-tmux-navigator
 	url = https://github.com/christoomey/vim-tmux-navigator.git
+[submodule "powerlevel10k/powerlevel10k"]
+	path = powerlevel10k/powerlevel10k
+	url = https://github.com/romkatv/powerlevel10k.git
+[submodule "zsh/catppuccin.zsh/zsh-syntax-highlighting"]
+	path = zsh/catppuccin.zsh/zsh-syntax-highlighting
+	url = git@github.com:catppuccin/zsh-syntax-highlighting.git
