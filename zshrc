@@ -1,4 +1,5 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+
+Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
@@ -8,6 +9,9 @@ fi
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
+# Powerlevel10k Config
+export P10K="$HOME/.etc/powerlevel10k/powerlevel10k"
+
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.zsh/oh-my-zsh"
 export ZSH_CUSTOM=$HOME/.zsh/custom
@@ -15,39 +19,14 @@ export ZSH_CUSTOM=$HOME/.zsh/custom
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="bullet-train"
+ZSH_THEME="$ZSH_HOME/catppuccin.zsh/zsh-syntax-highlighting/themes/catppuccin_frappe-zsh-syntax-highlighting.zsh"
 ZSH_AUTOSUGGEST_USE_ASYNC=true
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=15
-
-# Bullettrain config
-BULLETTRAIN_CONTEXT_FG="white"
-BULLETTRAIN_NVM_FG="black"
-BULLETTRAIN_VIRTUALENV_FG="black"
-BULLETTRAIN_KCTX_KCONFIG=$HOME/.kube/config
-BULLETTRAIN_KCTX_BG=blue
-BULLETTRAIN_KCTX_FG=white
-BULLETTRAIN_PROMPT_ADD_NEWLINE=false
-BULLETTRAIN_DIR_EXTENDED=0
-BULLETTRAIN_PROMPT_ORDER=(
-    status
-    context
-    dir
-    aws_vault
-    virtualenv2
-    ruby2
-    nvm
-    aws
-    go
-    custom
-    kctx2
-    git
-    hg
-    cmd_exec_time
-)
 
 # Exports
 export SHOW_AWS_PROMPT=false
 export SHOW_AWS_PROMPT=false
+export ZSH_HOME="$HOME/.zsh"
 
 # Uncomment the following line to use hyphen-insensitive completion. Case
 # sensitive completion must be off. _ and - will be interchangeable.
@@ -108,7 +87,7 @@ esac
 
 source $ZSH/oh-my-zsh.sh
 #source ~/powerlevel10k/powerlevel10k.zsh-theme # original binding
-source $ZSH/powerlevel10k/powerlevel10k.zsh-theme
+source $P10K/powerlevel10k.zsh-theme
 
 # User configuration
 
