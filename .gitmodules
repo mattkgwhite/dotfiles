@@ -34,3 +34,6 @@
 [submodule "zsh/catppuccin.zsh/zsh-syntax-highlighting"]
 	path = zsh/catppuccin.zsh/zsh-syntax-highlighting
 	url = git@github.com:catppuccin/zsh-syntax-highlighting.git
+[submodule "zsh/dracula.zsh"]
+	path = zsh/dracula.zsh
+	url = https://github.com/dracula/zsh

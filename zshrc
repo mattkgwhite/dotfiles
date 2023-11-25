@@ -19,7 +19,7 @@ export ZSH_CUSTOM=$HOME/.zsh/custom
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="$ZSH_HOME/catppuccin.zsh/zsh-syntax-highlighting/themes/catppuccin_frappe-zsh-syntax-highlighting.zsh"
+ZSH_THEME="dracula"
 ZSH_AUTOSUGGEST_USE_ASYNC=true
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=15
 
