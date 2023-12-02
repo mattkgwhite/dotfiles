@@ -13,6 +13,12 @@
 [submodule "zsh/bullet-train.zsh"]
 	path = zsh/bullet-train.zsh
 	url = https://github.com/caiogondim/bullet-train.zsh.git
+[submodule "zsh/dracula.zsh"]
+	path = zsh/dracula.zsh
+	url = https://github.com/dracula/zsh
+[submodule "zsh/catppuccin.zsh/zsh-syntax-highlighting"]
+	path = zsh/catppuccin.zsh/zsh-syntax-highlighting
+	url = git@github.com:catppuccin/zsh-syntax-highlighting.git
 [submodule "zsh/custom/plugins/zsh-completions"]
 	path = zsh/custom/plugins/zsh-completions
 	url = https://github.com/zsh-users/zsh-completions.git
@@ -31,9 +37,3 @@
 [submodule "powerlevel10k/powerlevel10k"]
 	path = powerlevel10k/powerlevel10k
 	url = https://github.com/romkatv/powerlevel10k.git
-[submodule "zsh/catppuccin.zsh/zsh-syntax-highlighting"]
-	path = zsh/catppuccin.zsh/zsh-syntax-highlighting
-	url = git@github.com:catppuccin/zsh-syntax-highlighting.git
-[submodule "zsh/dracula.zsh"]
-	path = zsh/dracula.zsh
-	url = https://github.com/dracula/zsh
