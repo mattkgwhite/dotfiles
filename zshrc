@@ -73,6 +73,15 @@ vscode
 zsh-completions
 )
 
+## Battery - battery
+# comes from .p10k.zsh file
+
+## IP - public_ip_address
+# comes from .p10k.zsh file
+
+## VPN IP - vpn_ip
+# comes from .p10k.zsh file
+
 ZSH_TMUX_AUTOSTART=true
 
 case $(uname -s) in
