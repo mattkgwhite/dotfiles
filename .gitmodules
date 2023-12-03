@@ -110,10 +110,10 @@
 [submodule "vim/pack/plugins/start/tsuquyomi"]
 	path = vim/pack/plugins/start/tsuquyomi
 	url = https://github.com/Quramy/tsuquyomi.git
-[submodule "vim/pack/plugins/start/YouCompleteMe"]
-	path = vim/pack/plugins/start/YouCompleteMe
-	url = https://github.com/Valloric/YouCompleteMe.git
-	ignore = all
+# [submodule "vim/pack/plugins/start/YouCompleteMe"]
+# 	path = vim/pack/plugins/start/YouCompleteMe
+# 	url = https://github.com/Valloric/YouCompleteMe.git
+# 	ignore = all
 [submodule "vim/pack/plugins/start/vim-polyglot"]
 	path = vim/pack/plugins/start/vim-polyglot
 	url = https://github.com/sheerun/vim-polyglot.git
