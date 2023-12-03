@@ -42,6 +42,7 @@ brew "zsh"
 brew "neovim"
 brew "git"
 brew "awscli"
+brew "vim"
 # Casks
 cask "alfred"
 cask "docker"
