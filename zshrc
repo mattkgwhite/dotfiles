@@ -104,8 +104,33 @@ source $P10K/powerlevel10k.zsh-theme
 #export VAULT_ADDR=https://vault.*
 export VAULT_ADDR=localhost:8200
 
-
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+# Personal Functions
+
+## pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+
+## Online?
+function online() {
+    host="${1}"
+    ports="${2:-22,80,443}"
+
+    if [[ "$host" == "" ]]; then
+        echo "Define a host in this function"
+        echo ""
+        return
+    fi
+
+    nmap -Pn $host -p $ports
+}
+
+## getCert
+function getCert() {
+    URL="$1"
+    PORT="${2:=443}"
+    echo | openssl s_client -connect ${URL}:${PORT} | openssl x509 -noout -text
+}
