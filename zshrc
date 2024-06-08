@@ -1,5 +1,4 @@
-#oh-my-posh
-eval "$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/kushal.omp.json')" 
+
 
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
@@ -11,7 +10,7 @@ export ZSH_CUSTOM=$HOME/.zsh/custom
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="dracula"
+# ZSH_THEME="dracula"
 ZSH_AUTOSUGGEST_USE_ASYNC=true
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=15
 
@@ -92,6 +91,10 @@ source $ZSH/oh-my-zsh.sh
 # Personal Aliases
 #export VAULT_ADDR=https://vault.*
 export VAULT_ADDR=localhost:8200
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+#oh-my-posh
+eval "$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/kushal.omp.json')"
 
 # Personal Functions
 
