@@ -86,7 +86,11 @@
           "foreground": "#81ff91",
           "style": "diamond",
           "template": "{{ .IP }}",
-          "type": "ipify"
+          "type": "ipify",
+          "properties": {
+            "cache_timeout": 10,
+            "http_timeout": 1000
+          }
         },
         {
           "foreground": "#81ff91",
