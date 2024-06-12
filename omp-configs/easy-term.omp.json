@@ -77,9 +77,12 @@
       "alignment": "right",
       "segments": [
         {
-          "foreground": "#81ff91",
+          "background": "#8a62da",
+          "foreground": "#000000",
+          "powerline_symbol": "\ue0b0",
+          "leading_diamond": "\ue0b2",
           "style": "diamond",
-          "template": "<#cc7eda>|</><#7eb8da>{{ .IP }}",
+          "template": "{{ .IP }} ",
           "type": "ipify",
           "properties": {
             "cache_timeout": 10,
@@ -87,43 +90,37 @@
           }
         },
         {
-          "foreground": "#81ff91",
+          "type": "battery",
+          "foreground": "#191f48",
+          "background": "#DA627D",
+          "powerline_symbol": "\ue0b0",
+          "leading_diamond": "\ue0b2",
           "style": "diamond",
-          "template": "<#cc7eda> \u007C </><#7eb8da>RAM:</> {{ (div ((sub .PhysicalTotalMemory .PhysicalFreeMemory)|float64) 1073741824.0) }}/{{ (div .PhysicalTotalMemory 1073741824.0) }}GB",
-          "type": "sysinfo"
+          "background_templates": [
+            "{{if eq \"Charging\" .State.String}}{{end}}",
+            "{{if eq \"Discharging\" .State.String}}{{end}}",
+            "{{if eq \"Full\" .State.String}}{{end}}"
+          ],
+          "template": " {{ if not .Error }}{{ .Icon }}{{ .Percentage }}{{ end }} ",
+          "properties": {
+            "discharging_icon": " ",
+            "charging_icon": " ",
+            "charged_icon": " "
+          }
         },
         {
-          "foreground": "#81ff91",
+          "foreground": "#FFFFFF",
           "properties": {
             "fetch_version": true
           },
           "style": "powerline",
-          "template": "<#cc7eda> \u007C </><#7eb8da>\ue718</> {{ if .PackageManagerIcon }}{{ .PackageManagerIcon }} {{ end }}{{ .Full }}",
+          "template": "{{ if .PackageManagerIcon }}{{ .PackageManagerIcon }} {{ end }}{{ .Full }}",
           "type": "node"
-        },
-        {
-          "type": "php",
-          "style": "powerline",
-          "foreground": "#81ff91",
-          "template": "<#cc7eda> \u007C </><#7eb8da>\ue73d</> {{ .Full }}"
-        },
-        {
-          "type": "npm",
-          "style": "powerline",
-          "foreground": "#81ff91",
-          "template": "<#cc7eda> \u007C </><#7eb8da>\ue71e </> {{ .Full }}"
-        },
-        {
-          "type": "sysinfo",
-          "style": "powerline",
-          "foreground": "#81ff91",
-          "template": "<> </>"
         },
         {
           "background": "#cecece",
           "foreground": "#4b4b4b",
           "leading_diamond": "\ue0b2",
-          "trailing_diamond": "\ue0b0",
           "properties": {
             "style": "austin",
             "threshold": 150
