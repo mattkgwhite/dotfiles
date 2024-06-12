@@ -92,9 +92,11 @@ source $ZSH/oh-my-zsh.sh
 #export VAULT_ADDR=https://vault.*
 export VAULT_ADDR=localhost:8200
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+
 #oh-my-posh
 eval "$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/mattkgwhite/dotfiles/main/omp-configs/easy-term.omp.json')"
+# to test configuration enable this and copy config locally and reference location. 
+# eval "$(oh-my-posh init zsh --config '')"
 
 # Personal Functions
 
