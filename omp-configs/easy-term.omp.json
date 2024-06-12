@@ -79,18 +79,18 @@
         {
           "foreground": "#81ff91",
           "style": "diamond",
-          "template": "<#cc7eda> \u007C </><#7eb8da>RAM:</> {{ (div ((sub .PhysicalTotalMemory .PhysicalFreeMemory)|float64) 1073741824.0) }}/{{ (div .PhysicalTotalMemory 1073741824.0) }}GB",
-          "type": "sysinfo"
-        },
-        {
-          "foreground": "#81ff91",
-          "style": "diamond",
-          "template": "<#cc7eda>|</><#7eb8da> {{ .IP }}",
+          "template": "<#cc7eda>|</><#7eb8da>{{ .IP }}",
           "type": "ipify",
           "properties": {
             "cache_timeout": 10,
             "http_timeout": 1000
           }
+        },
+        {
+          "foreground": "#81ff91",
+          "style": "diamond",
+          "template": "<#cc7eda> \u007C </><#7eb8da>RAM:</> {{ (div ((sub .PhysicalTotalMemory .PhysicalFreeMemory)|float64) 1073741824.0) }}/{{ (div .PhysicalTotalMemory 1073741824.0) }}GB",
+          "type": "sysinfo"
         },
         {
           "foreground": "#81ff91",
