@@ -125,3 +125,114 @@ function getCert() {
     PORT="${2:=443}"
     echo | openssl s_client -connect ${URL}:${PORT} | openssl x509 -noout -text
 }
+
+
+## Docker Container Management
+
+function dockerallconstart() {
+  #!/bin/bash
+  # Start all stopped containers
+  docker start $(docker ps -aq)
+}
+
+function dockerallconstop() {
+  #!/bin/bash
+  # Stop all running containers
+  docker stop $(docker ps -q)
+}
+
+function dockerremoveconstop() {
+  #!/bin/bash
+  # Remove all stopped containers
+  docker rm $(docker ps -aq -f "status=exited")
+}
+
+function dockerrmdangimages() {
+  #!/bin/bash
+  # Remove dangling images
+  docker rmi $(docker images -q -f "dangling=true")
+}
+
+function dockerbackupcontainerdata() {
+  #!/bin/bash
+  # Backup a containers data
+  CONTAINER_ID=$1
+  BACKUP_FILE="${CONTAINER_ID}_backup_$(date + %F).tar"
+  docker export $CONTAINER_ID > $BACKUP_FILE
+  echo "Backup saved to $BACKUP_FILE"
+}
+
+function dockerrestorecontainerdata() {
+  #!/bin/bash
+  # Restore a container from a tar backup
+  BACKUP_FILE=$1
+  docker import $BACKUP_FILE restored_container:latest
+  echo "Container restored as 'restored_container:latest'"
+}
+
+function dockercontainerusage() {
+  #!/bin/bash
+  # Monitor resource usage of all running containers
+  containers
+  docker stats --all
+}
+
+function dockerrestartcontainerauto() {
+  #!/bin/bash
+  # Restart a container with a restart policy
+  CONTAINER_NAME=$1
+  docker update --restart always $CONTAINER_NAME
+  echo "$CONTAINER_NAME will now restart automatically on failure."
+}
+
+function dockerrunandtidy() {
+  #!/bin/bash
+  # Run a container and clean up
+  IMAGE_NAME=$1
+  docker run --rm $IMAGE_NAME
+}
+
+function dockeralllogs() {
+  #!/bin/bash
+  # Display logs of all containers
+  docker ps -q | xargs -I {} docker logs {}
+}
+
+function dockerautoprune() {
+  #!/bin/bash
+  # Prune unused resources
+  docker system prune -f --volumes
+}
+
+function dockerupdatrunning() {
+  #!/bin/bash
+  # Update a running container
+  CONTAINER_NAME=$1
+  IMAGE_NAME=$(docker inspect --format='{{.Config.Image}}' $CONTAINER_NAME)
+  docker pull $IMAGE_NAME
+  docker stop $CONTAINER_NAME
+  docker rm $CONTAINER_NAME
+  docker run -d --name $CONTAINER_NAME $IMAGE_NAME
+}
+
+function dockercpfilesfromcontainer() {
+  #!/bin/bash
+  # Copy files from a container
+  CONTAINER_ID=$1
+  SOURCE_PATH=$2
+  DEST_PATH=$3
+  docker cp $CONTAINER_ID:$SOURCE_PATH $DEST_PATH
+  echo "Copied $SOURCE_PATH from $CONTAINER_PATH to $DEST_PATH"
+}
+
+function dockerrestartallcontainers() {
+  #!/bin/bash
+  # Restart all containers
+  docker restart $(docker ps -q)
+}
+
+function dockerlistallexposedports() {
+  #!/bin/bash
+  # List all exposed ports
+  docker ps --format '{{.ID}} {{.Name}}: {{.Ports}}'
+}
