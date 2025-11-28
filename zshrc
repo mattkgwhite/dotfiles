@@ -2,6 +2,9 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 export PATH=$HOME/bin:/usr/local/bin:/opt/homebrew/bin:$PATH
 
+# Rust configuration
+export PATH=/Users/kaygee/.local/bin:$PATH
+
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.zsh/oh-my-zsh"
 export ZSH_CUSTOM=$HOME/.zsh/custom
@@ -91,6 +94,11 @@ source $ZSH/oh-my-zsh.sh
 #export VAULT_ADDR=https://vault.*
 export VAULT_ADDR=localhost:8200
 
+# Force Neovim to use AstroNvim config
+alias avim='NVIM_APPNAME=astronvim nvim'
+
+# LunarVim already has its own command
+alias lvim='lvim'
 
 #oh-my-posh
 eval "$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/mattkgwhite/dotfiles/main/omp-configs/easy-term.omp.json')"
