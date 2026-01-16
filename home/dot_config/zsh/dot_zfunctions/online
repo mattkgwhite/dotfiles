@@ -1,0 +1,13 @@
+## Online?
+function online() {
+    host="${1}"
+    ports="${2:-22,80,443}"
+
+    if [[ "$host" == "" ]]; then
+        echo "Define a host in this function"
+        echo ""
+        return
+    fi
+
+    nmap -Pn $host -p $ports
+}

@@ -1,0 +1,14 @@
+[env]
+_.python.venv = { path = "{{config_root}}/.venv", create = true }
+
+[tools]
+python = "3.13"
+go = "latest"
+node = "latest"
+"npm:hrvst-cli" = "latest"
+ruby = "latest"
+uv = "latest"
+
+[settings]
+experimental = true
+python.uv_venv_auto = true
