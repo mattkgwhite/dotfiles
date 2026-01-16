@@ -25,7 +25,7 @@ ohmyzsh/ohmyzsh path:plugins/pipenv
 # ohmyzsh/ohmyzsh path:plugins/podman # docker alternative
 # ohmyzsh/ohmyzsh path:plugins/pulumi
 ohmyzsh/ohmyzsh path:plugins/python
-ohmyzsh/ohmyzsh path:plugins/pyenv
+# ohmyzsh/ohmyzsh path:plugins/pyenv
 ohmyzsh/ohmyzsh path:plugins/rclone
 ohmyzsh/ohmyzsh path:plugins/rsync
 ohmyzsh/ohmyzsh path:plugins/rust
@@ -42,17 +42,13 @@ ohmyzsh/ohmyzsh path:plugins/tmux
 ohmyzsh/ohmyzsh path:plugins/toolbox
 ohmyzsh/ohmyzsh path:plugins/vault
 ohmyzsh/ohmyzsh path:plugins/uv # uv package manager, replaces pip / pip-tools, poetry, pyenv, virtualenv
-ohmyzsh/ohmyzsh path:plugins/virtualenv
-ohmyzsh/ohmyzsh path:plugins/virtualenvwrapper
 ohmyzsh/ohmyzsh path:plugins/vault # hashicorp vault
 ohmyzsh/ohmyzsh path:plugins/vi-mode
 ohmyzsh/ohmyzsh path:plugins/vscode #  provides useful aliases to simply interaction between commandline and VS Code
 
-
 #configuration management
 ohmyzsh/ohmyzsh path:plugins/ansible
 ohmyzsh/ohmyzsh path:plugins/salt # saltstack
-
 
 # Add macOS specific plugins
 ohmyzsh/ohmyzsh path:plugins/brew conditional:is-macos
