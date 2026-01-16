@@ -77,14 +77,14 @@ zsh-completions
 
 ZSH_TMUX_AUTOSTART=true
 
-case $(uname -s) in
-  *Darwin*)
-    source $HOME/.zsh/zsh-os-conf/osx-pre-omz.zsh
-    ;;
-  *Linux*)
-    source $HOME/.zsh/zsh-os-conf/linux-pre-omz.zsh
-    ;;
-esac
+# case $(uname -s) in
+#   *Darwin*)
+#     source $HOME/.zsh/zsh-os-conf/osx-pre-omz.zsh
+#     ;;
+#   *Linux*)
+#     source $HOME/.zsh/zsh-os-conf/linux-pre-omz.zsh
+#     ;;
+# esac
 
 source $ZSH/oh-my-zsh.sh
 
