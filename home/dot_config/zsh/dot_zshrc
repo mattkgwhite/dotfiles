@@ -1,0 +1,81 @@
+#!/bin/zsh
+
+# Lazy-load (autoload) ZSH fucntions files from a directory
+ZFUNCDIR=${ZDOTDIR:-$HOME}/.zfunctions
+fpath=($ZFUNCDIR $fpath)
+autoload -Uz $ZFUNCDIR/*(.:t)
+
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
+export PATH=$HOME/bin:/usr/local/bin:/opt/homebrew/bin:$PATH
+
+# Rust configuration
+export PATH=/Users/kaygee/.local/bin:$PATH
+
+# Set any zstyles you might use for configuration.
+zstyle ':antidote:bundle' use-friendly-names 'yes'
+zstyle ':antidote:bundle' file ${ZDOTDIR:-$HOME}/.zplugins
+zstyle ':completion:*:commands' rehash yes
+zstyle ':bracketed-paste-magic' active-widgets '.self-*'.
+
+
+# Source and load Antidote
+source $(brew --prefix)/opt/antidote/share/antidote/antidote.zsh
+antidote load
+
+if [ ! -L $XDG_CONFIG_HOME/tmux/tmux.conf ]; then
+  ln -s $(antidote home)/gpakosz/.tmux/.tmux.conf $XDG_CONFIG_HOME/tmux/tmux.conf
+fi
+
+if [ ! -L $XDG_CONFIG_HOME/tmux/tmux.plugins ]; then
+  ln -s $(antidote home)/tmux-plugins $XDG_CONFIG_HOME/tmux/tmux.plugins
+fi
+
+TRAPUSR1() {
+  if [[ -o INTERACTIVE ]]; then
+    {echo; echo execute a new shell instance } 1>&2
+    exec "${SHELL}"
+  fi
+}
+
+zmodload zsh/complist
+
+
+setopt no_hist_verify # prevent substitution confirmation
+
+# Source anything in .zshrc.d.
+for _rc in ${ZDOTDIR:-$HOME}/.zshrc.d/*.zsh; do
+  # Ignore tilde files.
+  if [[ $_rc:t != '~'* ]]; then
+    source "$_rc"
+  fi
+done
+unset _rc
+
+# case $(uname -s) in
+#   *Darwin*)
+#     source $HOME/.zsh/zsh-os-conf/osx-pre-omz.zsh
+#     ;;
+#   *Linux*)
+#     source $HOME/.zsh/zsh-os-conf/linux-pre-omz.zsh
+#     ;;
+# esac
+
+
+#oh-my-posh
+eval "$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/mattkgwhite/dotfiles/main/omp-configs/easy-term.omp.json')"
+# to test configuration enable this and copy config locally and reference location. 
+# eval "$(oh-my-posh init zsh --config '')"
+
+# Personal Functions
+
+## pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+
+
+
+
+
+

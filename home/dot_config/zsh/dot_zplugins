@@ -1,0 +1,65 @@
+# Plugin manager for ZSH - https://github.com/getantidote/use-omz
+getantidote/use-omz
+
+ohmyzsh/ohmyzsh path:lib 
+ohmyzsh/ohmyzsh path:plugins/1password
+ohmyzsh/ohmyzsh path:plugins/argocd
+ohmyzsh/ohmyzsh path:plugins/aws
+ohmyzsh/ohmyzsh path:plugins/docker
+ohmyzsh/ohmyzsh path:plugins/docker-compose
+ohmyzsh/ohmyzsh path:plugins/dotenv
+ohmyzsh/ohmyzsh path:plugins/fzf
+ohmyzsh/ohmyzsh path:plugins/history-substring-search
+ohmyzsh/ohmyzsh path:plugins/helm
+ohmyzsh/ohmyzsh path:plugins/golang
+# ohmyzsh/ohmyzsh path:plugins/fluxcd # manually enable when required
+ohmyzsh/ohmyzsh path:plugins/k9s
+ohmyzsh/ohmyzsh path:plugins/kubectl
+# ohmyzsh/ohmyzsh path:plugins/minikube
+ohmyzsh/ohmyzsh path:plugins/mise
+ohmyzsh/ohmyzsh path:plugins/npm
+ohmyzsh/ohmyzsh path:plugins/nvm
+# ohmyzsh/ohmyzsh path:plugins/pass # pass password manager
+ohmyzsh/ohmyzsh path:plugins/pip
+ohmyzsh/ohmyzsh path:plugins/pipenv
+# ohmyzsh/ohmyzsh path:plugins/podman # docker alternative
+# ohmyzsh/ohmyzsh path:plugins/pulumi
+ohmyzsh/ohmyzsh path:plugins/python
+ohmyzsh/ohmyzsh path:plugins/pyenv
+ohmyzsh/ohmyzsh path:plugins/rclone
+ohmyzsh/ohmyzsh path:plugins/rsync
+ohmyzsh/ohmyzsh path:plugins/rust
+ohmyzsh/ohmyzsh path:plugins/rvm # ruby version manager
+ohmyzsh/ohmyzsh path:plugins/screen
+ohmyzsh/ohmyzsh path:plugins/ssh
+ohmyzsh/ohmyzsh path:plugins/starship
+ohmyzsh/ohmyzsh path:plugins/sudo
+ohmyzsh/ohmyzsh path:plugins/task # task cli
+ohmyzsh/ohmyzsh path:plugins/tailscale
+ohmyzsh/ohmyzsh path:plugins/terraform
+ohmyzsh/ohmyzsh path:plugins/thefuck
+ohmyzsh/ohmyzsh path:plugins/tmux
+ohmyzsh/ohmyzsh path:plugins/toolbox
+ohmyzsh/ohmyzsh path:plugins/vault
+ohmyzsh/ohmyzsh path:plugins/uv # uv package manager, replaces pip / pip-tools, poetry, pyenv, virtualenv
+ohmyzsh/ohmyzsh path:plugins/virtualenv
+ohmyzsh/ohmyzsh path:plugins/virtualenvwrapper
+ohmyzsh/ohmyzsh path:plugins/vault # hashicorp vault
+ohmyzsh/ohmyzsh path:plugins/vi-mode
+ohmyzsh/ohmyzsh path:plugins/vscode #  provides useful aliases to simply interaction between commandline and VS Code
+
+
+#configuration management
+ohmyzsh/ohmyzsh path:plugins/ansible
+ohmyzsh/ohmyzsh path:plugins/salt # saltstack
+
+
+# Add macOS specific plugins
+ohmyzsh/ohmyzsh path:plugins/brew conditional:is-macos
+ohmyzsh/ohmyzsh path:plugins/iterm2 conditional:is-macos
+ohmyzsh/ohmyzsh path:plugins/macos conditional:is-macos
+
+# Clone tmux dotfiles and plugins
+tmux-plugins/tmux-resurrect kind:clone
+gpakosz/.tmux kind:clone
+

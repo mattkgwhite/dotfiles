@@ -1,1 +1,0 @@
-../../catppuccin.zsh/themes/catppuccin_macchiato-zsh-syntax-highlighting.zsh

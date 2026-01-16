@@ -1,0 +1,6 @@
+## getCert
+function getCert() {
+    URL="$1"
+    PORT="${2:=443}"
+    echo | openssl s_client -connect ${URL}:${PORT} | openssl x509 -noout -text
+}
