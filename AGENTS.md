@@ -162,6 +162,17 @@ Finicky's built-in auto-reload does NOT work when the config is managed by chezm
 
 ---
 
+## Brewfile env var convention
+
+Homebrew renames env vars set before `brew bundle` by adding the `HOMEBREW_` prefix in the Brewfile Ruby context. So:
+
+- In the bootstrap script, set the short name: `CODESPACES=1 brew bundle ...` or `PRIVATE=1 brew bundle ...`
+- In the Brewfile, access the prefixed name: `ENV["HOMEBREW_CODESPACES"]` or `ENV["HOMEBREW_PRIVATE"]`
+
+Never set `HOMEBREW_FOO=1` before `brew bundle` — that would result in `ENV["HOMEBREW_HOMEBREW_FOO"]` in the Brewfile.
+
+---
+
 ## Continuous maintenance (meta-rule)
 
 - After every substantive conversation, review whether this file needs updating.

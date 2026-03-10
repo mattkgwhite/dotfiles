@@ -53,6 +53,8 @@ brew doctor || true
 
 {{- if .codespaces }}
 CODESPACES=1 brew bundle -q --file="$CHEZMOI_SOURCE_DIR/Brewfile" || true
+{{- else if .private }}
+PRIVATE=1 brew bundle -q --file="$CHEZMOI_SOURCE_DIR/Brewfile"
 {{- else }}
 brew bundle -q --file="$CHEZMOI_SOURCE_DIR/Brewfile"
 {{- end }}

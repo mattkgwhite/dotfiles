@@ -14,7 +14,7 @@ brew "bash" unless ENV["HOMEBREW_CODESPACES"]
 brew "bat" # better cat
 brew "blueutil" if OS.mac?
 brew "btop" unless ENV["HOMEBREW_CODESPACES"]
-brew "cbonsai" unless ENV["HOMEBREW_CODESPACES"]
+brew "cbonsai" unless ENV["HOMEBREW_CODESPACES"] if ENV["HOMEBREW_PRIVATE"]
 brew "chezmoi"
 brew "colima" unless ENV["HOMEBREW_CODESPACES"]
 brew "colordiff" unless ENV["HOMEBREW_CODESPACES"]
@@ -53,7 +53,7 @@ cask "1password" if OS.mac? # work
 cask "1password-cli" if OS.mac? # work
 cask "alfred" if OS.mac? # better spotlight
 cask "amethyst" if OS.mac? # tiling wm
-cask "cursor" if OS.mac?
+cask "cursor" if OS.mac? && ENV["HOMEBREW_PRIVATE"]
 # cask "element" if OS.mac? # matrix chat
 cask "eqmac" if OS.mac?
 cask "finicky" if OS.mac?
@@ -68,11 +68,11 @@ cask "jordanbaird-ice" if OS.mac? # menu bar
 cask "kitty" if OS.mac?
 # cask "lm-studio" if OS.mac?
 cask "lookaway" if OS.mac? # screen breaks
-cask "lulu" if OS.mac? # firewall
+cask "lulu" if OS.mac? && ENV["HOMEBREW_PRIVATE"] # firewall
 # cask "macwhisper" if OS.mac?
 cask "obsidian" if OS.mac?
 cask "openlens" if OS.mac?
-cask "shadow" if OS.mac?
+cask "shadow" if OS.mac? && ENV["HOMEBREW_PRIVATE"]
 # cask "slack" if OS.mac?
 cask "visual-studio-code" if OS.mac?
 cask "wakatime" if OS.mac?
