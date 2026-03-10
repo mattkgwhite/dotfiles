@@ -81,6 +81,36 @@ When writing content to Jira tickets via the Atlassian MCP (descriptions, commen
 
 ---
 
+## Browsing code in git repositories
+
+When you need to read source code from a public or private git repository, clone it locally with `git clone` first. Do not curl GitHub API endpoints, fetch raw file URLs, or use the GitHub web UI to browse code. Cloning is faster, more reliable, and gives full access to the entire codebase. This applies even for a single file lookup.
+
+---
+
+## Toolchain execution policy (mise required)
+
+When a runtime or CLI can be managed by `mise`, agents must run it through `mise`.
+
+- Prefer `mise x -- <command>` (or `mise exec ... -- <command>`) for ad hoc commands.
+- Use `mise run <task>` for project tasks when available.
+- Do not call managed toolchains directly when a `mise` invocation is possible.
+
+## Python package management (mise + uv required)
+
+Python workflows must use `mise` and `uv` together.
+
+- Never run `python`, `python3`, `pip`, `pip3`, or raw `uv` directly.
+- Run Python commands as `mise x -- uv ...` (or `mise exec ... -- uv ...`).
+- Install project dependencies with `mise x -- uv add <package>`.
+- Install global Python CLI tools with `mise x -- uv tool install <package>`.
+- Run scripts with dependencies using `mise x -- uv run --with <package> <script-or-command>`.
+- Before project-scoped uv commands, ensure the directory is bootstrapped by uv (`pyproject.toml` and `.python-version`). If missing, run `mise x -- uv init .` first.
+- Never use `--break-system-packages`.
+
+For uv projects, rely on global mise config to auto source or create the project `.venv` via `python.uv_venv_auto = "create|source"`.
+
+---
+
 ## Commit discipline
 
 Before committing, run `git diff --staged` and make an objective assessment of whether the change is both atomic and in-scope based on the context of the request. Do not commit unrelated changes that happened to be modified in the working tree.
