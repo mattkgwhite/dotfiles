@@ -112,6 +112,16 @@ For uv projects, rely on global mise config to auto source or create the project
 
 ---
 
+## wolf command
+
+`wolf` is a thin wrapper at `~/.local/bin/wolf` that prepends `~/.local/share/opencode-shims` to PATH before exec-ing its arguments. It is used by the `python-guard` OpenCode plugin, which automatically rewrites every bash tool command to `wolf <original-command>`.
+
+- Do not manually add `wolf` to commands you write. The plugin inserts it automatically.
+- Do not run `wolf wolf <cmd>` — `wolf` detects this and exits with an error.
+- Do not remove or shadow `wolf` from `~/.local/bin`.
+
+---
+
 ## Commit discipline
 
 Before committing, run `git diff --staged` and make an objective assessment of whether the change is both atomic and in-scope based on the context of the request. Do not commit unrelated changes that happened to be modified in the working tree.
