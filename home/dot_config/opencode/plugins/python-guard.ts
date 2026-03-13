@@ -46,12 +46,8 @@ export const PythonGuard: Plugin = async () => {
         throw new Error(`python-guard integrity failure: ${integrity}`)
       }
 
-      // Guard against double-wrapping
-      if (/^wolf\s/.test(cmd) || cmd === "wolf") {
-        throw new Error(
-          "Do not add `wolf` to commands manually. The python-guard plugin wraps every bash command with wolf automatically."
-        )
-      }
+      // Skip wrapping if already wrapped (idempotent)
+      if (/^wolf\s/.test(cmd) || cmd === "wolf") return
 
       // Run via `wolf` which prepends the opencode-shims dir to PATH,
       // ensuring shims shadow any system python/pip/uv/uvx binaries
