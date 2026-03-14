@@ -44,12 +44,14 @@ export HOMEBREW_CASK_OPTS="--require-sha"
 
 
 export MISE_PYTHON_UV_VENV_AUTO=true
+export OPENCODE_ENABLE_EXA=1
 
 # Ensure path arrays do not contain duplicates.
 typeset -gU path fpath
 
 # Set the list of directories that zsh searches for commands.
 path=(
+  ${OPENCODE:+$XDG_DATA_HOME/opencode-shims}
   $HOME/{,s}bin(N)
   $HOME/.local/{,s}bin(N)
   $HOME/.scripts(N)

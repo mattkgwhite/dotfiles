@@ -112,13 +112,12 @@ For uv projects, rely on global mise config to auto source or create the project
 
 ---
 
-## wolf command
+## Python guard (shell.env shims)
 
-`wolf` is a thin wrapper at `~/.local/bin/wolf` that prepends `~/.local/share/opencode-shims` to PATH before exec-ing its arguments. It is used by the `python-guard` OpenCode plugin, which automatically rewrites every bash tool command to `wolf <original-command>`.
+When OpenCode spawns a shell, it sets `OPENCODE=1` natively. The `.zshenv` PATH array detects this and conditionally prepends `~/.local/share/opencode-shims`, which contains shims for `python`, `python3`, `pip`, `pip3`, `uv`, and `uvx`. Each shim checks `$_` to see if it was invoked via `mise`; if not, it blocks with an error.
 
-- Do not manually add `wolf` to commands you write. The plugin inserts it automatically.
-- Do not run `wolf wolf <cmd>` — `wolf` detects this and exits with an error.
-- Do not remove or shadow `wolf` from `~/.local/bin`.
+- Do not prefix commands with `wolf` or any other wrapper. Shims are injected via PATH automatically.
+- Do not modify files in `~/.local/share/opencode-shims/`.
 
 ---
 

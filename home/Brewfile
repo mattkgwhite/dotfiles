@@ -80,5 +80,5 @@ cask "xscreensaver" if OS.mac?
 # cask "yubico-authenticator" if OS.mac?
 cask "zed" if OS.mac?
 # cask "zoom" if OS.mac?
-mas "Fantastical", id: 975937182 if OS.mac?
-mas "Irvue", id: 1039633667 if OS.mac?
+mas "Fantastical", id: 975937182 if OS.mac? && $stdin.tty?
+mas "Irvue", id: 1039633667 if OS.mac? && $stdin.tty?

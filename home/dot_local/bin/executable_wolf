@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-# wolf: run a command with the opencode-shims directory prepended to PATH.
-# Used by the OpenCode python-guard plugin to enforce mise+uv policy.
-# Do not call wolf directly in commands — the plugin inserts it automatically.
-SHIM_DIR="${HOME}/.local/share/opencode-shims"
-exec env PATH="${SHIM_DIR}:${PATH}" "$@"

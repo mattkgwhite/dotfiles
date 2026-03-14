@@ -1,30 +1,18 @@
 #!/usr/bin/env bash
 # Shim: enforce mise wrapper for python/pip/uv toolchain binaries.
-# Walk the process tree upward; if mise appears before the shell session
-# boundary (bash/zsh/sh with pid=1 parent), allow through.
-# Otherwise block with a clear error.
+# When invoked via `mise x -- <cmd>`, the $_ env var points to the mise
+# binary. Use that as a lightweight signal to allow through; otherwise block.
+
+# Capture $_ immediately; subsequent commands overwrite it.
+INVOKER="$_"
 
 BINARY="$(basename "$0")"
 REAL="$(PATH="${PATH#*opencode-shims:}" command -v "$BINARY" 2>/dev/null)"
 
-# Walk up the process tree looking for mise
-pid=$$
-while true; do
-  ppid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ')
-  [[ -z "$ppid" || "$ppid" == "0" || "$ppid" == "$pid" ]] && break
-  comm=$(ps -o comm= -p "$ppid" 2>/dev/null)
-  case "$comm" in
-    mise)
-      # Invoked under mise — allow through
-      exec "$REAL" "$@"
-      ;;
-    bash|zsh|sh|fish|opencode|node)
-      # Hit the shell/session boundary without finding mise — block
-      break
-      ;;
-  esac
-  pid="$ppid"
-done
+# Under `mise x --`, $_ points to the mise binary
+case "$INVOKER" in
+  */mise) exec "$REAL" "$@" ;;
+esac
 
 cat >&2 <<EOF
 Do not use $BINARY directly.
