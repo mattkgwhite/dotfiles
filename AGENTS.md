@@ -103,10 +103,11 @@ Deleting a file from the chezmoi source does **not** remove it from the target (
 
 - Verify the removal mechanism against the official chezmoi docs before changing the source state.
 - Prefer declaring removals in `.chezmoiremove` when retiring a previously managed target.
+- When a deployed file is stale because its source entry was removed or renamed, default to `.chezmoiremove` or another documented chezmoi removal mechanism before touching the target path directly.
 - Use other documented chezmoi removal semantics only when they are a better fit for the target type.
 - Delete the source file from `home/` only after the removal is represented in chezmoi.
 - Run `chezmoi apply` so chezmoi removes the deployed target.
-- Do not delete the deployed file directly from `~/`, `~/.config`, or similar target paths as the primary removal workflow.
+- Do not delete the deployed file directly from `~/`, `~/.config`, or similar target paths unless the documented chezmoi removal has already been recorded and applied.
 
 ---
 
