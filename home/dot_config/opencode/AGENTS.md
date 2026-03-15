@@ -19,9 +19,17 @@ Use a project-level `AGENTS.md` for rules specific to that codebase: language co
 
 ---
 
-## Prefer docs over guessing
+## Never guess schemas or APIs
 
-When uncertain about how a tool, API, framework, or CLI behaves — fetch the official documentation rather than inferring or guessing. Incorrect assumptions cause harder-to-debug problems than a short lookup. This applies even when you have partial knowledge: verify edge cases from the source.
+When working with any configuration schema (Kubernetes, Talos, Helm values, etc.), always read the authoritative source before writing config. Acceptable sources, in order of preference:
+
+1. The actual Go struct definitions or JSON schema from the project source (clone the repo if needed)
+2. The official rendered documentation
+3. The project's own example files in the same repo
+
+Never trust: blog posts, AI-generated examples, or partial memory of a schema. A wrong key name wastes more time than the lookup takes. This applies even when you are fairly confident -- verify before writing.
+
+If a documentation site does not render usefully via WebFetch, clone the source repo and read the struct tags directly.
 
 ---
 
@@ -61,6 +69,20 @@ For rules specific to the chezmoi dotfiles repo itself, edit `~/.local/share/che
 ## Daily note logging
 
 When something is achieved during a session (a task completed, a ticket updated, a document published, etc.), check whether today's daily note exists in Obsidian before asking. Only ask if the note already exists. Use the `question` tool to ask — not plain text. Only add it if they confirm. Use the Obsidian Tasks format for action items and plain bullets for logged achievements, following vault conventions.
+
+---
+
+## Post-task retrospective and self-improvement
+
+After completing any non-trivial task, perform a brief critical retrospective before closing out:
+
+1. **What went right:** note any approaches or tools that worked well.
+2. **What went wrong:** identify mistakes, incorrect assumptions, wasted steps, or anything that required correction.
+3. **Actionable lessons:** for each thing that went wrong, determine whether a rule change would prevent it recurring. If yes, update global memory immediately (edit the chezmoi source and apply). Do not defer this.
+
+The retrospective does not need to be verbose. A single sentence per point is enough. The goal is that each session leaves global memory slightly better than it found it. Silent self-improvement is acceptable; only surface the retrospective to the user if a rule was added or if the user would benefit from knowing.
+
+This rule applies retroactively: if a session ends without a retrospective, perform one before the final response.
 
 ---
 
