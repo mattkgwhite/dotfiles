@@ -3,7 +3,11 @@ description: Run post-task retrospective and update memory with lessons learned
 subtask: true
 ---
 
-Perform a structured post-task retrospective covering the work just completed. Follow these steps in order:
+Perform a structured post-task retrospective covering the work just completed.
+
+If additional context was provided via arguments: $ARGUMENTS, factor this in when identifying what went wrong and deciding which areas to scrutinise most closely. If no arguments were provided, base the retrospective on the full session.
+
+Follow these steps in order:
 
 ## 1. What went right
 
