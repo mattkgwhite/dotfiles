@@ -92,6 +92,8 @@ After completing any non-trivial task, perform a brief critical retrospective be
 
 The retrospective does not need to be verbose. A single sentence per point is enough. The goal is that each session leaves global memory slightly better than it found it. Silent self-improvement is acceptable; only surface the retrospective to the user if a rule was added or if the user would benefit from knowing.
 
+If a retrospective, subtask, or delegated review identifies a lesson that should be persisted, the primary agent remains responsible for ensuring the `@memory` delegation actually happens before the loop is considered complete. Reporting that memory still needs updating does not satisfy the requirement. If a subtask cannot perform the update itself, resume control and perform the delegation explicitly.
+
 This rule applies retroactively: if a session ends without a retrospective, perform one before the final response.
 
 When `chezmoi apply` triggers a brew bundle run (via an onchange script), treat it as fire-and-forget. Once the apply itself succeeds (config files deployed), do not wait on the brew bundle background process or treat a bash timeout as an error.
