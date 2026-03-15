@@ -72,10 +72,6 @@ The user refers to `~/.config/opencode/AGENTS.md` as **global memory**. When ask
 
 The user refers to the `AGENTS.md` in the current project root (or nearest ancestor) as **local memory**. When asked to "commit something to local memory", delegate to the `@memory` subagent.
 
-- If a request is about editing, correcting, reviewing, strengthening, or recording lessons in any `AGENTS.md`, delegate to `@memory` immediately.
-- Treat mentions of `AGENTS.md`, "global memory", "local memory", or retrospective memory updates as `@memory` work by default.
-- Do not start an inline `AGENTS.md` review or draft and plan to delegate later, delegate first.
-
 Never edit `~/.config/opencode/AGENTS.md` directly — it is managed by chezmoi and will be overwritten. The `@memory` subagent knows this and handles it correctly.
 
 The same chezmoi rule applies to all dotfiles under `~/.config/` — always edit the source in `~/.local/share/chezmoi/` and apply from there. Use the `@dotfiles` subagent for this.
