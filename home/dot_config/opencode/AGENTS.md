@@ -88,7 +88,7 @@ After completing any non-trivial task, perform a brief critical retrospective be
 
 1. **What went right:** note any approaches or tools that worked well.
 2. **What went wrong:** identify mistakes, incorrect assumptions, wasted steps, or anything that required correction.
-3. **Actionable lessons:** for each thing that went wrong, determine whether a rule change would prevent it recurring. If yes, update global memory immediately (edit the chezmoi source and apply). Do not defer this.
+3. **Actionable lessons:** for each thing that went wrong, delegate to `@memory` to review global memory. The acceptable outcomes are: add a new rule, strengthen or clarify the wording of an existing rule, or add a brief note confirming an existing rule already covers the lesson. "No new rule needed" is NOT an acceptable reason to skip delegating. The delegation must happen; the outcome of that delegation may be a no-op, but the review itself is mandatory.
 
 The retrospective does not need to be verbose. A single sentence per point is enough. The goal is that each session leaves global memory slightly better than it found it. Silent self-improvement is acceptable; only surface the retrospective to the user if a rule was added or if the user would benefit from knowing.
 
