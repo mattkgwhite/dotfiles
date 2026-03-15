@@ -84,6 +84,8 @@ The retrospective does not need to be verbose. A single sentence per point is en
 
 This rule applies retroactively: if a session ends without a retrospective, perform one before the final response.
 
+When `chezmoi apply` triggers a brew bundle run (via an onchange script), treat it as fire-and-forget. Once the apply itself succeeds (config files deployed), do not wait on the brew bundle background process or treat a bash timeout as an error. Beads or other formulae being pre-installed is sufficient confirmation.
+
 ---
 
 ## Problem-solving attitude
