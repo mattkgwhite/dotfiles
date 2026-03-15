@@ -86,7 +86,7 @@ When contradictions, duplication, or scope conflicts are found, reconcile them i
 
 Choose the narrowest correct scope for each rule: keep cross-cutting behavior in global memory, and keep project-specific conventions in local memory.
 
-If a rule in global memory is actually project-specific, move it to the relevant local memory file, or narrow it, as part of the same change.
+If a rule in global memory is actually project-specific, move it to the relevant local memory file and remove or narrow the global version in the same change. Do not leave the project-specific rule behind in global memory.
 
 ---
 
