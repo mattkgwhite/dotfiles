@@ -56,6 +56,14 @@ Four specialised subagents handle common delegated tasks. Use them instead of do
 
 ---
 
+## Custom commands and subtask isolation
+
+- Treat custom commands with `subtask: true` as isolated subagent executions, not as continuations of the current session.
+- If a command depends on the current session context, conversation state, or an in-progress retrospective, do not configure it with `subtask: true`.
+- Prefer running retrospectives, reviews, and other session-aware commands in the current session. Use `subtask: true` only when isolation matters more than shared context.
+
+---
+
 ## Global memory and local memory
 
 The user refers to `~/.config/opencode/AGENTS.md` as **global memory**. When asked to "commit something to global memory", delegate to the `@memory` subagent.
