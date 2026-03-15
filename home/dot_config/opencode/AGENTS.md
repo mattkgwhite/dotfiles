@@ -189,6 +189,7 @@ Commit messages use semantic commit format: `type(scope): description`. Types: `
 - When a task crosses a policy boundary or mixes concerns, prefer the smallest atomic command that completes the immediate next step.
 - Do not chain filesystem cleanup, chezmoi source edits, and git operations into one shell command.
 - If cleanup is needed outside the source tree, perform that cleanup as a separate step, then run repo or git commands separately.
+- Keep source edits, deployed-target cleanup, `chezmoi apply`, and git commit or push as separate commands unless a later step strictly depends on the previous one and stays within the same concern.
 - Keep destructive or policy-sensitive shell actions isolated so the intent is easy to inspect before execution.
 
 ---
