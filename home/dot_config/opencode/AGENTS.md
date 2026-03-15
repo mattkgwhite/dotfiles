@@ -159,3 +159,18 @@ Commit messages use semantic commit format: `type(scope): description`. Types: `
 - Attempt the intended operation first.
 - If it fails because a directory is missing, create the directory and retry.
 - Only do a pre-check when a tool explicitly requires it.
+
+---
+
+## Issue Tracking
+
+This project uses **bd (beads)** for issue tracking.
+Run `bd prime` for workflow context, or install hooks (`bd hooks install`) for auto-injection.
+
+**Quick reference:**
+- `bd ready` - Find unblocked work
+- `bd create "Title" --type task --priority 2` - Create issue
+- `bd close <id>` - Complete work
+- `bd dolt push` - Push beads to remote
+
+For full workflow details: `bd prime`
