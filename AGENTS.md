@@ -264,6 +264,12 @@ bd automatically syncs via Dolt:
 - ❌ Do NOT use external issue trackers
 - ❌ Do NOT duplicate tracking systems
 
+### Delegating multi-step beads operations
+
+For any beads operation that requires 2 or more `bd` commands (status overviews, finding and completing ready work, exploring the issue graph, multi-issue sequences), delegate to the `beads-task-agent` subagent via the Task tool instead of running `bd` commands directly.
+
+Single atomic operations (creating one issue, closing one issue, updating one issue) can be run via the CLI directly.
+
 For more details, see README.md and docs/QUICKSTART.md.
 
 ## Landing the Plane (Session Completion)

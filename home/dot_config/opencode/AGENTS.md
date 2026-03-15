@@ -45,13 +45,14 @@ If a documentation site does not render usefully via WebFetch, clone the source 
 
 ## Subagents
 
-Three specialised subagents handle common delegated tasks. Use them instead of doing these tasks inline.
+Four specialised subagents handle common delegated tasks. Use them instead of doing these tasks inline.
 
 | Subagent | When to use |
 |----------|-------------|
 | `@memory` | Persisting rules, conventions, or lessons: updates to global memory (`AGENTS.md`) or local memory (project `AGENTS.md`) |
 | `@dotfiles` | Any change to chezmoi-managed files: adding, modifying, or removing config files, scripts, or templates |
 | `@daily-note` | Logging achievements or action items to today's Obsidian daily note |
+| `@beads-task-agent` | Any beads operation requiring 2+ `bd` commands: status overviews, finding and completing ready work, exploring the issue graph, multi-issue sequences |
 
 ---
 
