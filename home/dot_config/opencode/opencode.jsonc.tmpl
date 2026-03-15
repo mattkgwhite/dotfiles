@@ -12,7 +12,9 @@
       "*": "ask",
       // Allow chezmoi apply unsupervised (used when updating global memory / AGENTS.md)
       "chezmoi apply": "allow",
-      "chezmoi apply *": "allow"
+      "chezmoi apply *": "allow",
+      // Allow echo commands
+      "echo *": "allow"
     },
 
     // Allow reads and edits to the chezmoi source tree (global memory lives there)
