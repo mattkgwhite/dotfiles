@@ -77,6 +77,23 @@
       "type": "local",
       "command": ["npx", "-y", "chrome-devtools-mcp@latest"],
       "enabled": true
+    },
+
+    // Context7 MCP — up-to-date library docs injected into prompts
+    // https://context7.com | package: @upstash/context7-mcp
+    // Optional: set CONTEXT7_API_KEY for higher rate limits
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    },
+
+    // grep.app MCP (Vercel) — search a million public GitHub repos
+    // https://vercel.com/blog/grep-a-million-github-repositories-via-mcp
+    "grep": {
+      "type": "remote",
+      "url": "https://mcp.grep.app",
+      "enabled": true
     }
   }
 }
