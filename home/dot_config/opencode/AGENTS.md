@@ -13,9 +13,9 @@ OpenCode loads rules from two locations:
 | **Global** | `~/.config/opencode/AGENTS.md` | Every session, every project |
 | **Project** | `AGENTS.md` in the project root (or nearest ancestor) | That project only |
 
-Use `~/.config/opencode/AGENTS.md` for rules that should apply universally — personal preferences, workflow conventions, and cross-cutting principles.
+Use `~/.config/opencode/AGENTS.md` for rules that should apply universally, personal preferences, workflow conventions, and cross-cutting principles.
 
-Use a project-level `AGENTS.md` for rules specific to that codebase: language conventions, repo layout, build commands, etc.
+Use a project-level `AGENTS.md` for rules specific to that codebase, language conventions, repo layout, build commands, and other project-only conventions.
 
 ---
 
@@ -56,6 +56,8 @@ Four specialised subagents handle common delegated tasks. Use them instead of do
 | `@daily-note` | Logging achievements or action items to today's Obsidian daily note |
 | `@beads-task-agent` | Any beads operation requiring 2+ `bd` commands: status overviews, finding and completing ready work, exploring the issue graph, multi-issue sequences |
 
+When subagent delegations are needed at session close (config changes, memory updates, daily note logging), run them in sequence rather than inline: delegate each concern to its subagent one at a time, wait for each to complete, then proceed to the next. This keeps the primary agent's context clean and each concern isolated.
+
 ---
 
 ## Custom commands and subtask isolation
@@ -70,13 +72,21 @@ Four specialised subagents handle common delegated tasks. Use them instead of do
 
 The user refers to `~/.config/opencode/AGENTS.md` as **global memory**. When asked to "commit something to global memory", delegate to the `@memory` subagent.
 
-The user refers to the `AGENTS.md` in the current project root (or nearest ancestor) as **local memory**. When asked to "commit something to local memory", delegate to the `@memory` subagent.
+The user refers to the `AGENTS.md` in the current project root, or nearest ancestor, as **local memory**. When asked to "commit something to local memory", delegate to the `@memory` subagent.
 
-Never edit `~/.config/opencode/AGENTS.md` directly — it is managed by chezmoi and will be overwritten. The `@memory` subagent knows this and handles it correctly.
+Never edit `~/.config/opencode/AGENTS.md` directly, it is managed by chezmoi and will be overwritten. The `@memory` subagent knows this and handles it correctly.
 
-The same chezmoi rule applies to all dotfiles under `~/.config/` — always edit the source in `~/.local/share/chezmoi/` and apply from there. Use the `@dotfiles` subagent for this.
+The same chezmoi rule applies to all dotfiles under `~/.config/`, always edit the source in `~/.local/share/chezmoi/` and apply from there. Use the `@dotfiles` subagent for this.
 
 For rules specific to the chezmoi dotfiles repo itself, the target file is `~/.local/share/chezmoi/AGENTS.md`; tell the `@memory` subagent this explicitly.
+
+When `@memory` updates any memory file, it must review nearby rules in that file for contradictions, duplication, and scope conflicts.
+
+When contradictions, duplication, or scope conflicts are found, reconcile them in the same edit instead of appending another overlapping rule.
+
+Choose the narrowest correct scope for each rule: keep cross-cutting behavior in global memory, and keep project-specific conventions in local memory.
+
+If a rule in global memory is actually project-specific, move it to the relevant local memory file, or narrow it, as part of the same change.
 
 ---
 
@@ -88,7 +98,7 @@ For rules specific to the chezmoi dotfiles repo itself, the target file is `~/.l
 
 ## Daily note logging
 
-When something is achieved during a session (a task completed, a ticket updated, a document published, etc.), delegate to the `@daily-note` subagent. It knows the vault conventions and will check whether today's note exists before asking the user.
+When something is achieved during a session (a task completed, a ticket updated, a document published, etc.), ask the user first whether they want it logged to their daily note. Only delegate to the `@daily-note` subagent after the user confirms. Never log proactively or assume the user wants a log entry, even at session end.
 
 ---
 
@@ -119,17 +129,6 @@ When `chezmoi apply` triggers a brew bundle run (via an onchange script), treat 
 ## Problem-solving attitude
 
 Never suggest the user accept a limitation, take a shortcut, or move on when a proper solution may exist. Keep investigating until the problem is actually solved. Suggesting workarounds as a final answer is not acceptable.
-
----
-
-## Atlassian Jira — writing ticket content
-
-When writing content to Jira tickets via the Atlassian MCP (descriptions, comments, etc.):
-
-- Reference other Jira tickets using the plain key format: `KEY-123` (e.g. `SEC-105`, `ONW-476`). Jira auto-resolves bare keys to smart links in the rendered UI.
-- Do **not** use the `JIRA:KEY-123` prefix — that is an Obsidian-specific convention for the Jira plugin and will appear as literal text in Jira.
-- Jira Cloud uses Atlassian Document Format (ADF) for rich text. When passing content via MCP tools, prefer plain text or ADF-structured input as required by the tool — do not use Confluence/Jira wiki markup (e.g. `h2.`, `||`, `{code}`) unless the tool explicitly expects it.
-- In Obsidian notes, continue to use `JIRA:KEY-123` as per vault conventions.
 
 ---
 
