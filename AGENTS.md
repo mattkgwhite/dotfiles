@@ -99,11 +99,14 @@ See [Templating](https://www.chezmoi.io/user-guide/templating/) and [Templates](
 
 ### Removing a managed file
 
-Deleting a file from the chezmoi source does **not** remove it from the target (`~/`). Chezmoi only removes targets when explicitly told to via `.chezmoiremove` or the `remove_` prefix. If you delete a source file and run `chezmoi apply`, the deployed target is left behind as an unmanaged file. To fully remove a managed file:
+Deleting a file from the chezmoi source does **not** remove it from the target (`~/`). Chezmoi only removes targets when explicitly told to via documented removal mechanisms, for example `.chezmoiremove`. If you delete a source file and run `chezmoi apply`, the deployed target is left behind as an unmanaged file.
 
-- Delete the source file from `home/`.
-- Run `chezmoi apply` (this will not touch the target).
-- Manually delete the deployed file from `~/` (e.g. `rm ~/.scripts/kitten`).
+- Verify the removal mechanism against the official chezmoi docs before changing the source state.
+- Prefer declaring removals in `.chezmoiremove` when retiring a previously managed target.
+- Use other documented chezmoi removal semantics only when they are a better fit for the target type.
+- Delete the source file from `home/` only after the removal is represented in chezmoi.
+- Run `chezmoi apply` so chezmoi removes the deployed target.
+- Do not delete the deployed file directly from `~/`, `~/.config`, or similar target paths as the primary removal workflow.
 
 ---
 
