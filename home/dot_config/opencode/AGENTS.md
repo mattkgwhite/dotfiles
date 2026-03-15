@@ -102,6 +102,12 @@ After completing any non-trivial task, perform a brief critical retrospective be
 
 The retrospective does not need to be verbose. A single sentence per point is enough. The goal is that each session leaves global memory slightly better than it found it. Silent self-improvement is acceptable; only surface the retrospective to the user if a rule was added or if the user would benefit from knowing.
 
+When turning a concrete incident into a persisted lesson:
+
+- Use the incident as evidence, but write the rule at the highest useful level of abstraction.
+- Avoid overfitting the rule to the exact incident if the same operational principle would prevent the same class of mistake elsewhere.
+- Do not generalise so far that the rule becomes vague or non-actionable.
+
 If a retrospective, subtask, or delegated review identifies a lesson that should be persisted, the primary agent remains responsible for ensuring the `@memory` delegation actually happens before the loop is considered complete. Reporting that memory still needs updating does not satisfy the requirement. If a subtask cannot perform the update itself, resume control and perform the delegation explicitly.
 
 This rule applies retroactively: if a session ends without a retrospective, perform one before the final response.
