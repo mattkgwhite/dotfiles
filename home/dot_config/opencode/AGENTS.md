@@ -172,6 +172,15 @@ Commit messages use semantic commit format: `type(scope): description`. Types: `
 
 ---
 
+## Shell command granularity
+
+- When a task crosses a policy boundary or mixes concerns, prefer the smallest atomic command that completes the immediate next step.
+- Do not chain filesystem cleanup, chezmoi source edits, and git operations into one shell command.
+- If cleanup is needed outside the source tree, perform that cleanup as a separate step, then run repo or git commands separately.
+- Keep destructive or policy-sensitive shell actions isolated so the intent is easy to inspect before execution.
+
+---
+
 ## Issue Tracking
 
 This project uses **bd (beads)** for issue tracking.
