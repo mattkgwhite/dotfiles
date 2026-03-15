@@ -98,14 +98,14 @@ After completing any non-trivial task, perform a brief critical retrospective be
 
 1. **What went right:** note any approaches or tools that worked well.
 2. **What went wrong:** identify mistakes, incorrect assumptions, wasted steps, or anything that required correction.
-3. **Actionable lessons:** for each thing that went wrong, delegate to `@memory` to review global memory. The acceptable outcomes are: add a new rule, strengthen or clarify the wording of an existing rule, or add a brief note confirming an existing rule already covers the lesson. "No new rule needed" is NOT an acceptable reason to skip delegating. The delegation must happen; the outcome of that delegation may be a no-op, but the review itself is mandatory.
+3. **Actionable lessons:** for each thing that went wrong, delegate to `@memory` to review global memory. Prefer strengthening or clarifying broadly applicable rules over adding incident-specific ones. The acceptable outcomes are: add a new rule, strengthen or clarify the wording of an existing rule, or add a brief note confirming an existing rule already covers the lesson. "No new rule needed" is NOT an acceptable reason to skip delegating. The delegation must happen; the outcome of that delegation may be a no-op, but the review itself is mandatory.
 
-The retrospective does not need to be verbose. A single sentence per point is enough. The goal is that each session leaves global memory slightly better than it found it. Silent self-improvement is acceptable; only surface the retrospective to the user if a rule was added or if the user would benefit from knowing.
+The retrospective does not need to be verbose. A single sentence per point is enough. The goal is that each session leaves global memory slightly better than it found it, by making it more accurate and reusable, not more tied to one incident. Silent self-improvement is acceptable; only surface the retrospective to the user if a rule was added or if the user would benefit from knowing.
 
 When turning a concrete incident into a persisted lesson:
 
-- Use the incident as evidence, but write the rule at the highest useful level of abstraction.
-- Avoid overfitting the rule to the exact incident if the same operational principle would prevent the same class of mistake elsewhere.
+- Use the incident as evidence, but do not make the incident itself the rule.
+- Write the rule at the highest useful level of abstraction that would prevent the same class of mistake elsewhere.
 - Do not generalise so far that the rule becomes vague or non-actionable.
 
 If a retrospective, subtask, or delegated review identifies a lesson that should be persisted, the primary agent remains responsible for ensuring the `@memory` delegation actually happens before the loop is considered complete. Reporting that memory still needs updating does not satisfy the requirement. If a subtask cannot perform the update itself, resume control and perform the delegation explicitly.
