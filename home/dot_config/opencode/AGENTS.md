@@ -43,20 +43,29 @@ If a documentation site does not render usefully via WebFetch, clone the source 
 
 ---
 
+## Subagents
+
+Three specialised subagents handle common delegated tasks. Use them instead of doing these tasks inline.
+
+| Subagent | When to use |
+|----------|-------------|
+| `@memory` | Persisting rules, conventions, or lessons: updates to global memory (`AGENTS.md`) or local memory (project `AGENTS.md`) |
+| `@dotfiles` | Any change to chezmoi-managed files: adding, modifying, or removing config files, scripts, or templates |
+| `@daily-note` | Logging achievements or action items to today's Obsidian daily note |
+
+---
+
 ## Global memory and local memory
 
-The user refers to `~/.config/opencode/AGENTS.md` as **global memory**. When asked to "commit something to global memory":
+The user refers to `~/.config/opencode/AGENTS.md` as **global memory**. When asked to "commit something to global memory", delegate to the `@memory` subagent.
 
-1. Edit the chezmoi source at `~/.local/share/chezmoi/home/dot_config/opencode/AGENTS.md`
-2. Run `chezmoi apply`
+The user refers to the `AGENTS.md` in the current project root (or nearest ancestor) as **local memory**. When asked to "commit something to local memory", delegate to the `@memory` subagent.
 
-Never edit `~/.config/opencode/AGENTS.md` directly — it is managed by chezmoi and will be overwritten.
+Never edit `~/.config/opencode/AGENTS.md` directly — it is managed by chezmoi and will be overwritten. The `@memory` subagent knows this and handles it correctly.
 
-The user refers to the `AGENTS.md` in the current project root (or nearest ancestor) as **local memory**. When asked to "commit something to local memory", edit that file directly.
+The same chezmoi rule applies to all dotfiles under `~/.config/` — always edit the source in `~/.local/share/chezmoi/` and apply from there. Use the `@dotfiles` subagent for this.
 
-The same chezmoi rule applies to all dotfiles under `~/.config/` — always edit the source in `~/.local/share/chezmoi/` and apply from there.
-
-For rules specific to the chezmoi dotfiles repo itself, edit `~/.local/share/chezmoi/AGENTS.md` instead.
+For rules specific to the chezmoi dotfiles repo itself, the target file is `~/.local/share/chezmoi/AGENTS.md`; tell the `@memory` subagent this explicitly.
 
 ---
 
@@ -68,7 +77,7 @@ For rules specific to the chezmoi dotfiles repo itself, edit `~/.local/share/che
 
 ## Daily note logging
 
-When something is achieved during a session (a task completed, a ticket updated, a document published, etc.), check whether today's daily note exists in Obsidian before asking. Only ask if the note already exists. Use the `question` tool to ask — not plain text. Only add it if they confirm. Use the Obsidian Tasks format for action items and plain bullets for logged achievements, following vault conventions.
+When something is achieved during a session (a task completed, a ticket updated, a document published, etc.), delegate to the `@daily-note` subagent. It knows the vault conventions and will check whether today's note exists before asking the user.
 
 ---
 
