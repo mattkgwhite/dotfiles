@@ -31,7 +31,7 @@ Never trust: blog posts, AI-generated examples, or partial memory of a schema. A
 
 If a documentation site does not render usefully via WebFetch, clone the source repo and read the struct tags directly.
 
-For SDK calling conventions (method signatures, argument shapes, etc.), prefer real call sites in existing plugins or examples over generated type declarations. Generated types may reflect an internal calling convention that differs from what external callers use. For OpenCode plugins, for example, read `packages/slack/src/index.ts` or other concrete plugin implementations in the source repo, not the generated SDK type files.
+For SDK calling conventions (method signatures, argument shapes, etc.), prefer real call sites in existing plugins or examples over generated type declarations. Generated types may reflect an internal calling convention that differs from what external callers use. For OpenCode plugins, read concrete plugin implementations in the source repo (e.g. `packages/slack/src/index.ts`, `packages/github/src/index.ts`) rather than generated SDK type files. When the docs or types are ambiguous, a working plugin in the same repo is the ground truth.
 
 ---
 
