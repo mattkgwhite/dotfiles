@@ -29,11 +29,13 @@ brew "git" unless ENV["HOMEBREW_CODESPACES"]
 # brew "gmp"
 # brew "gnupg"
 brew "htop" unless ENV["HOMEBREW_CODESPACES"]
+brew "k9s"
 brew "kubernetes-cli" unless ENV["HOMEBREW_CODESPACES"]
 # brew "libyaml"
 brew "mas" if OS.mac? # mac app store
 brew "mise" # mise-en-place
 brew "neovim" unless ENV["HOMEBREW_CODESPACES"]
+brew "nmap"
 brew "opencode" unless ENV["HOMEBREW_CODESPACES"]
 brew "parallel" unless ENV["HOMEBREW_CODESPACES"]
 # brew "pinentry-mac" if OS.mac?
@@ -43,9 +45,11 @@ brew "sevenzip" unless ENV["HOMEBREW_CODESPACES"]
 brew "thefuck" unless ENV["HOMEBREW_CODESPACES"]
 brew "timg" unless ENV["HOMEBREW_CODESPACES"] # terminal image/video viewer (kitty graphics)
 brew "tmux" unless ENV["HOMEBREW_CODESPACES"]
+brew "tree"
 brew "uv" # python manager
 brew "viu" unless ENV["HOMEBREW_CODESPACES"] # terminal image viewer (kitty graphics)
 brew "wakatime-cli" unless ENV["HOMEBREW_CODESPACES"]
+brew "watch"
 brew "wget" unless ENV["HOMEBREW_CODESPACES"]
 # brew "ykman"
 # brew "ykpers"
@@ -66,20 +70,17 @@ cask "ghostty" if OS.mac?
 # cask "gpg-suite" if OS.mac?
 cask "iterm2" if OS.mac? # better terminal
 cask "jordanbaird-ice" if OS.mac? # menu bar
-cask "kitty" if OS.mac?
 # cask "lm-studio" if OS.mac?
 cask "lookaway" if OS.mac? # screen breaks
 cask "lulu" if OS.mac? && ENV["HOMEBREW_PRIVATE"] # firewall
 # cask "macwhisper" if OS.mac?
 cask "obsidian" if OS.mac?
-cask "openlens" if OS.mac?
 cask "shadow" if OS.mac? && ENV["HOMEBREW_PRIVATE"]
 # cask "slack" if OS.mac?
 cask "visual-studio-code" if OS.mac?
 cask "wakatime" if OS.mac?
 cask "xscreensaver" if OS.mac?
 # cask "yubico-authenticator" if OS.mac?
-cask "zed" if OS.mac?
 # cask "zoom" if OS.mac?
 mas "Fantastical", id: 975937182 if OS.mac? && $stdin.tty?
 mas "Irvue", id: 1039633667 if OS.mac? && $stdin.tty?
