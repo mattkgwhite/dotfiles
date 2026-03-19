@@ -23,3 +23,8 @@ Brewfile.ignore
 AppData
 Documents
 {{ end }}
+
+{{ if ne .chezmoi.os "darwin" }}
+# macOS-only targets — not applicable on non-macOS
+Library
+{{ end }}
