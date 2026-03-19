@@ -20,5 +20,6 @@ Brewfile.ignore
 # Windows-only targets — not applicable on Unix
 .config/wezterm
 .config/oh-my-posh
+AppData
 Documents
 {{ end }}
