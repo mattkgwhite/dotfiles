@@ -4,12 +4,16 @@ local config = wezterm.config_builder()
 
 -- Font
 config.font = wezterm.font("FiraCode Nerd Font Mono")
-config.font_size = 13.0
+config.font_size = 11.0
 
 -- Theme
 config.color_scheme = "Catppuccin Mocha"
 
 -- Window
+wezterm.on("gui-startup", function(cmd)
+  local _, _, window = wezterm.mux.spawn_window(cmd or {})
+  window:gui_window():maximize()
+end)
 config.window_decorations = "NONE"
 config.window_padding = {
   left = 0,

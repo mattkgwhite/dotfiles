@@ -89,16 +89,6 @@
           "options": {
             "display_error": false
           }
-        },
-        {
-          "type": "time",
-          "style": "powerline",
-          "powerline_symbol": "\ue0b2",
-          "invert_powerline": true,
-          "foreground": "#1e1e2e",
-          "background": "#a6adc8",
-          "template": " {{ .CurrentDate | date \"15:04:05\" }} ",
-          "options": {}
         }
       ]
     },
