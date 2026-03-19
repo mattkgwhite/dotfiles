@@ -1,0 +1,125 @@
+{{- $chocoPackages := list "bat" "eza" "fd" "fzf" "jq" "k9s" "mise" "nerd-fonts-FiraCode" "neovim" "oh-my-posh" "powershell-core" "powertoys" "ripgrep" "wezterm" -}}
+{{ if eq .chezmoi.os "windows" -}}
+# Chocolatey package list hash (triggers re-run when this list changes):
+# {{ join " " $chocoPackages | sha256sum }}
+
+$ErrorActionPreference = "Stop"
+
+# --- Elevated block: Chocolatey packages + WSL provisioning ---
+$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+$elevatedScript = {
+    $ErrorActionPreference = "Stop"
+
+    if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
+        Write-Host "Installing Chocolatey..."
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+        $env:PATH = "$env:ALLUSERSPROFILE\chocolatey\bin;$env:PATH"
+    }
+
+    $packages = @(
+{{- range $chocoPackages }}
+        "{{ . }}"
+{{- end }}
+    )
+
+    foreach ($pkg in $packages) {
+        Write-Host "Installing $pkg..."
+        choco install $pkg -y --no-progress
+    }
+
+    # --- WSL ---
+    if (-not (Get-Command wsl -ErrorAction SilentlyContinue)) {
+        Write-Host "Installing WSL..."
+        wsl --install --no-distribution
+        Write-Host "WSL installed. A reboot may be required before WSL is available."
+    }
+
+    if (Get-Command wsl -ErrorAction SilentlyContinue) {
+        $distros = wsl --list --quiet 2>$null
+        if ($distros -notcontains "Ubuntu") {
+            $wslUser = $env:USERNAME.ToLower()
+            $cloudInitDir = "$env:USERPROFILE\.cloud-init"
+            if (-not (Test-Path $cloudInitDir)) { New-Item -ItemType Directory -Path $cloudInitDir | Out-Null }
+            $cloudConfig = @"
+#cloud-config
+users:
+- name: $wslUser
+  groups: [adm,dialout,cdrom,floppy,sudo,audio,dip,video,plugdev,netdev]
+  sudo: ALL=(ALL) NOPASSWD:ALL
+  shell: /bin/bash
+
+write_files:
+- path: /etc/wsl.conf
+  append: true
+  content: |
+    [user]
+    default=$wslUser
+
+runcmd:
+  - sudo -u $wslUser git clone https://github.com/chipwolf/dotfiles /home/$wslUser/.local/share/chezmoi
+  - sudo -u $wslUser /home/$wslUser/.local/share/chezmoi/install.sh
+"@
+            [System.IO.File]::WriteAllText("$cloudInitDir\Ubuntu.user-data", $cloudConfig)
+
+            Write-Host "Installing Ubuntu WSL distribution (cloud-init will provision user '$wslUser')..."
+            wsl --install Ubuntu --no-launch
+
+            Write-Host "Launching Ubuntu for cloud-init provisioning..."
+            $prevLine = ""
+            do {
+                Start-Sleep -Seconds 5
+                $status = (wsl -d Ubuntu -- cloud-init status 2>$null) -replace '^\s+',''
+                $tail = wsl -d Ubuntu -- bash -c "tail -1 /var/log/cloud-init-output.log 2>/dev/null" 2>$null
+                if ($tail -and $tail -ne $prevLine) {
+                    Write-Host "  [$status] $tail"
+                    $prevLine = $tail
+                }
+            } while ($status -match "running")
+
+            if ($status -match "error") {
+                Write-Host "cloud-init finished with errors. Run 'wsl -d Ubuntu -- cat /var/log/cloud-init.log' for details." -ForegroundColor Yellow
+            } else {
+                Write-Host "WSL provisioning complete." -ForegroundColor Green
+            }
+        } else {
+            Write-Host "Updating dotfiles in WSL..."
+            wsl -d Ubuntu -- bash -lc '
+              if [ ! -d ~/.local/share/chezmoi ]; then
+                git clone https://github.com/chipwolf/dotfiles ~/.local/share/chezmoi
+              fi
+              cd ~/.local/share/chezmoi && git pull
+              ~/.local/share/chezmoi/install.sh
+            '
+        }
+    }
+}
+
+if ($isAdmin) {
+    & $elevatedScript
+} else {
+    $scriptFile = "$env:TEMP\chezmoi-bootstrap-elevated.ps1"
+    $elevatedScript.ToString() | Out-File $scriptFile -Encoding ascii
+    Write-Host "Elevating for package installation and WSL provisioning..."
+    Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptFile`"" -Wait
+    Remove-Item $scriptFile -ErrorAction SilentlyContinue
+}
+
+# Refresh PATH so newly installed tools are available
+$env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")
+
+# Install mise-managed tools (does not require elevation)
+if (Get-Command mise -ErrorAction SilentlyContinue) {
+    Write-Host "Running mise install..."
+    mise trust
+    mise install
+}
+
+# Sync Neovim plugins
+if (Get-Command nvim -ErrorAction SilentlyContinue) {
+    Write-Host "Syncing Neovim plugins..."
+    nvim --headless -c "Lazy! sync" -c "qa"
+}
+{{- end }}

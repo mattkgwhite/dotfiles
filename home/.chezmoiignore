@@ -1,3 +1,24 @@
 # .chezmoiignore — source-dir-only files that should not be applied to ~/
 Brewfile
 Brewfile.ignore
+
+{{ if eq .chezmoi.os "windows" }}
+# Unix-only targets — not applicable on Windows
+.zshenv
+.profile
+.config/zsh
+.config/tmux
+.config/kitty
+.config/ghostty
+.config/finicky.js
+.gnupg
+.scripts
+.local/share/opencode-shims
+{{ end }}
+
+{{ if ne .chezmoi.os "windows" }}
+# Windows-only targets — not applicable on Unix
+.config/wezterm
+.config/oh-my-posh
+Documents
+{{ end }}

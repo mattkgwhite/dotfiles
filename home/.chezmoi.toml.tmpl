@@ -1,5 +1,5 @@
 {{- $codespaces:= env "CODESPACES" | not | not -}}
-{{- $private := stat (joinPath .chezmoi.homeDir ".private") | not | not -}}
+{{- $private := or (eq .chezmoi.os "windows") (stat (joinPath .chezmoi.homeDir ".private") | not | not) -}}
 sourceDir = {{ .chezmoi.sourceDir | quote }}
 
 [data]

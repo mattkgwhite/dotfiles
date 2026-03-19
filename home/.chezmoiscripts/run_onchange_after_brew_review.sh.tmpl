@@ -1,3 +1,4 @@
+{{ if ne .chezmoi.os "windows" -}}
 #!/bin/bash
 
 # Run interactive Homebrew drift review after Brewfile changes.
@@ -21,3 +22,4 @@ if command -v brew &>/dev/null && [ -f "$BREW_REVIEW" ]; then
   bash "$BREW_REVIEW" || true
 fi
 {{ end -}}
+{{- end }}

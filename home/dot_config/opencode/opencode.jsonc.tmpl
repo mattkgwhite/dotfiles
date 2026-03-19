@@ -117,7 +117,8 @@
     // Allow reads and edits to the chezmoi source tree (global memory lives there)
     "external_directory": {
       "~/.local/share/chezmoi/**": "allow"
-    },
+    }
+{{- if not .private }},
 
     // Require approval before any Atlassian MCP tool is invoked
     "atlassian_*": "ask",
@@ -137,6 +138,7 @@
     "mcp-atlassian_jira_get_*": "allow",
     "mcp-atlassian_jira_search*": "allow",
     "mcp-atlassian_jira_batch_get_changelogs": "allow"
+{{- end }}
   },
 
   "plugin": [
@@ -147,6 +149,7 @@
   ],
 
   "mcp": {
+{{- if not .private }}
     // Atlassian Rovo MCP server — connects Jira, Confluence, and Compass
     // Auth: run `opencode mcp auth atlassian` to complete the OAuth 2.1 flow
     "atlassian": {
@@ -162,6 +165,7 @@
       "command": ["bash", "-c", "set -a; source ~/.config/opencode/mcp-atlassian.env; set +a; exec uvx mcp-atlassian"],
       "enabled": true
     },
+{{- end }}
 
     // mcp-obsidian — gives OpenCode access to your Obsidian vault
     // https://mcp-obsidian.org

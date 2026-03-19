@@ -124,6 +124,22 @@ Deleting a file from the chezmoi source does **not** remove it from the target (
 
 ---
 
+## Windows support
+
+- **Native Windows** is supported — `chezmoi apply` deploys cross-platform configs (git, nvim, mise, opencode, k9s) and Windows-specific configs (WezTerm), while skipping Unix-only targets (zsh, brew, tmux, ghostty, kitty, finicky, gnupg, scripts, opencode-shims).
+- **OS-conditional ignores** in `home/.chezmoiignore` use `{{ if eq .chezmoi.os "windows" }}` and `{{ if ne .chezmoi.os "windows" }}` blocks to control which targets are deployed per platform.
+- **Bash chezmoiscripts** (`run_onchange_after_bootstrap.sh.tmpl`, `run_onchange_after_brew_review.sh.tmpl`, `run_onchange_after_tmux_symlinks.sh.tmpl`) are wrapped in `{{ if ne .chezmoi.os "windows" }}` guards so they render to empty on Windows (chezmoi skips empty scripts).
+- **Windows bootstrap** — `home/.chezmoiscripts/run_onchange_after_bootstrap_windows.ps1.tmpl` installs packages via Chocolatey (`choco install -y`), runs `mise install`, and syncs Neovim plugins. Runs only on Windows.
+- **`install.ps1`** at the repo root is the Windows equivalent of `install.sh`: installs Chocolatey, chezmoi, and git, then runs `chezmoi init --apply`.
+- **WezTerm** — `home/dot_config/wezterm/wezterm.lua` (→ `~/.config/wezterm/wezterm.lua`). Windows terminal emulator with kitty graphics protocol support. Ignored on non-Windows via `.chezmoiignore`.
+- **OpenCode** — `home/dot_config/opencode/opencode.jsonc.tmpl` gates the Atlassian MCP servers (Rovo and sooperset) and their permission entries behind `{{ if not .private }}`, so they are excluded on personal machines. Since Windows is always personal, this also covers Windows.
+- **Package manager** — Windows uses Chocolatey (`choco`), not winget or scoop.
+- **When adding new configs**, decide if the target is cross-platform, Unix-only, or Windows-only, and update `home/.chezmoiignore` accordingly.
+- **When adding new chezmoiscripts**, bash scripts (`.sh.tmpl`) must be guarded with `{{ if ne .chezmoi.os "windows" }}` and PowerShell scripts (`.ps1.tmpl`) with `{{ if eq .chezmoi.os "windows" }}` so they render to empty on the wrong OS.
+- **WSL** — The Windows bootstrap script provisions WSL Ubuntu non-interactively via cloud-init. It writes a cloud-config to `~/.cloud-init/Ubuntu.user-data` (using the Windows username), installs Ubuntu with `--no-launch`, then launches and waits for cloud-init to create the user, clone the dotfiles repo, and run `install.sh`. Inside WSL, `chezmoi.os` is `"linux"` so the full Unix config stack (zsh, brew, tmux, etc.) applies without modification.
+
+---
+
 ## Homebrew management
 
 - **`home/Brewfile`** and **`home/Brewfile.ignore`** are source-dir only — listed in `home/.chezmoiignore` and never applied to `~/`.

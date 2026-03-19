@@ -80,10 +80,11 @@ Deleting a source file does NOT remove the deployed target. To fully remove:
 
 Templates use Go `text/template` plus sprig and chezmoi-specific functions. Common data:
 
-- `.chezmoi.os` — OS name (`darwin`, `linux`)
+- `.chezmoi.os` — OS name (`darwin`, `linux`, `windows`)
 - `.chezmoi.hostname` — machine hostname
 - `.chezmoi.homeDir` — home directory path
 - `.codespaces` — bool, set from env in `home/.chezmoi.toml.tmpl`
+- `.private` — bool, true when `~/.private` exists (personal machine; excludes work-only configs like Atlassian MCP)
 
 Run `chezmoi data` to inspect all available template data on the current machine.
 

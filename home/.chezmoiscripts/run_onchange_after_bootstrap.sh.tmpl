@@ -1,3 +1,4 @@
+{{ if ne .chezmoi.os "windows" -}}
 #!/bin/bash
 
 # -e: exit on error
@@ -20,7 +21,7 @@ EOF
 {{ end -}}
 
 {{ if eq .chezmoi.os "linux" -}}
-PKGS="build-essential procps curl file git"
+PKGS="build-essential procps curl file git libffi-dev libyaml-dev zlib1g-dev"
 if ! dpkg -s $PKGS &>/dev/null; then
   sudo apt update -q
   sudo apt install -yq $PKGS
@@ -76,10 +77,18 @@ zsh -c '
 
 {{- if not .codespaces }}
 mise trust
-mise install
+mise install || true
 
 if [ -z "$NVIM_PRE_INSTALLED" ]; then
   nvim --headless "+Lazy! sync" +qa
+fi
+
+BREW_ZSH="$(brew --prefix)/bin/zsh"
+if [ -x "$BREW_ZSH" ] && [ "$SHELL" != "$BREW_ZSH" ]; then
+  if ! grep -qxF "$BREW_ZSH" /etc/shells; then
+    echo "$BREW_ZSH" | sudo tee -a /etc/shells >/dev/null
+  fi
+  sudo chsh -s "$BREW_ZSH" "$(whoami)"
 fi
 {{- end }}
 
@@ -88,3 +97,4 @@ fi
 pkill -HUP -u "$USER" zsh || true
 {{- end }}
 {{ end -}}
+{{- end }}

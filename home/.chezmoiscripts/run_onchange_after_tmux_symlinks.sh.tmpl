@@ -1,3 +1,4 @@
+{{ if ne .chezmoi.os "windows" -}}
 #!/bin/bash
 
 # Re-runs when .zplugins changes (antidote plugin layout may change):
@@ -15,3 +16,4 @@ XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 ln -sf "$ANTIDOTE_HOME/gpakosz/.tmux/.tmux.conf" "$XDG_CONFIG_HOME/tmux/tmux.conf"
 ln -sf "$ANTIDOTE_HOME/tmux-plugins" "$XDG_CONFIG_HOME/tmux/tmux.plugins"
 {{ end -}}
+{{- end }}
