@@ -1,7 +1,5 @@
-Dotfiles
+Dotfiles [![SLSA 3](https://slsa.dev/images/gh-badge-level3.svg)](https://slsa.dev)
 ===
-
-[![SLSA 3](https://slsa.dev/images/gh-badge-level3.svg)](https://slsa.dev)
 
 <!-- start chipwolf/badgesort default -->
 [![macOS](https://img.shields.io/badge/macOS-000000.svg?style=for-the-badge&logo=macos&logoColor=white)](#)
