@@ -45,18 +45,18 @@ For SDK calling conventions (method signatures, argument shapes, etc.), prefer r
 
 ---
 
-## Subagents
+## Skills and subagents
 
-Four specialised subagents handle common delegated tasks. Use them instead of doing these tasks inline.
+Two skills provide reusable workflows; load them on-demand via the `skill` tool. Two subagents handle delegated execution tasks.
 
-| Subagent | When to use |
-|----------|-------------|
-| `@memory` | Persisting rules, conventions, or lessons: updates to global memory (`AGENTS.md`) or local memory (project `AGENTS.md`) |
-| `@dotfiles` | Any change to chezmoi-managed files: adding, modifying, or removing config files, scripts, or templates |
-| `@daily-note` | Logging achievements or action items to today's Obsidian daily note |
-| `@beads-task-agent` | Any beads operation requiring 2+ `bd` commands: status overviews, finding and completing ready work, exploring the issue graph, multi-issue sequences |
+| Name | Type | When to use |
+|------|------|-------------|
+| `memory` | skill | Before writing to any AGENTS.md file: persisting rules, conventions, or lessons |
+| `dotfiles` | skill | Before making any change to chezmoi-managed files: adding, modifying, or removing config files, scripts, or templates |
+| `@daily-note` | subagent | Logging achievements or action items to today's Obsidian daily note |
+| `@beads-task-agent` | subagent | Any beads operation requiring 2+ `bd` commands: status overviews, finding and completing ready work, exploring the issue graph, multi-issue sequences |
 
-When subagent delegations are needed at session close (config changes, memory updates, daily note logging), run them in sequence rather than inline: delegate each concern to its subagent one at a time, wait for each to complete, then proceed to the next. This keeps the primary agent's context clean and each concern isolated.
+When delegating to subagents at session close (daily note logging, beads operations), run them in sequence rather than inline: delegate each concern one at a time, wait for each to complete, then proceed to the next.
 
 ---
 
@@ -70,23 +70,21 @@ When subagent delegations are needed at session close (config changes, memory up
 
 ## Global memory and local memory
 
-The user refers to `~/.config/opencode/AGENTS.md` as **global memory**. When asked to "commit something to global memory", delegate to the `@memory` subagent.
+The user refers to `~/.config/opencode/AGENTS.md` as **global memory**. When asked to "commit something to global memory", load the `memory` skill and follow its workflow.
 
-The user refers to the `AGENTS.md` in the current project root, or nearest ancestor, as **local memory**. When asked to "commit something to local memory", delegate to the `@memory` subagent.
+The user refers to the `AGENTS.md` in the current project root, or nearest ancestor, as **local memory**. When asked to "commit something to local memory", load the `memory` skill and follow its workflow.
 
-Never edit `~/.config/opencode/AGENTS.md` directly, it is managed by chezmoi and will be overwritten. The `@memory` subagent knows this and handles it correctly.
+Never edit `~/.config/opencode/AGENTS.md` directly; it is managed by chezmoi and will be overwritten. The `memory` skill covers this.
 
-The same chezmoi rule applies to all dotfiles under `~/.config/`, always edit the source in `~/.local/share/chezmoi/` and apply from there. Use the `@dotfiles` subagent for this.
+The same chezmoi rule applies to all dotfiles under `~/.config/`: always edit the source in `~/.local/share/chezmoi/` and apply from there. Load the `dotfiles` skill for this.
 
-For rules specific to the chezmoi dotfiles repo itself, the target file is `~/.local/share/chezmoi/AGENTS.md`; tell the `@memory` subagent this explicitly.
+For rules specific to the chezmoi dotfiles repo itself, the target file is `~/.local/share/chezmoi/AGENTS.md`; note this explicitly when loading the `memory` skill.
 
-When `@memory` updates any memory file, it must review nearby rules in that file for contradictions, duplication, and scope conflicts.
-
-When contradictions, duplication, or scope conflicts are found, reconcile them in the same edit instead of appending another overlapping rule.
+When updating any memory file, review nearby rules for contradictions, duplication, and scope conflicts; reconcile in the same edit.
 
 Choose the narrowest correct scope for each rule: keep cross-cutting behavior in global memory, and keep project-specific conventions in local memory.
 
-If a rule in global memory is actually project-specific, move it to the relevant local memory file and remove or narrow the global version in the same change. Do not leave the project-specific rule behind in global memory.
+If a rule in global memory is actually project-specific, move it to the relevant local memory file and remove or narrow the global version in the same change.
 
 ---
 
@@ -108,7 +106,7 @@ After completing any non-trivial task, perform a brief critical retrospective be
 
 1. **What went right:** note any approaches or tools that worked well.
 2. **What went wrong:** identify mistakes, incorrect assumptions, wasted steps, or anything that required correction.
-3. **Actionable lessons:** for each thing that went wrong, delegate to `@memory` to review global memory. Prefer strengthening or clarifying broadly applicable rules over adding incident-specific ones. The acceptable outcomes are: add a new rule, strengthen or clarify the wording of an existing rule, or add a brief note confirming an existing rule already covers the lesson. "No new rule needed" is NOT an acceptable reason to skip delegating. The delegation must happen; the outcome of that delegation may be a no-op, but the review itself is mandatory.
+3. **Actionable lessons:** for each thing that went wrong, load the `memory` skill and review global memory. Prefer strengthening or clarifying broadly applicable rules over adding incident-specific ones. The acceptable outcomes are: add a new rule, strengthen or clarify the wording of an existing rule, or add a brief note confirming an existing rule already covers the lesson. "No new rule needed" is NOT an acceptable reason to skip the review. The review must happen; the outcome of that review may be a no-op, but the review itself is mandatory.
 
 The retrospective does not need to be verbose. A single sentence per point is enough. The goal is that each session leaves global memory slightly better than it found it, by making it more accurate and reusable, not more tied to one incident. Silent self-improvement is acceptable; only surface the retrospective to the user if a rule was added or if the user would benefit from knowing.
 
@@ -118,7 +116,7 @@ When turning a concrete incident into a persisted lesson:
 - Write the rule at the highest useful level of abstraction that would prevent the same class of mistake elsewhere.
 - Do not generalise so far that the rule becomes vague or non-actionable.
 
-If a retrospective, subtask, or delegated review identifies a lesson that should be persisted, the primary agent remains responsible for ensuring the `@memory` delegation actually happens before the loop is considered complete. Reporting that memory still needs updating does not satisfy the requirement. If a subtask cannot perform the update itself, resume control and perform the delegation explicitly.
+If a retrospective identifies a lesson that should be persisted, the primary agent remains responsible for ensuring the `memory` skill is loaded and the update happens before the loop is considered complete. Reporting that memory still needs updating does not satisfy the requirement.
 
 This rule applies retroactively: if a session ends without a retrospective, perform one before the final response.
 

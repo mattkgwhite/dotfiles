@@ -1,0 +1,19 @@
+{
+    "window.commandCenter": true,
+    "editor.fontFamily": "'FiraCode Nerd Font Mono', Menlo, Monaco, 'Courier New', monospace",
+    "debug.console.collapseIdenticalLines": false,
+    "workbench.colorTheme": "Catppuccin Mocha",
+    "workbench.iconTheme": "catppuccin-mocha",
+    "cursor.composer.usageSummaryDisplay": "always",
+    "cursor.general.enableShadowWorkspace": true,
+    "obsidianPreview.vaultPath": "{{ .chezmoi.homeDir }}/Documents/Obsidian/Vault",
+    "update.releaseTrack": "prerelease"{{ if eq .chezmoi.os "windows" }},
+    "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono",
+    "terminal.integrated.defaultProfile.windows": "WSL Bash",
+    "terminal.integrated.profiles.windows": {
+        "WSL Bash": {
+            "path": "C:\\Windows\\System32\\wsl.exe",
+            "args": ["-e", "bash", "--login"]
+        }
+    }{{ end }}
+}

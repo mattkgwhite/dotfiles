@@ -61,8 +61,8 @@ export const PermissionPersist: Plugin = async ({ client }) => {
           ``,
           `Please ask the user which pattern(s) they would like saved permanently to their OpenCode config.`,
           `Show them the exact command and the default wildcard as examples, and let them specify their own`,
-          `pattern in natural language (or say "skip" to not save any). For each pattern to save, delegate to`,
-          `the @dotfiles subagent to add it to the \`permission\` section of`,
+          `pattern in natural language (or say "skip" to not save any). For each pattern to save, load the`,
+          `\`dotfiles\` skill and add it to the \`permission\` section of`,
           `\`~/.local/share/chezmoi/home/dot_config/opencode/opencode.jsonc.tmpl\` with a value of`,
           `\`"allow"\`, under the relevant tool key (e.g., \`"bash"\`). Then run \`chezmoi apply\`.`,
         ].join("\n")
