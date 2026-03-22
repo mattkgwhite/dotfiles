@@ -105,7 +105,14 @@ fi
 # POSIX way to get script's dir: https://stackoverflow.com/a/29834779/12156188
 script_dir="$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)"
 
-set -- init --apply --source="${script_dir}"
+# If the script is running from a local clone (i.e. .chezmoiroot exists next to it),
+# use that as the source. Otherwise (e.g. piped via curl/sh), let chezmoi clone from
+# GitHub into the default location (~/.local/share/chezmoi).
+if [ -f "${script_dir}/.chezmoiroot" ]; then
+  set -- init --apply --source="${script_dir}"
+else
+  set -- init --apply "https://github.com/chipwolf/dotfiles"
+fi
 
 echo "Running 'chezmoi $*'" >&2
 # exec: replace current process with chezmoi
