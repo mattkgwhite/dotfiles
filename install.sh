@@ -27,7 +27,7 @@ if [ -n "${CODESPACES:-}" ]; then
     printf '%s\n' "$OUR_LAYERS" | while IFS= read -r digest; do
       if ! printf '%s\n' "$BASE_LAYERS" | grep -qxF "$digest"; then
         printf 'Applying overlay layer %s\n' "$digest" >&2
-        "$CRANE" blob "$OUR_IMAGE" "$digest" | tar -xz --no-same-owner -C /
+        "$CRANE" blob "${OUR_IMAGE}@${digest}" | tar -xz --no-same-owner -C /
       fi
     done
 
