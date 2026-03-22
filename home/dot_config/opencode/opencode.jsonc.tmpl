@@ -116,7 +116,9 @@
 
     // Allow reads and edits to the chezmoi source tree (global memory lives there)
     "external_directory": {
-      "~/.local/share/chezmoi/**": "allow"
+      "~/.local/share/chezmoi/**": "allow",
+      "/tmp/**": "allow",
+      "{{ .chezmoi.homeDir }}/AppData/Local/Temp/**": "allow"
     }
 {{- if not .private }},
 
