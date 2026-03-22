@@ -1,0 +1,131 @@
+---
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: null
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  IMAGE_REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      release_created: ${{ steps.rp.outputs.release_created }}
+      tag_name: ${{ steps.rp.outputs.tag_name }}
+    steps:
+      - name: Release Please
+        id: rp
+        uses: googleapis/release-please-action@v4.4.0
+
+  # --- Build and attest container image ---
+
+  build:
+    if: needs.release-please.outputs.release_created == 'true'
+    needs: [release-please]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.image.outputs.image }}
+      digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.IMAGE_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.release-please.outputs.tag_name }}
+
+      - name: Output image
+        id: image
+        run: |
+          echo "image=${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}" >> "$GITHUB_OUTPUT"
+
+  container-provenance:
+    needs: [release-please, build]
+    permissions:
+      actions: read
+      id-token: write
+      packages: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.1.0
+    with:
+      image: ${{ needs.build.outputs.image }}
+      digest: ${{ needs.build.outputs.digest }}
+      registry-username: ${{ github.actor }}
+    secrets:
+      registry-password: ${{ secrets.GITHUB_TOKEN }}
+
+  # --- Upload and attest install scripts ---
+
+  upload-scripts:
+    if: needs.release-please.outputs.release_created == 'true'
+    needs: [release-please]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Interpolate repo URL in install scripts
+        env:
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          RAW_BASE: ${{ github.server_url }}/${{ github.repository }}/releases/latest/download
+        run: |
+          sed -i "s|repo_url=\"https://github.com/chipwolf/dotfiles\"|repo_url=\"${REPO_URL}\"|" install.sh
+          sed -i "s|\\\$repoUrl = \"https://github.com/chipwolf/dotfiles\"|\$repoUrl = \"${REPO_URL}\"|" install.ps1
+          sed -i "s|\\\$rawBase = \"https://raw.githubusercontent.com/chipwolf/dotfiles/main\"|\$rawBase = \"${RAW_BASE}\"|" install.ps1
+
+      - name: Upload install scripts to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ needs.release-please.outputs.tag_name }}" \
+            install.sh \
+            install.ps1 \
+            --clobber
+
+      - name: Generate hashes
+        id: hash
+        run: |
+          echo "hashes=$(sha256sum install.sh install.ps1 | base64 -w0)" >> "$GITHUB_OUTPUT"
+
+  script-provenance:
+    needs: [release-please, upload-scripts]
+    permissions:
+      actions: read
+      id-token: write
+      contents: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
+    with:
+      base64-subjects: ${{ needs.upload-scripts.outputs.hashes }}
+      upload-assets: true
+      upload-tag-name: ${{ needs.release-please.outputs.tag_name }}
