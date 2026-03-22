@@ -43,4 +43,7 @@ $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Get-Location }
 Write-Host "Applying chezmoi dotfiles from $scriptDir..." -ForegroundColor Cyan
 chezmoi init --apply --source="$scriptDir"
 
+# Disable filemode tracking (Windows does not support the executable bit)
+git -C "$scriptDir" config core.fileMode false
+
 Write-Host "Done! Restart your terminal to pick up the new configuration." -ForegroundColor Green
