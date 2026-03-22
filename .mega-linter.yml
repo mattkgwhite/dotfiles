@@ -1,0 +1,5 @@
+DISABLE:
+  - COPYPASTE
+  - SPELL
+
+SARIF_REPORTER: true

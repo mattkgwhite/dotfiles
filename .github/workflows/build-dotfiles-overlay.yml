@@ -15,6 +15,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@v4
 
@@ -26,8 +28,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: ghcr.io/chipwolf/dotfiles:latest
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v4.1.0
+        with:
+          subject-name: ghcr.io/chipwolf/dotfiles
+          subject-digest: ${{ steps.build.outputs.digest }}
