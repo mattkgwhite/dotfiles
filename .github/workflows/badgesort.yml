@@ -1,0 +1,46 @@
+name: BadgeSort
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  badgesort:
+    name: BadgeSort
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Generate badges
+        uses: docker://ghcr.io/chipwolf/badgesort:latest
+        with:
+          slugs: >-
+            bitwarden
+            docker
+            git
+            githubactions
+            homebrew
+            linux
+            macos
+            neovim
+            python
+            tmux
+            wezterm
+            zsh
+          style: for-the-badge
+          sort: hilbert
+          format: markdown
+          output: README.md
+
+      - name: Commit badge updates
+        uses: stefanzweifel/git-auto-commit-action@v7.1.0
+        with:
+          commit_message: "chore: update badges"
+          file_pattern: README.md

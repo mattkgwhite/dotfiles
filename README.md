@@ -3,6 +3,9 @@ Dotfiles
 
 [![SLSA 3](https://slsa.dev/images/gh-badge-level3.svg)](https://slsa.dev)
 
+<!-- start chipwolf/badgesort default -->
+<!-- end chipwolf/badgesort default -->
+
 Configuration files for backup/sync between systems.
 
 ## Install
