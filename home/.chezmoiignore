@@ -8,7 +8,6 @@ Brewfile.ignore
 .profile
 .config/zsh
 .config/tmux
-.config/kitty
 .config/ghostty
 .config/finicky.js
 .gnupg
