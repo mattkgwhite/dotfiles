@@ -46,9 +46,8 @@ The [Codespaces overlay image](https://ghcr.io/chipwolf/dotfiles) is built with
 Signing runs in an isolated job that build steps cannot influence, preventing
 tampering both during and after the build.
 
-Verify with [slsa-verifier](https://github.com/slsa-framework/slsa-verifier):
+Verify with the [GitHub CLI](https://cli.github.com):
 
 ```sh
-slsa-verifier verify-image ghcr.io/chipwolf/dotfiles:latest \
-  --source-uri github.com/chipwolf/dotfiles
+gh attestation verify oci://ghcr.io/chipwolf/dotfiles:latest --owner chipwolf
 ```
