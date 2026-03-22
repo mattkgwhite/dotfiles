@@ -1,8 +1,12 @@
 # install.ps1 — Bootstrap chezmoi dotfiles on Windows.
+# Forks: update $repoUrl below to point at your fork.
 # Usage (elevated PowerShell not required — script self-elevates):
 #   irm https://raw.githubusercontent.com/chipwolf/dotfiles/main/install.ps1 | iex
 # Or clone the repo and run:
 #   .\install.ps1
+
+$repoUrl = "https://github.com/chipwolf/dotfiles"
+$rawBase = "https://raw.githubusercontent.com/chipwolf/dotfiles/main"
 
 $ErrorActionPreference = "Stop"
 
@@ -17,7 +21,7 @@ if (-not $isAdmin) {
     } else {
         # Running via iex/pipe — re-download and re-launch elevated via a temp file
         $tmp = "$env:TEMP\dotfiles-install.ps1"
-        (New-Object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/chipwolf/dotfiles/main/install.ps1', $tmp)
+        (New-Object System.Net.WebClient).DownloadFile("$rawBase/install.ps1", $tmp)
         Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$tmp`"" -Wait
         Remove-Item $tmp -ErrorAction SilentlyContinue
     }
@@ -64,7 +68,7 @@ if ($PSScriptRoot -and (Test-Path "$PSScriptRoot\.chezmoiroot")) {
     chezmoi init --apply --source="$sourceDir"
 } else {
     Write-Host "Applying chezmoi dotfiles from GitHub..." -ForegroundColor Cyan
-    chezmoi init --apply "https://github.com/chipwolf/dotfiles"
+    chezmoi init --apply $repoUrl
     $sourceDir = $defaultSourceDir
 }
 

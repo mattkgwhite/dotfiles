@@ -1,8 +1,11 @@
 #!/bin/sh
+# Forks: update repo_url below to point at your fork.
 
 # -e: exit on error
 # -u: exit on unset variables
 set -eu
+
+repo_url="https://github.com/chipwolf/dotfiles"
 
 # --- Codespaces fast path ---
 # Pull only our overlay layers from GHCR and extract them directly,
@@ -111,7 +114,7 @@ script_dir="$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)"
 if [ -f "${script_dir}/.chezmoiroot" ]; then
   set -- init --apply --source="${script_dir}"
 else
-  set -- init --apply "https://github.com/chipwolf/dotfiles"
+  set -- init --apply "${repo_url}"
 fi
 
 echo "Running 'chezmoi $*'" >&2
