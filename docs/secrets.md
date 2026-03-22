@@ -21,23 +21,19 @@ chezmoi is configured to use Bitwarden CLI as its secret manager. The config in 
     command = "bw"
 ```
 
-This tells chezmoi templates to resolve secrets via `bw get` at apply time. The workflow:
+This tells chezmoi to resolve `bitwarden` template function calls via the `bw` CLI at apply time.
 
-1. Install the Bitwarden CLI: `brew install bitwarden-cli` (included in the Brewfile)
-2. Log in: `bw login`
-3. Unlock the vault: `export BW_SESSION=$(bw unlock --raw)`
-4. Run `chezmoi apply`: templates that reference `bitwarden` will pull secrets from your vault
+### Current state
 
-### Secret introduction order
+No templates in the source state currently call the `bitwarden` template function. The `[bitwarden]` config block is present so that when templates are added that reference Bitwarden, chezmoi knows which command to use. As a result, `chezmoi apply` works fully without a Bitwarden session today.
 
-On a fresh machine, the bootstrap runs in this order:
+### When Bitwarden-backed templates are added
 
-1. `install.sh` / `install.ps1` installs chezmoi and dependencies
-2. `chezmoi init --apply` applies configs
-3. Templates that need Bitwarden secrets will fail silently or produce placeholder values if the vault is not unlocked
-4. After unlocking Bitwarden, re-run `chezmoi apply` to populate secrets
+Once templates reference `bitwarden`, those specific targets will fail during apply when the vault is not unlocked. The rest of the apply still succeeds. The workflow on a fresh machine would be:
 
-This means the first apply on a new machine produces a functional but incomplete setup. A second apply after `bw unlock` fills in the secrets.
+1. Run the bootstrap (`install.sh` / `install.ps1`): configs deploy, secret-dependent targets error or are skipped.
+2. Log in and unlock: `bw login && export BW_SESSION=$(bw unlock --raw)`
+3. Re-apply: `chezmoi apply` fills in the secret-backed targets.
 
 ## GnuPG configuration
 

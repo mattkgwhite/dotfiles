@@ -15,79 +15,69 @@ Dotfiles
 [![Python](https://img.shields.io/badge/Python-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](#)
 <!-- end chipwolf/badgesort default -->
 
-Personal, opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo configures macOS (primary), Linux, Windows, and GitHub Codespaces. The bootstrap scripts install dependencies, apply configs, and get a new machine to a working state in a single command.
-
-This is not a framework or a starter kit. It is one person's daily-driver setup, shared publicly. If you fork it, expect to replace most of the personal choices before using it.
+Opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo configures macOS (primary), Linux, Windows, and GitHub Codespaces. A single bootstrap command installs dependencies, applies configs, and gets a new machine to a working state.
 
 ## What you get
 
-| Tool | What it does |
-|------|-------------|
-| **zsh + Powerlevel10k** | Shell and prompt |
-| **Neovim (LazyVim)** | Editor |
-| **tmux** | Terminal multiplexer |
-| **Homebrew** | Package manager (macOS/Linux) |
-| **mise** | Polyglot runtime manager (node, python, go, etc.) |
-| **WezTerm** | Terminal emulator (Windows) |
-| **Kitty** | Terminal emulator (macOS/Linux) |
-| **Ghostty** | Terminal emulator (macOS/Linux) |
-| **OpenCode** | AI coding agent |
-| **k9s** | Kubernetes TUI |
-| **Finicky** | macOS default browser router |
-| **GnuPG** | Encryption and signing |
-| **Git** | Version control config |
-| **Oh My Posh** | Prompt engine (Windows) |
-
-### Platform matrix
-
-Not everything deploys everywhere. chezmoi's ignore rules control what lands on each OS.
-
-| | macOS | Linux | Windows | Codespaces |
-|---|:---:|:---:|:---:|:---:|
-| zsh + Powerlevel10k | x | x | | x |
-| Neovim (LazyVim) | x | x | x | x |
-| tmux | x | x | | x |
-| Homebrew | x | x | | x |
-| mise | x | x | x | x |
-| WezTerm | | | x | |
-| Oh My Posh | | | x | |
-| Kitty | x | x | | |
-| Ghostty | x | x | | |
-| Finicky | x | | | |
-| GnuPG | x | x | | |
-| Git | x | x | x | x |
-| OpenCode | x | x | x | x |
-| k9s | x | x | x | x |
+| Tool | Role | macOS | Linux | Windows | Codespaces |
+|------|------|:---:|:---:|:---:|:---:|
+| **zsh + Powerlevel10k** | Shell and prompt | x | x | | x |
+| **Oh My Posh** | Prompt engine (Windows) | | | x | |
+| **Ghostty** | Terminal emulator | x | x | | |
+| **WezTerm** | Terminal emulator (Windows) | | | x | |
+| **tmux** | Terminal multiplexer | x | x | | x |
+| **Neovim (LazyVim)** | Editor | x | x | x | x |
+| **OpenCode** | AI coding agent | x | x | x | x |
+| **Git** | Version control config | x | x | x | x |
+| **GnuPG** | Encryption and signing | x | x | | |
+| **Homebrew** | Package manager | x | x | | x |
+| **mise** | Runtime manager (node, python, go, etc.) | x | x | x | x |
+| **k9s** | Kubernetes TUI | x | x | x | x |
+| **Finicky** | Default browser router | x | | | |
 
 ---
 
 ## Install
 
+> [!WARNING]
+> These scripts fetch and execute code from this repo in a single command. That requires trusting the repository owner and GitHub's transport security. Review them first if that matters to you, or use the [inspect-first path](#inspect-first) below.
+>
+> The install scripts are published as [GitHub Release](https://github.com/chipwolf/dotfiles/releases/latest) assets with [SLSA Build L3](https://slsa.dev/spec/v1.0/levels#build-l3) provenance. You can verify them before running: `gh attestation verify install.sh --owner chipwolf`
+
 **macOS / Linux**
 
 ```sh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/chipwolf/dotfiles/main/install.sh)"
+sh -c "$(curl -fsSL https://github.com/chipwolf/dotfiles/releases/latest/download/install.sh)"
 ```
 
-**Windows** (PowerShell, elevated)
+**Windows** (PowerShell, the script self-elevates)
 
 ```powershell
-irm https://raw.githubusercontent.com/chipwolf/dotfiles/main/install.ps1 | iex
+irm https://github.com/chipwolf/dotfiles/releases/latest/download/install.ps1 | iex
 ```
 
 ### What happens
 
-1. The script installs chezmoi (and Homebrew on macOS/Linux, Chocolatey on Windows, if missing).
-2. chezmoi clones this repo and applies the config to your home directory.
-3. On macOS/Linux, `brew bundle` installs packages from the Brewfile. On Windows, `choco install` handles packages.
-4. mise installs managed runtimes. Neovim syncs plugins.
+**macOS / Linux:**
 
-> [!IMPORTANT]
-> chezmoi does not delete your existing files. It writes managed targets alongside whatever is already there. If a managed file conflicts with an existing one, chezmoi will overwrite it. Run `chezmoi diff` before `chezmoi apply` to see exactly what would change.
+1. Installs Homebrew (if missing) and chezmoi.
+2. `chezmoi init --apply` clones this repo and writes configs to `~/`.
+3. `brew bundle` installs everything in the Brewfile. `brew upgrade` and `brew cleanup` run after.
+4. Antidote (zsh plugin manager) prewarms the plugin cache.
+5. mise installs managed runtimes. Neovim syncs plugins.
+6. Sets the Homebrew-installed zsh as the default shell.
 
-### Preview before applying
+**Windows:**
 
-If you want to inspect everything first:
+1. Installs Chocolatey (if missing) and chezmoi.
+2. `chezmoi init --apply` clones this repo and writes configs to `~/`.
+3. `choco install` installs packages (Neovim, WezTerm, mise, Oh My Posh, and others).
+4. Provisions WSL with Ubuntu via cloud-init: creates a user, clones this repo inside WSL, and runs the Linux bootstrap. If Ubuntu is already installed, it pulls and re-applies instead.
+5. mise installs managed runtimes. Neovim syncs plugins.
+
+### <a id="inspect-first"></a>Inspect first
+
+If you want to review everything before it touches your machine:
 
 ```sh
 chezmoi init https://github.com/chipwolf/dotfiles
@@ -95,56 +85,36 @@ chezmoi diff
 chezmoi apply
 ```
 
+This clones the repo and shows a diff. Nothing is written until `chezmoi apply`. You need chezmoi installed first (`brew install chezmoi` or see [chezmoi.io/get](https://www.chezmoi.io/install/)).
+
 ### Prerequisites
 
-The bootstrap scripts install most dependencies automatically. You need:
+The bootstrap scripts handle most dependencies. You need:
 
-- **macOS/Linux:** `curl` or `wget`, and a POSIX shell. Everything else (Homebrew, chezmoi, packages) is installed for you.
-- **Windows:** PowerShell 5+. The script installs Chocolatey, chezmoi, and git.
+- **macOS/Linux:** `curl` or `wget`, and a POSIX shell.
+- **Windows:** PowerShell 5+.
 
----
+### Secrets and Bitwarden
 
-## Template flags
+chezmoi is configured to use Bitwarden CLI (`bw`) as its secret manager, but no templates currently require it. `chezmoi apply` works fully without a Bitwarden session today. See [docs/secrets.md](docs/secrets.md) for details.
 
-chezmoi templates use two boolean flags to adapt behavior per machine. These are set automatically in `.chezmoi.toml.tmpl`:
+### Template flags
 
-| Flag | When it is true | What it gates |
-|------|----------------|---------------|
+chezmoi uses two boolean flags to adapt behavior per machine. Both are set automatically in `.chezmoi.toml.tmpl`.
+
+| Flag | When true | What it gates |
+|------|-----------|---------------|
 | `codespaces` | `CODESPACES` env var is set | Skips GUI apps and redundant packages in the Brewfile. Uses the overlay fast path in `install.sh`. |
 | `private` | Windows, or `~/.private` exists | Enables personal-machine config: excludes work-specific MCP servers and Atlassian integrations from OpenCode. |
 
-To mark a macOS or Linux machine as private, `touch ~/.private` before running `chezmoi apply`.
-
----
-
-## Codespaces
-
-When you enable a personal dotfiles repo in your [GitHub Codespaces settings](https://github.com/settings/codespaces), GitHub clones this repo into each new codespace and runs `install.sh`.
-
-This repo ships a pre-baked [overlay container image](https://ghcr.io/chipwolf/dotfiles) on GHCR. When `install.sh` detects `CODESPACES=1`, it pulls only the overlay layers that differ from the base devcontainer image and extracts them directly, skipping the full bootstrap. The result is the same setup, provisioned faster.
-
 > [!IMPORTANT]
-> Dotfiles changes only apply to new codespaces. Existing codespaces keep their current state unless you rebuild them.
+> To mark a macOS or Linux machine as private, run `touch ~/.private` before `chezmoi apply`.
 
 ---
 
-## Forking and customization
+## Updating
 
-This is a personal setup. If you fork it, here is what to change first:
-
-1. **`install.sh` and `install.ps1`**: update `repo_url` / `$repoUrl` to your fork.
-2. **`home/.chezmoi.toml.tmpl`**: review the `private` and `codespaces` logic. You may want different conditions.
-3. **`home/Brewfile`**: replace the package list with your own.
-4. **`home/dot_config/`**: this is where most tool configs live. Replace or remove what you do not use.
-5. **`.macos`**: macOS system defaults (verbose boot, Safari auditing). Review and edit or delete.
-6. **Git identity**: update `home/dot_config/git/` with your name, email, and signing key.
-
-> [!TIP]
-> The chezmoi source state lives under `home/` (set by `.chezmoiroot`). Filenames use chezmoi's attribute prefixes: `dot_` becomes a leading `.`, `private_` restricts permissions, `executable_` adds the execute bit. For example, `home/dot_config/nvim/` deploys to `~/.config/nvim/`.
-
-### Updating after install
-
-To pull the latest changes from the repo and re-apply:
+Pull the latest changes from the repo and re-apply:
 
 ```sh
 chezmoi update
@@ -152,9 +122,34 @@ chezmoi update
 
 ---
 
-## SSH key setup (optional)
+## Codespaces
 
-If you use a YubiKey for SSH authentication, the quick version:
+When you set a personal dotfiles repo in your [GitHub Codespaces settings](https://github.com/settings/codespaces), GitHub clones this repo into each new codespace and runs `install.sh`.
+
+This repo ships a pre-baked [overlay container image](https://ghcr.io/chipwolf/dotfiles) on GHCR. When `install.sh` detects `CODESPACES=1`, it pulls only the overlay layers that differ from the base devcontainer image and extracts them directly, skipping the full bootstrap.
+
+> [!IMPORTANT]
+> Dotfiles changes only take effect in new codespaces. Existing ones keep their current state unless rebuilt.
+
+---
+
+## Forking
+
+If you fork this repo, the main things to update:
+
+1. **`home/Brewfile`**: adjust packages to taste.
+2. **Git identity**: update `home/dot_config/git/` with your name, email, and signing key.
+
+The install scripts (`install.sh`, `install.ps1`) have the repo URL interpolated automatically during the release workflow, so forks that use the same workflow get correct URLs in their release assets without editing.
+
+> [!TIP]
+> The chezmoi source state lives under `home/` (set by `.chezmoiroot`). Filenames use chezmoi's attribute prefixes: `dot_` becomes a leading `.`, `private_` restricts permissions, `executable_` adds the execute bit. `home/dot_config/nvim/` deploys to `~/.config/nvim/`.
+
+---
+
+## SSH key setup
+
+If you use a YubiKey for SSH authentication:
 
 ```shell
 ykman config usb -d OTP
@@ -162,24 +157,31 @@ ykman fido access change-pin
 ssh-keygen -t ed25519-sk -C "user@domain.tld" -O resident -O verify-required
 ```
 
-For the full workflow (backup keys, credential hygiene, recovery on new machines), see [docs/yubikey.md](docs/yubikey.md).
+Full workflow (backup keys, credential hygiene, recovery): [docs/yubikey.md](docs/yubikey.md).
 
 ---
 
 ## Provenance [![SLSA 3](https://slsa.dev/images/gh-badge-level3.svg)](https://slsa.dev)
 
-The [Codespaces overlay image](https://ghcr.io/chipwolf/dotfiles) is built with [SLSA Build L3](https://slsa.dev/spec/v1.0/levels#build-l3) provenance via the [SLSA GitHub Generator](https://github.com/slsa-framework/slsa-github-generator). Signing runs in an isolated job that build steps cannot influence, preventing tampering both during and after the build.
+All release artifacts are built with [SLSA Build L3](https://slsa.dev/spec/v1.0/levels#build-l3) provenance via the [SLSA GitHub Generator](https://github.com/slsa-framework/slsa-github-generator). The signing job runs in isolation from build steps, preventing tampering during and after the build.
 
-> [!WARNING]
-> SLSA provenance covers the container image only. The bootstrap scripts (`install.sh`, `install.ps1`) are fetched over HTTPS from the `main` branch and are not individually signed or pinned by hash. Review them before running. No secrets or private key material are committed to this repository.
+This covers:
 
-Verify the container image:
+- **Install scripts** (`install.sh`, `install.ps1`): published as [GitHub Release](https://github.com/chipwolf/dotfiles/releases/latest) assets with generic SLSA provenance.
+- **Codespaces overlay image** ([ghcr.io/chipwolf/dotfiles](https://ghcr.io/chipwolf/dotfiles)): published to GHCR with container SLSA provenance.
+
+> [!NOTE]
+> SLSA provenance does not cover the chezmoi source state (templates, configs, run scripts) or packages installed by Homebrew, Chocolatey, or mise. Those are outside the attestation boundary.
+
+Verify:
 
 ```sh
+# Install scripts (download the asset first)
+gh attestation verify install.sh --owner chipwolf
+
+# Container image
 gh attestation verify oci://ghcr.io/chipwolf/dotfiles:latest --owner chipwolf
 ```
-
-For the full trust model (bootstrap scripts, `irm | iex`, what is and is not attested), see [SECURITY.md](SECURITY.md).
 
 ---
 
@@ -187,7 +189,6 @@ For the full trust model (bootstrap scripts, `irm | iex`, what is and is not att
 
 | Document | Contents |
 |----------|----------|
-| [SECURITY.md](SECURITY.md) | Trust model, bootstrap script trust, container image provenance |
-| [docs/yubikey.md](docs/yubikey.md) | Full YubiKey SSH workflow, backup strategy, credential hygiene |
+| [docs/yubikey.md](docs/yubikey.md) | YubiKey SSH workflow, backup strategy, credential hygiene |
 | [docs/secrets.md](docs/secrets.md) | Bitwarden integration, GnuPG config, secret introduction order |
-| [docs/opencode-mcp.md](docs/opencode-mcp.md) | MCP server inventory, trust surface, permission model |
+

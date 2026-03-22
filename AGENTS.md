@@ -121,6 +121,8 @@ Deleting a file from the chezmoi source does **not** remove it from the target (
 - **Executable** – `home/dot_scripts/executable_brew-review` (→ `~/.scripts/brew-review`) is the Homebrew drift review script. `home/dot_scripts/executable_7zw` (→ `~/.scripts/7zw`) is a 7-zip wrapper. Both live in `dot_scripts/` — not `dot_zfunctions/` (see Brew section below).
 - **Bootstrap** – `home/.chezmoiscripts/run_once_before_bootstrap.sh.tmpl` runs once before other updates (install deps, brew bundle, oh-my-zsh, mise, etc.). It is OS-aware (darwin/linux) and sets Codespaces overrides when `codespaces` is true.
 - **Root-level (not in source state)** – `install.sh` runs `chezmoi init --apply --source=...` to bootstrap; `.macos` holds macOS defaults; `.gitignore` excludes local/private artifacts (e.g. `*.local.*`, vim swap/undo). Do not add ignored patterns to the source state.
+- **README "What you get" table** – The tool table in `README.md` is sorted by category: shell/prompt, terminal emulators, multiplexer, editor, dev tools, version control, security, package/runtime management, then platform-specific utilities. When adding or removing a managed tool, update this table and preserve the sort order. Platform columns (macOS, Linux, Windows, Codespaces) must reflect what `.chezmoiignore` actually deploys.
+- **Install script repo URL** – `install.sh` and `install.ps1` hardcode `repo_url` pointing at `chipwolf/dotfiles`. The release workflow (`release.yml`) interpolates this with `github.server_url/github.repository` before uploading to the release, so forks get correct URLs automatically. Do not remove the hardcoded values from the source files; they are needed for local clone execution.
 
 ---
 
