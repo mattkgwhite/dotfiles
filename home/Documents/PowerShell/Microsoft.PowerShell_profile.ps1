@@ -1,7 +1,9 @@
 if (Get-Module -ListAvailable -Name PSReadLine) {
     Set-PSReadLineOption -EditMode Windows
-    Set-PSReadLineOption -PredictionSource History
-    Set-PSReadLineOption -PredictionViewStyle ListView
+    if ([Environment]::UserInteractive -and -not [Console]::IsOutputRedirected) {
+        Set-PSReadLineOption -PredictionSource History
+        Set-PSReadLineOption -PredictionViewStyle ListView
+    }
     Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 }
 

@@ -162,7 +162,7 @@
     // Credentials sourced from ~/.config/opencode/mcp-atlassian.env at launch
     "mcp-atlassian": {
       "type": "local",
-      "command": ["bash", "-c", "set -a; source ~/.config/opencode/mcp-atlassian.env; set +a; exec uvx mcp-atlassian"],
+      "command": ["bash", "-c", "set -a; source ~/.config/opencode/mcp-atlassian.env; set +a; exec mise x python -- uvx mcp-atlassian"],
       "enabled": true
     },
 {{- end }}
@@ -171,14 +171,14 @@
     // https://mcp-obsidian.org
     "obsidian": {
       "type": "local",
-      "command": ["npx", "-y", "@mauricio.wolff/mcp-obsidian@latest", "{{ .chezmoi.homeDir }}/Documents/Obsidian/Vault"],
+      "command": ["mise", "x", "node", "--", "npx", "-y", "@mauricio.wolff/mcp-obsidian@latest", "{{ .chezmoi.homeDir }}/Documents/Obsidian/Vault"],
       "enabled": true
     },
 
     // Chrome DevTools MCP — browser automation and debugging
     "chrome-devtools": {
       "type": "local",
-      "command": ["npx", "-y", "chrome-devtools-mcp@latest"],
+      "command": ["mise", "x", "node", "--", "npx", "-y", "chrome-devtools-mcp@latest"],
       "enabled": true
     },
 

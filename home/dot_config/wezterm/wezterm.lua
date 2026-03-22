@@ -14,7 +14,7 @@ wezterm.on("gui-startup", function(cmd)
   local _, _, window = wezterm.mux.spawn_window(cmd or {})
   window:gui_window():maximize()
 end)
-config.window_decorations = "NONE"
+config.window_decorations = "RESIZE"
 config.window_padding = {
   left = 0,
   right = 0,
