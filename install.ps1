@@ -37,13 +37,21 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     }
 }
 
-# Determine source directory
-$scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Get-Location }
-
-Write-Host "Applying chezmoi dotfiles from $scriptDir..." -ForegroundColor Cyan
-chezmoi init --apply --source="$scriptDir"
+# Initialise and apply chezmoi dotfiles.
+# If the script is running from a local clone, use that as the source.
+# Otherwise (e.g. iex download), let chezmoi clone from GitHub into the default location.
+$defaultSourceDir = "$env:USERPROFILE\.local\share\chezmoi"
+if ($PSScriptRoot -and (Test-Path "$PSScriptRoot\.chezmoiroot")) {
+    $sourceDir = $PSScriptRoot
+    Write-Host "Applying chezmoi dotfiles from $sourceDir..." -ForegroundColor Cyan
+    chezmoi init --apply --source="$sourceDir"
+} else {
+    Write-Host "Applying chezmoi dotfiles from GitHub..." -ForegroundColor Cyan
+    chezmoi init --apply "https://github.com/chipwolf/dotfiles"
+    $sourceDir = $defaultSourceDir
+}
 
 # Disable filemode tracking (Windows does not support the executable bit)
-git -C "$scriptDir" config core.fileMode false
+git -C "$sourceDir" config core.fileMode false
 
 Write-Host "Done! Restart your terminal to pick up the new configuration." -ForegroundColor Green
