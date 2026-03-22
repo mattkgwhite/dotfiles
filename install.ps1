@@ -57,16 +57,11 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
 # Initialise and apply chezmoi dotfiles.
 # If the script is running from a local clone, use that as the source.
 # Otherwise (e.g. irm | iex), let chezmoi clone from GitHub into the default location.
-# On subsequent runs (source dir already exists), just apply rather than re-init.
 $defaultSourceDir = "$env:USERPROFILE\.local\share\chezmoi"
 if ($PSScriptRoot -and (Test-Path "$PSScriptRoot\.chezmoiroot")) {
     $sourceDir = $PSScriptRoot
     Write-Host "Applying chezmoi dotfiles from $sourceDir..." -ForegroundColor Cyan
     chezmoi init --apply --source="$sourceDir"
-} elseif (Test-Path $defaultSourceDir) {
-    Write-Host "Applying chezmoi dotfiles..." -ForegroundColor Cyan
-    chezmoi apply
-    $sourceDir = $defaultSourceDir
 } else {
     Write-Host "Applying chezmoi dotfiles from GitHub..." -ForegroundColor Cyan
     chezmoi init --apply "https://github.com/chipwolf/dotfiles"

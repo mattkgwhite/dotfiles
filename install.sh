@@ -106,12 +106,10 @@ fi
 script_dir="$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)"
 
 # If the script is running from a local clone (i.e. .chezmoiroot exists next to it),
-# use that as the source. If already initialised, just apply. Otherwise let chezmoi
-# clone from GitHub into the default location (~/.local/share/chezmoi).
+# use that as the source. Otherwise (e.g. piped via curl/sh), let chezmoi clone from
+# GitHub into the default location (~/.local/share/chezmoi).
 if [ -f "${script_dir}/.chezmoiroot" ]; then
   set -- init --apply --source="${script_dir}"
-elif [ -d "${HOME}/.local/share/chezmoi" ]; then
-  set -- apply
 else
   set -- init --apply "https://github.com/chipwolf/dotfiles"
 fi
