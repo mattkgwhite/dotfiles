@@ -19,16 +19,7 @@ irm https://raw.githubusercontent.com/chipwolf/dotfiles/main/install.ps1 | iex
 
 ### Already have [chezmoi](https://chezmoi.io)?
 
-**macOS / Linux**
-
 ```sh
-chezmoi init --apply https://github.com/chipwolf/dotfiles
-```
-
-**Windows** — install chezmoi via [Chocolatey](https://chocolatey.org) if needed, then:
-
-```powershell
-choco install chezmoi -y
 chezmoi init --apply https://github.com/chipwolf/dotfiles
 ```
 
