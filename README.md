@@ -4,12 +4,15 @@ Dotfiles
 <!-- start chipwolf/badgesort default -->
 [![macOS](https://img.shields.io/badge/macOS-000000.svg?style=for-the-badge&logo=macos&logoColor=white)](#)
 [![BadgeSort](https://img.shields.io/badge/BadgeSort-000000.svg?style=for-the-badge&logo=githubsponsors)](https://github.com/ChipWolf/BadgeSort)
-[![Windows](https://img.shields.io/badge/Windows-0078D4.svg?style=for-the-badge&logo=windows&logoColor=white)](#)
 [![tmux](https://img.shields.io/badge/tmux-1BB91F.svg?style=for-the-badge&logo=tmux&logoColor=white)](#)
 [![Neovim](https://img.shields.io/badge/Neovim-57A143.svg?style=for-the-badge&logo=neovim&logoColor=white)](#)
 [![Linux](https://img.shields.io/badge/Linux-FCC624.svg?style=for-the-badge&logo=linux&logoColor=black)](#)
 [![Homebrew](https://img.shields.io/badge/Homebrew-FBB040.svg?style=for-the-badge&logo=homebrew&logoColor=black)](#)
 [![Git](https://img.shields.io/badge/Git-F05032.svg?style=for-the-badge&logo=git&logoColor=white)](#)
+[![Docker](https://img.shields.io/badge/Docker-2496ED.svg?style=for-the-badge&logo=docker&logoColor=white)](#)
+[![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF.svg?style=for-the-badge&logo=githubactions&logoColor=white)](#)
+[![Bitwarden](https://img.shields.io/badge/Bitwarden-175DDC.svg?style=for-the-badge&logo=bitwarden&logoColor=white)](#)
+[![Python](https://img.shields.io/badge/Python-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](#)
 <!-- end chipwolf/badgesort default -->
 
 Personal, opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo configures macOS (primary), Linux, Windows, and GitHub Codespaces. The bootstrap scripts install dependencies, apply configs, and get a new machine to a working state in a single command.
