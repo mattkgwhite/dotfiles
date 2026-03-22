@@ -11,10 +11,10 @@ Configuration files for backup/sync between systems.
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/chipwolf/dotfiles/main/install.sh)"
 ```
 
-**Windows** (elevated PowerShell)
+**Windows** (PowerShell)
 
 ```powershell
-iex (irm https://raw.githubusercontent.com/chipwolf/dotfiles/main/install.ps1)
+irm https://raw.githubusercontent.com/chipwolf/dotfiles/main/install.ps1 | iex
 ```
 
 ## SSH key setup

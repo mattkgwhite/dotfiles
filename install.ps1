@@ -1,11 +1,28 @@
-#Requires -RunAsAdministrator
 # install.ps1 — Bootstrap chezmoi dotfiles on Windows.
-# Usage: Run in an elevated PowerShell session.
-#   iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/chipwolf/dotfiles/main/install.ps1'))
+# Usage (elevated PowerShell not required — script self-elevates):
+#   irm https://raw.githubusercontent.com/chipwolf/dotfiles/main/install.ps1 | iex
 # Or clone the repo and run:
 #   .\install.ps1
 
 $ErrorActionPreference = "Stop"
+
+# Self-elevate if not already running as administrator
+$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+if (-not $isAdmin) {
+    Write-Host "Elevating to administrator..." -ForegroundColor Cyan
+    $scriptPath = $MyInvocation.MyCommand.Path
+    if ($scriptPath) {
+        # Running from a file — re-launch the file elevated
+        Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptPath`"" -Wait
+    } else {
+        # Running via iex/pipe — re-download and re-launch elevated via a temp file
+        $tmp = "$env:TEMP\dotfiles-install.ps1"
+        (New-Object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/chipwolf/dotfiles/main/install.ps1', $tmp)
+        Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$tmp`"" -Wait
+        Remove-Item $tmp -ErrorAction SilentlyContinue
+    }
+    exit
+}
 
 # Install Chocolatey if not present
 if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
@@ -39,7 +56,7 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
 
 # Initialise and apply chezmoi dotfiles.
 # If the script is running from a local clone, use that as the source.
-# Otherwise (e.g. iex download), let chezmoi clone from GitHub into the default location.
+# Otherwise (e.g. irm | iex), let chezmoi clone from GitHub into the default location.
 $defaultSourceDir = "$env:USERPROFILE\.local\share\chezmoi"
 if ($PSScriptRoot -and (Test-Path "$PSScriptRoot\.chezmoiroot")) {
     $sourceDir = $PSScriptRoot
