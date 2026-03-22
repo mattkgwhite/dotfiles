@@ -54,9 +54,8 @@ Two skills provide reusable workflows; load them on-demand via the `skill` tool.
 | `memory` | skill | Before writing to any AGENTS.md file: persisting rules, conventions, or lessons |
 | `dotfiles` | skill | Before making any change to chezmoi-managed files: adding, modifying, or removing config files, scripts, or templates |
 | `@daily-note` | subagent | Logging achievements or action items to today's Obsidian daily note |
-| `@beads-task-agent` | subagent | Any beads operation requiring 2+ `bd` commands: status overviews, finding and completing ready work, exploring the issue graph, multi-issue sequences |
 
-When delegating to subagents at session close (daily note logging, beads operations), run them in sequence rather than inline: delegate each concern one at a time, wait for each to complete, then proceed to the next.
+When delegating to subagents at session close (daily note logging), run them in sequence rather than inline: delegate each concern one at a time, wait for each to complete, then proceed to the next.
 
 ---
 
@@ -194,18 +193,3 @@ Commit messages use semantic commit format: `type(scope): description`. Types: `
 - If cleanup is needed outside the source tree, perform that cleanup as a separate step, then run repo or git commands separately.
 - Keep source edits, deployed-target cleanup, `chezmoi apply`, and git commit or push as separate commands unless a later step strictly depends on the previous one and stays within the same concern.
 - Keep destructive or policy-sensitive shell actions isolated so the intent is easy to inspect before execution.
-
----
-
-## Issue Tracking
-
-This project uses **bd (beads)** for issue tracking.
-Run `bd prime` for workflow context, or install hooks (`bd hooks install`) for auto-injection.
-
-**Quick reference:**
-- `bd ready` - Find unblocked work
-- `bd create "Title" --type task --priority 2` - Create issue
-- `bd close <id>` - Complete work
-- `bd dolt push` - Push beads to remote
-
-For full workflow details: `bd prime`

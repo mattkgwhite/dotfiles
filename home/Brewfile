@@ -13,7 +13,6 @@ brew "awscli" unless ENV["HOMEBREW_CODESPACES"]
 brew "bash" unless ENV["HOMEBREW_CODESPACES"]
 brew "bat" # better cat
 brew "bitwarden-cli" unless ENV["HOMEBREW_CODESPACES"]
-brew "beads" # beads CLI for opencode-beads plugin
 brew "blueutil" if OS.mac?
 brew "btop" unless ENV["HOMEBREW_CODESPACES"]
 brew "cbonsai" unless ENV["HOMEBREW_CODESPACES"] if ENV["HOMEBREW_PRIVATE"]

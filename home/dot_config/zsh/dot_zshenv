@@ -45,7 +45,6 @@ export HOMEBREW_CASK_OPTS="--require-sha"
 
 export MISE_PYTHON_UV_VENV_AUTO=true
 export OPENCODE_ENABLE_EXA=1
-export BD_DIR=${HOME}/.local/beads
 
 # Ensure path arrays do not contain duplicates.
 typeset -gU path fpath
