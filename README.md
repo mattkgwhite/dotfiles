@@ -17,7 +17,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/chipwolf/dotfiles/main/ins
 irm https://raw.githubusercontent.com/chipwolf/dotfiles/main/install.ps1 | iex
 ```
 
-### Already have chezmoi?
+### Already have [chezmoi](https://chezmoi.io)?
 
 **macOS / Linux**
 
@@ -25,7 +25,7 @@ irm https://raw.githubusercontent.com/chipwolf/dotfiles/main/install.ps1 | iex
 chezmoi init --apply https://github.com/chipwolf/dotfiles
 ```
 
-**Windows** — install [chezmoi](https://chezmoi.io) via [Chocolatey](https://chocolatey.org) if needed, then:
+**Windows** — install chezmoi via [Chocolatey](https://chocolatey.org) if needed, then:
 
 ```powershell
 choco install chezmoi -y
