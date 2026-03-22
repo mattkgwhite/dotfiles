@@ -21,7 +21,13 @@ if [ -n "${CODESPACES:-}" ]; then
     OUR_IMAGE="ghcr.io/chipwolf/dotfiles:latest"
     BASE_IMAGE="mcr.microsoft.com/devcontainers/universal:latest"
 
-    OUR_LAYERS=$("$CRANE" manifest "$OUR_IMAGE" | jq -r '.layers[].digest')
+    OUR_MANIFEST=$("$CRANE" manifest "$OUR_IMAGE")
+    OUR_DIGEST=$("$CRANE" digest "$OUR_IMAGE")
+    gh attestation verify "oci://${OUR_IMAGE%:*}@${OUR_DIGEST}" \
+      --owner chipwolf \
+      --signer-workflow slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml
+
+    OUR_LAYERS=$(printf '%s' "$OUR_MANIFEST" | jq -r '.layers[].digest')
     BASE_LAYERS=$("$CRANE" manifest --platform linux/amd64 "$BASE_IMAGE" | jq -r '.layers[].digest')
 
     printf '%s\n' "$OUR_LAYERS" | while IFS= read -r digest; do
