@@ -33,7 +33,7 @@ if [ -n "${CODESPACES:-}" ] && [ -z "${DOTFILES_NO_OVERLAY:-}" ]; then
     printf '%s\n' "$OUR_LAYERS" | while IFS= read -r digest; do
       if ! printf '%s\n' "$BASE_LAYERS" | grep -qxF "$digest"; then
         printf 'Applying overlay layer %s\n' "$digest" >&2
-        "$CRANE" blob "${OUR_IMAGE}@${digest}" | tar -xz --no-same-owner --no-same-permissions --no-overwrite-dir --warning=no-timestamp --exclude='./tmp' -C /
+        "$CRANE" blob "${OUR_IMAGE}@${digest}" | sudo tar -xz --no-same-owner --no-same-permissions --no-overwrite-dir --warning=no-timestamp --exclude='./tmp' -C /
       fi
     done
 
