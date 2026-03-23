@@ -101,11 +101,15 @@ jobs:
       - name: Interpolate repo URL in install scripts
         env:
           REPO_URL: ${{ github.server_url }}/${{ github.repository }}
-          RAW_BASE: ${{ github.server_url }}/${{ github.repository }}/releases/latest/download
+          IMAGE_NAME: ${{ env.IMAGE_REGISTRY }}/${{ github.repository }}
+          OWNER: ${{ github.repository_owner }}
         run: |
+          IMAGE_NAME_LC="${IMAGE_NAME,,}"
           sed -i "s|repo_url=\"https://github.com/chipwolf/dotfiles\"|repo_url=\"${REPO_URL}\"|" install.sh
+          sed -i "s|ghcr.io/chipwolf/dotfiles|${IMAGE_NAME_LC}|g" install.sh
+          sed -i "s|--owner chipwolf|--owner ${OWNER}|g" install.sh
           sed -i "s|\\\$repoUrl = \"https://github.com/chipwolf/dotfiles\"|\$repoUrl = \"${REPO_URL}\"|" install.ps1
-          sed -i "s|\\\$rawBase = \"https://raw.githubusercontent.com/chipwolf/dotfiles/main\"|\$rawBase = \"${RAW_BASE}\"|" install.ps1
+          sed -i "s|https://github.com/chipwolf/dotfiles/releases/download/|${REPO_URL}/releases/download/|g" install.ps1
 
       - name: Upload install scripts to release
         env:
