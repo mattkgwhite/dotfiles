@@ -41,6 +41,15 @@ if [ -n "${CODESPACES:-}" ] && [ -z "${DOTFILES_NO_OVERLAY:-}" ]; then
 
   if (set -e; _dotfiles_fast_path); then
     printf 'Dotfiles applied from pre-built overlay.\n' >&2
+    # Trust and install mise tools for the workspace project.
+    for d in /workspaces/[!.]*/; do
+      if [ -d "$d" ]; then
+        eval "$(mise activate sh 2>/dev/null)" || true
+        mise trust --all "$d" 2>/dev/null || true
+        mise install --cd "$d" 2>/dev/null || true
+        break
+      fi
+    done
     # Kill stale terminal sessions opened during provisioning so the user
     # gets a fresh shell with the newly applied config.
     pkill -HUP -u "$(whoami)" bash 2>/dev/null || true
