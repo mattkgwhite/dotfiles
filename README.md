@@ -46,15 +46,19 @@ Opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo config
 
 **macOS / Linux**
 
+<!-- x-release-please-start-version -->
 ```sh
-sh -c "$(curl -fsSL https://github.com/chipwolf/dotfiles/releases/download/v1.1.0/install.sh)" # x-release-please-version
+sh -c "$(curl -fsSL https://github.com/chipwolf/dotfiles/releases/download/v1.1.0/install.sh)"
 ```
+<!-- x-release-please-end -->
 
 **Windows** (PowerShell, the script self-elevates)
 
+<!-- x-release-please-start-version -->
 ```powershell
-irm https://github.com/chipwolf/dotfiles/releases/download/v1.1.0/install.ps1 | iex # x-release-please-version
+irm https://github.com/chipwolf/dotfiles/releases/download/v1.1.0/install.ps1 | iex
 ```
+<!-- x-release-please-end -->
 
 ### What happens
 
@@ -175,13 +179,15 @@ This covers:
 
 Verify:
 
+<!-- x-release-please-start-version -->
 ```sh
 # Install scripts (download the asset first)
 gh attestation verify install.sh --owner chipwolf
 
 # Container image
-gh attestation verify oci://ghcr.io/chipwolf/dotfiles:v1.1.0 --owner chipwolf # x-release-please-version
+gh attestation verify oci://ghcr.io/chipwolf/dotfiles:v1.1.0 --owner chipwolf
 ```
+<!-- x-release-please-end -->
 
 ---
 
