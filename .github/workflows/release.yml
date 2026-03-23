@@ -15,12 +15,10 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  IMAGE_REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   release-please:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
       pull-requests: write
@@ -32,89 +30,33 @@ jobs:
         id: rp
         uses: googleapis/release-please-action@v4.4.0
 
-  # --- Build and attest container image ---
+  # --- Build and attest container image (reusable workflow for SLSA L3) ---
 
   build:
     if: needs.release-please.outputs.release_created == 'true'
     needs: [release-please]
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/_build-container.yml
+    with:
+      image_registry: ghcr.io
+      image_name: ${{ github.repository }}
+      tag_name: ${{ needs.release-please.outputs.tag_name }}
     permissions:
       contents: read
       packages: write
       id-token: write
       attestations: write
-    steps:
-      - uses: actions/checkout@v6
 
-      - name: Lowercase image name
-        id: image
-        run: |
-          echo "name=${IMAGE_NAME,,}" >> "$GITHUB_OUTPUT"
-        env:
-          IMAGE_NAME: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      - name: Log in to GHCR
-        uses: docker/login-action@v4
-        with:
-          registry: ${{ env.IMAGE_REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push
-        id: build
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ steps.image.outputs.name }}:latest
-            ${{ steps.image.outputs.name }}:${{ needs.release-please.outputs.tag_name }}
-
-      - name: Attest container provenance
-        uses: actions/attest@v4
-        with:
-          subject-name: ${{ steps.image.outputs.name }}
-          subject-digest: ${{ steps.build.outputs.digest }}
-          push-to-registry: true
-
-  # --- Upload and attest install scripts ---
+  # --- Upload and attest install scripts (reusable workflow for SLSA L3) ---
 
   upload-scripts:
     if: needs.release-please.outputs.release_created == 'true'
     needs: [release-please]
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/_upload-scripts.yml
+    with:
+      image_registry: ghcr.io
+      image_name: ${{ github.repository }}
+      tag_name: ${{ needs.release-please.outputs.tag_name }}
     permissions:
       contents: write
       id-token: write
       attestations: write
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Interpolate repo URL in install scripts
-        env:
-          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
-          IMAGE_NAME: ${{ env.IMAGE_REGISTRY }}/${{ github.repository }}
-          REPOSITORY: ${{ github.repository }}
-        run: |
-          IMAGE_NAME_LC="${IMAGE_NAME,,}"
-          sed -i "s|repo_url=\"https://github.com/chipwolf/dotfiles\"|repo_url=\"${REPO_URL}\"|" install.sh
-          sed -i "s|ghcr.io/chipwolf/dotfiles|${IMAGE_NAME_LC}|g" install.sh
-          sed -i "s|--repo chipwolf/dotfiles|--repo ${REPOSITORY}|g" install.sh
-          sed -i "s|\\\$repoUrl = \"https://github.com/chipwolf/dotfiles\"|\$repoUrl = \"${REPO_URL}\"|" install.ps1
-          sed -i "s|https://github.com/chipwolf/dotfiles/releases/download/|${REPO_URL}/releases/download/|g" install.ps1
-
-      - name: Upload install scripts to release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload "${{ needs.release-please.outputs.tag_name }}" \
-            install.sh \
-            install.ps1 \
-            --clobber
-
-      - name: Attest install script provenance
-        uses: actions/attest@v4
-        with:
-          subject-path: |
-            install.sh
-            install.ps1

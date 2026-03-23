@@ -167,7 +167,7 @@ Full workflow (backup keys, credential hygiene, recovery): [docs/yubikey.md](doc
 
 ## Provenance [![SLSA 3](https://slsa.dev/images/gh-badge-level3.svg)](https://slsa.dev)
 
-All release artifacts are built with [SLSA Build L3](https://slsa.dev/spec/v1.0/levels#build-l3) provenance via [GitHub artifact attestations](https://docs.github.com/en/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds). Attestation runs in isolation from build steps, preventing tampering during and after the build.
+All release artifacts are built with [SLSA Build L3](https://slsa.dev/spec/v1.0/levels#build-l3) provenance via [GitHub artifact attestations](https://docs.github.com/en/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds) in [reusable workflows](https://docs.github.com/en/actions/security-guides/using-artifact-attestations-and-reusable-workflows-to-achieve-slsa-v1-build-level-3) that isolate the build from the calling workflow.
 
 This covers:
 
