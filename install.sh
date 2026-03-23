@@ -35,6 +35,7 @@ if [ -n "${CODESPACES:-}" ] && [ -z "${DOTFILES_NO_OVERLAY:-}" ]; then
   }
 
   if (set -e; _dotfiles_fast_path); then
+    set -x
     printf 'Dotfiles applied from pre-built overlay.\n' >&2
     # Trust and install mise tools for the workspace project.
     for d in /workspaces/[!.]*/; do
