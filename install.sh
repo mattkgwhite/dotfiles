@@ -10,7 +10,7 @@ repo_url="https://github.com/chipwolf/dotfiles"
 # --- Codespaces fast path ---
 # Pull only our overlay layers from GHCR and extract them directly,
 # skipping the full chezmoi apply + brew bundle. Falls back silently.
-if [ -n "${CODESPACES:-}" ]; then
+if [ -n "${CODESPACES:-}" ] && [ -z "${DOTFILES_NO_OVERLAY:-}" ]; then
   _dotfiles_fast_path() {
     CRANE_VERSION="v0.20.2"
     mkdir -p /tmp/_crane

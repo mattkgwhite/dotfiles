@@ -5,5 +5,5 @@ FROM mcr.microsoft.com/devcontainers/universal:latest
 
 USER codespace
 COPY --chown=codespace:codespace . /tmp/dotfiles
-RUN CODESPACES=1 /tmp/dotfiles/install.sh \
+RUN CODESPACES=1 DOTFILES_NO_OVERLAY=1 /tmp/dotfiles/install.sh \
     && rm -rf /tmp/dotfiles /home/codespace/.config/chezmoi
