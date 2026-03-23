@@ -57,6 +57,7 @@ jobs:
           # The Dockerfile adds exactly 2 layers on top of the base:
           #   1. COPY (dotfiles source)
           #   2. RUN  (install.sh + cleanup)
+          # Keep in sync with the Dockerfile instruction count after FROM.
           DIFF_COUNT=2
 
           # docker save and extract only our layer tarballs

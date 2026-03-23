@@ -5,6 +5,9 @@
 # CI extracts only the diff layers (those added by COPY + RUN below) and
 # pushes them as a scratch-based delta image to GHCR. install.sh pulls
 # all layers from that image; no base-image manifest diffing needed.
+#
+# IMPORTANT: _build-container.yml hardcodes DIFF_COUNT=2 (one layer per
+# instruction after FROM). Update that value if you add or remove layers.
 FROM mcr.microsoft.com/devcontainers/universal:latest
 
 USER codespace
