@@ -8,8 +8,9 @@ set -eu
 repo_url="https://github.com/chipwolf/dotfiles"
 
 # --- Codespaces fast path ---
-# Pull only our overlay layers from GHCR and extract them directly,
-# skipping the full chezmoi apply + brew bundle. Falls back silently.
+# The GHCR image is a delta-only image (scratch + our overlay layers).
+# Pull every layer and extract directly, skipping full chezmoi apply +
+# brew bundle. Falls back silently on any failure.
 if [ -n "${CODESPACES:-}" ] && [ -z "${DOTFILES_NO_OVERLAY:-}" ]; then
   _dotfiles_fast_path() {
     CRANE_VERSION="v0.20.2"
@@ -19,21 +20,15 @@ if [ -n "${CODESPACES:-}" ] && [ -z "${DOTFILES_NO_OVERLAY:-}" ]; then
     CRANE=/tmp/_crane/crane
 
     OUR_IMAGE="ghcr.io/chipwolf/dotfiles:v1.2.1" # x-release-please-version
-    BASE_IMAGE="mcr.microsoft.com/devcontainers/universal:latest"
 
     OUR_MANIFEST=$("$CRANE" manifest "$OUR_IMAGE")
     OUR_DIGEST=$("$CRANE" digest "$OUR_IMAGE")
     gh attestation verify "oci://${OUR_IMAGE%:*}@${OUR_DIGEST}" \
       --repo chipwolf/dotfiles
 
-    OUR_LAYERS=$(printf '%s' "$OUR_MANIFEST" | jq -r '.layers[].digest')
-    BASE_LAYERS=$("$CRANE" manifest --platform linux/amd64 "$BASE_IMAGE" | jq -r '.layers[].digest')
-
-    printf '%s\n' "$OUR_LAYERS" | while IFS= read -r digest; do
-      if ! printf '%s\n' "$BASE_LAYERS" | grep -qxF "$digest"; then
-        printf 'Applying overlay layer %s\n' "$digest" >&2
-        "$CRANE" blob "${OUR_IMAGE}@${digest}" | sudo tar -xz --no-overwrite-dir --warning=no-timestamp --exclude='./tmp' -C /
-      fi
+    printf '%s' "$OUR_MANIFEST" | jq -r '.layers[].digest' | while IFS= read -r digest; do
+      printf 'Applying overlay layer %s\n' "$digest" >&2
+      "$CRANE" blob "${OUR_IMAGE}@${digest}" | sudo tar -xz --no-overwrite-dir --warning=no-timestamp --exclude='./tmp' -C /
     done
 
     rm -rf /tmp/_crane
@@ -56,7 +51,7 @@ if [ -n "${CODESPACES:-}" ] && [ -z "${DOTFILES_NO_OVERLAY:-}" ]; then
     pkill -HUP -u "$(whoami)" zsh 2>/dev/null || true
     exit 0
   fi
-  printf 'Overlay fast path failed — falling back to chezmoi.\n' >&2
+  printf 'Overlay fast path failed, falling back to chezmoi.\n' >&2
 fi
 # --- end Codespaces fast path ---
 
