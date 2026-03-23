@@ -1,9 +1,23 @@
 # Builds a pre-baked dotfiles overlay image for GitHub Codespaces.
 # The resulting image layers (minus the base) are pulled and extracted
 # into a codespace by install.sh for fast dotfiles provisioning.
+#
+# CI extracts only the diff layers (those added by COPY + RUN below) and
+# pushes them as a scratch-based delta image to GHCR. install.sh pulls
+# all layers from that image; no base-image manifest diffing needed.
 FROM mcr.microsoft.com/devcontainers/universal:latest
 
 USER codespace
 COPY --chown=codespace:codespace . /tmp/dotfiles
 RUN CODESPACES=1 DOTFILES_NO_OVERLAY=1 /tmp/dotfiles/install.sh \
-    && rm -rf /tmp/dotfiles /home/codespace/.config/chezmoi
+    && rm -rf /tmp/dotfiles /home/codespace/.config/chezmoi \
+    # --- Layer size cleanup (saves ~535 MiB uncompressed) ---
+    # Remove Homebrew download cache and stale bottles
+    && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)" \
+    && brew cleanup --prune=all -s \
+    # Remove Homebrew git repo history (brew update re-clones on first use)
+    && rm -rf /home/linuxbrew/.linuxbrew/Homebrew/.git \
+    # Remove antidote plugin .git history (only working trees needed at runtime)
+    && { find /home/codespace/.cache/antidote -name .git -type d -exec rm -rf {} + 2>/dev/null || true; } \
+    # Remove duplicate chezmoi binary (brew-installed copy is on PATH)
+    && rm -f /home/codespace/.local/bin/chezmoi
