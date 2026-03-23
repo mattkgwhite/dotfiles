@@ -40,9 +40,9 @@ Opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo config
 ## Install
 
 > [!WARNING]
-> These scripts fetch and execute code from this repo in a single command. That requires trusting the repository owner and GitHub's transport security. Review them first if that matters to you, or use the [inspect-first path](#inspect-first) below.
+> These scripts fetch and execute code from this repo in a single command. Review them first if that matters to you, or use the [inspect-first path](#inspect-first) below.
 >
-> The install scripts are published as [GitHub Release](https://github.com/chipwolf/dotfiles/releases/latest) assets with [SLSA Build L3](https://slsa.dev/spec/v1.0/levels#build-l3) provenance. You can verify them before running: `gh attestation verify install.sh --owner chipwolf`
+> The install scripts are published as [GitHub Release](https://github.com/chipwolf/dotfiles/releases/latest) assets with [SLSA Build L3](https://slsa.dev/spec/v1.0/levels#build-l3) provenance, verified with: `gh attestation verify install.sh --owner chipwolf`
 
 **macOS / Linux**
 
