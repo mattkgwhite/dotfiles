@@ -94,7 +94,7 @@ fi
 
 # Reload all running zsh sessions so they pick up the updated config
 {{- if .codespaces }}
-pkill -HUP -u "$USER" zsh || true
+pkill -HUP -u "$(whoami)" zsh || true
 {{- end }}
 {{ end -}}
 {{- end }}
