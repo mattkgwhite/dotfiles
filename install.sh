@@ -24,8 +24,7 @@ if [ -n "${CODESPACES:-}" ] && [ -z "${DOTFILES_NO_OVERLAY:-}" ]; then
     OUR_MANIFEST=$("$CRANE" manifest "$OUR_IMAGE")
     OUR_DIGEST=$("$CRANE" digest "$OUR_IMAGE")
     gh attestation verify "oci://${OUR_IMAGE%:*}@${OUR_DIGEST}" \
-      --owner chipwolf \
-      --signer-workflow slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml
+      --repo chipwolf/dotfiles
 
     OUR_LAYERS=$(printf '%s' "$OUR_MANIFEST" | jq -r '.layers[].digest')
     BASE_LAYERS=$("$CRANE" manifest --platform linux/amd64 "$BASE_IMAGE" | jq -r '.layers[].digest')

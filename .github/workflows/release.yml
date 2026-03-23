@@ -41,9 +41,8 @@ jobs:
     permissions:
       contents: read
       packages: write
-    outputs:
-      image: ${{ steps.image.outputs.name }}
-      digest: ${{ steps.build.outputs.digest }}
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@v6
 
@@ -71,19 +70,12 @@ jobs:
             ${{ steps.image.outputs.name }}:latest
             ${{ steps.image.outputs.name }}:${{ needs.release-please.outputs.tag_name }}
 
-  container-provenance:
-    needs: [release-please, build]
-    permissions:
-      actions: read
-      id-token: write
-      packages: write
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.1.0
-    with:
-      image: ${{ needs.build.outputs.image }}
-      digest: ${{ needs.build.outputs.digest }}
-      registry-username: ${{ github.actor }}
-    secrets:
-      registry-password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Attest container provenance
+        uses: actions/attest@v4
+        with:
+          subject-name: ${{ steps.image.outputs.name }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
 
   # --- Upload and attest install scripts ---
 
@@ -93,8 +85,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    outputs:
-      hashes: ${{ steps.hash.outputs.hashes }}
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@v6
 
@@ -102,12 +94,12 @@ jobs:
         env:
           REPO_URL: ${{ github.server_url }}/${{ github.repository }}
           IMAGE_NAME: ${{ env.IMAGE_REGISTRY }}/${{ github.repository }}
-          OWNER: ${{ github.repository_owner }}
+          REPOSITORY: ${{ github.repository }}
         run: |
           IMAGE_NAME_LC="${IMAGE_NAME,,}"
           sed -i "s|repo_url=\"https://github.com/chipwolf/dotfiles\"|repo_url=\"${REPO_URL}\"|" install.sh
           sed -i "s|ghcr.io/chipwolf/dotfiles|${IMAGE_NAME_LC}|g" install.sh
-          sed -i "s|--owner chipwolf|--owner ${OWNER}|g" install.sh
+          sed -i "s|--repo chipwolf/dotfiles|--repo ${REPOSITORY}|g" install.sh
           sed -i "s|\\\$repoUrl = \"https://github.com/chipwolf/dotfiles\"|\$repoUrl = \"${REPO_URL}\"|" install.ps1
           sed -i "s|https://github.com/chipwolf/dotfiles/releases/download/|${REPO_URL}/releases/download/|g" install.ps1
 
@@ -120,19 +112,9 @@ jobs:
             install.ps1 \
             --clobber
 
-      - name: Generate hashes
-        id: hash
-        run: |
-          echo "hashes=$(sha256sum install.sh install.ps1 | base64 -w0)" >> "$GITHUB_OUTPUT"
-
-  script-provenance:
-    needs: [release-please, upload-scripts]
-    permissions:
-      actions: read
-      id-token: write
-      contents: write
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
-    with:
-      base64-subjects: ${{ needs.upload-scripts.outputs.hashes }}
-      upload-assets: true
-      upload-tag-name: ${{ needs.release-please.outputs.tag_name }}
+      - name: Attest install script provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            install.sh
+            install.ps1

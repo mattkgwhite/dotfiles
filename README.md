@@ -42,7 +42,7 @@ Opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo config
 > [!WARNING]
 > These scripts fetch and execute code from this repo in a single command. Review them first if that matters to you, or use the [inspect-first path](#inspect-first) below.
 >
-> The install scripts are published as [GitHub Release](https://github.com/chipwolf/dotfiles/releases/tag/v1.1.1) assets with [SLSA Build L3](https://slsa.dev/spec/v1.0/levels#build-l3) provenance, verified with: `gh attestation verify install.sh --owner chipwolf` <!-- x-release-please-version -->
+> The install scripts are published as [GitHub Release](https://github.com/chipwolf/dotfiles/releases/tag/v1.1.1) assets with [SLSA Build L3](https://slsa.dev/spec/v1.0/levels#build-l3) provenance, verified with: `gh attestation verify install.sh --repo chipwolf/dotfiles` <!-- x-release-please-version -->
 
 **macOS / Linux**
 
@@ -167,25 +167,25 @@ Full workflow (backup keys, credential hygiene, recovery): [docs/yubikey.md](doc
 
 ## Provenance [![SLSA 3](https://slsa.dev/images/gh-badge-level3.svg)](https://slsa.dev)
 
-All release artifacts are built with [SLSA Build L3](https://slsa.dev/spec/v1.0/levels#build-l3) provenance via the [SLSA GitHub Generator](https://github.com/slsa-framework/slsa-github-generator). The signing job runs in isolation from build steps, preventing tampering during and after the build.
+All release artifacts are built with [SLSA Build L3](https://slsa.dev/spec/v1.0/levels#build-l3) provenance via [GitHub artifact attestations](https://docs.github.com/en/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds). Attestation runs in isolation from build steps, preventing tampering during and after the build.
 
 This covers:
 
-- **Install scripts** (`install.sh`, `install.ps1`): published as [GitHub Release](https://github.com/chipwolf/dotfiles/releases/tag/v1.1.1) assets with generic SLSA provenance. <!-- x-release-please-version -->
-- **Codespaces overlay image** ([ghcr.io/chipwolf/dotfiles](https://ghcr.io/chipwolf/dotfiles)): published to GHCR with container SLSA provenance.
+- **Install scripts** (`install.sh`, `install.ps1`): published as [GitHub Release](https://github.com/chipwolf/dotfiles/releases/tag/v1.1.1) assets. <!-- x-release-please-version -->
+- **Codespaces overlay image** ([ghcr.io/chipwolf/dotfiles](https://ghcr.io/chipwolf/dotfiles)): published to GHCR.
 
 > [!NOTE]
-> SLSA provenance does not cover the chezmoi source state (templates, configs, run scripts) or packages installed by Homebrew, Chocolatey, or mise. Those are outside the attestation boundary.
+> Provenance does not cover the chezmoi source state (templates, configs, run scripts) or packages installed by Homebrew, Chocolatey, or mise. Those are outside the attestation boundary.
 
 Verify:
 
 <!-- x-release-please-start-version -->
 ```sh
 # Install scripts (download the asset first)
-gh attestation verify install.sh --owner chipwolf
+gh attestation verify install.sh --repo chipwolf/dotfiles
 
 # Container image
-gh attestation verify oci://ghcr.io/chipwolf/dotfiles:v1.1.1 --owner chipwolf
+gh attestation verify oci://ghcr.io/chipwolf/dotfiles:v1.1.1 --repo chipwolf/dotfiles
 ```
 <!-- x-release-please-end -->
 
