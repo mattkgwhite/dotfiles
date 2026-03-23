@@ -17,7 +17,7 @@ concurrency:
 jobs:
   megalinter:
     name: MegaLinter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: github.event.action != 'closed'
     permissions:
       contents: read
