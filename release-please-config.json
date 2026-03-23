@@ -5,7 +5,7 @@
       "release-type": "simple",
       "changelog-path": "CHANGELOG.md",
       "include-component-in-tag": false,
-      "extra-files": []
+      "extra-files": ["README.md"]
     }
   },
   "separate-pull-requests": false,
