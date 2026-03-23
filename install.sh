@@ -41,6 +41,10 @@ if [ -n "${CODESPACES:-}" ] && [ -z "${DOTFILES_NO_OVERLAY:-}" ]; then
 
   if (set -e; _dotfiles_fast_path); then
     printf 'Dotfiles applied from pre-built overlay.\n' >&2
+    # Kill stale terminal sessions opened during provisioning so the user
+    # gets a fresh shell with the newly applied config.
+    pkill -HUP -u "$(whoami)" bash 2>/dev/null || true
+    pkill -HUP -u "$(whoami)" zsh 2>/dev/null || true
     exit 0
   fi
   printf 'Overlay fast path failed — falling back to chezmoi.\n' >&2
