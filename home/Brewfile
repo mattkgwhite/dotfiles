@@ -29,7 +29,6 @@ brew "git" unless ENV["HOMEBREW_CODESPACES"]
 # brew "gmp"
 # brew "gnupg"
 brew "htop" unless ENV["HOMEBREW_CODESPACES"]
-brew "k9s"
 brew "kubernetes-cli" unless ENV["HOMEBREW_CODESPACES"]
 # brew "libyaml"
 brew "mas" if OS.mac? # mac app store

@@ -1,4 +1,4 @@
-{{- $chocoPackages := list "bat" "bitwarden-cli" "eza" "fd" "fzf" "jq" "k9s" "mise" "nerd-fonts-FiraCode" "neovim" "oh-my-posh" "opencode" "powershell-core" "powertoys" "ripgrep" "wezterm" -}}
+{{- $chocoPackages := list "bat" "bitwarden-cli" "eza" "fd" "fzf" "jq" "mise" "nerd-fonts-FiraCode" "neovim" "oh-my-posh" "opencode" "powershell-core" "powertoys" "ripgrep" "wezterm" -}}
 {{ if eq .chezmoi.os "windows" -}}
 # Chocolatey package list hash (triggers re-run when this list changes):
 # {{ join " " $chocoPackages | sha256sum }}

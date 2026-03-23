@@ -128,7 +128,7 @@ Deleting a file from the chezmoi source does **not** remove it from the target (
 
 ## Windows support
 
-- **Native Windows** is supported — `chezmoi apply` deploys cross-platform configs (git, nvim, mise, opencode, k9s) and Windows-specific configs (WezTerm), while skipping Unix-only targets (zsh, brew, tmux, ghostty, kitty, finicky, gnupg, scripts, opencode-shims).
+- **Native Windows** is supported — `chezmoi apply` deploys cross-platform configs (git, nvim, mise, opencode) and Windows-specific configs (WezTerm), while skipping Unix-only targets (zsh, brew, tmux, ghostty, kitty, finicky, gnupg, scripts, opencode-shims).
 - **OS-conditional ignores** in `home/.chezmoiignore` use `{{ if eq .chezmoi.os "windows" }}` and `{{ if ne .chezmoi.os "windows" }}` blocks to control which targets are deployed per platform.
 - **Bash chezmoiscripts** (`run_onchange_after_bootstrap.sh.tmpl`, `run_onchange_after_brew_review.sh.tmpl`, `run_onchange_after_tmux_symlinks.sh.tmpl`) are wrapped in `{{ if ne .chezmoi.os "windows" }}` guards so they render to empty on Windows (chezmoi skips empty scripts).
 - **Windows bootstrap** — `home/.chezmoiscripts/run_onchange_after_bootstrap_windows.ps1.tmpl` installs packages via Chocolatey (`choco install -y`), runs `mise install`, and syncs Neovim plugins. Runs only on Windows.

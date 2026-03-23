@@ -32,7 +32,6 @@ Opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo config
 | **GnuPG** | Encryption and signing | x | x | | |
 | **Homebrew** | Package manager | x | x | | x |
 | **mise** | Runtime manager (node, python, go, etc.) | x | x | x | x |
-| **k9s** | Kubernetes TUI | x | x | x | x |
 | **Finicky** | Default browser router | x | | | |
 
 ---
