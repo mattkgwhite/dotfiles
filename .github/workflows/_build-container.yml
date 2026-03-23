@@ -53,29 +53,22 @@ jobs:
           set -euo pipefail
           IMAGE="${{ steps.image.outputs.name }}"
           TAG="${{ inputs.tag_name }}"
-          BASE_IMAGE="mcr.microsoft.com/devcontainers/universal:latest"
 
-          # Count base vs full layers to find our diff
-          base_count=$(docker inspect --format='{{range .RootFS.Layers}}x{{end}}' "$BASE_IMAGE" | wc -c)
-          base_count=$((base_count - 1))
-          full_count=$(docker inspect --format='{{range .RootFS.Layers}}x{{end}}' dotfiles-full:local | wc -c)
-          full_count=$((full_count - 1))
-          diff_count=$((full_count - base_count))
-
-          echo "Base layers: $base_count, Full layers: $full_count, Our layers: $diff_count"
-
-          if [ "$diff_count" -le 0 ]; then
-            echo "::error::No diff layers found"
-            exit 1
-          fi
+          # The Dockerfile adds exactly 2 layers on top of the base:
+          #   1. COPY (dotfiles source)
+          #   2. RUN  (install.sh + cleanup)
+          DIFF_COUNT=2
 
           # docker save and extract only our layer tarballs
           work="$(mktemp -d)"
           docker save dotfiles-full:local -o "$work/full.tar"
           tar xf "$work/full.tar" -C "$work" manifest.json
 
+          total=$(jq -r '.[0].Layers | length' "$work/manifest.json")
+          echo "Total layers: $total, Our layers: $DIFF_COUNT"
+
           layer_paths=$(jq -r '.[0].Layers[]' "$work/manifest.json")
-          our_layers=$(echo "$layer_paths" | tail -n "$diff_count")
+          our_layers=$(echo "$layer_paths" | tail -n "$DIFF_COUNT")
 
           append_args=""
           for lp in $our_layers; do
