@@ -13,6 +13,7 @@ These constraints are unconditional. Apply them without being asked.
 - **Clone repos to read source.** Never curl GitHub API endpoints or fetch raw URLs. `git clone` first, then read.
 - **All Python through mise.** Never invoke `python`, `pip`, `uv`, or `uvx` directly. Load the `python-toolchain` skill before any Python work.
 - **Never accept a limitation without investigating.** Keep working until the problem is actually solved. Suggesting workarounds as a final answer is not acceptable.
+- **Don't say "Docker containers."** Docker is a brand name, not a container type. Write "containers" or "OCI images" in prose. Action references like `docker/login-action` are fine as-is.
 
 ---
 
