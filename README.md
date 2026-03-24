@@ -23,9 +23,9 @@ Opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo config
 |------|------|:---:|:---:|:---:|:---:|
 | **zsh + Powerlevel10k** | Shell and prompt | x | x | | x |
 | **Oh My Posh** | Prompt engine (Windows) | | | x | |
-| **Ghostty** | Terminal emulator | x | x | | |
+| **Ghostty** | Terminal emulator | x | | | |
 | **WezTerm** | Terminal emulator (Windows) | | | x | |
-| **tmux** | Terminal multiplexer | x | x | | x |
+| **tmux** | Terminal multiplexer | x | | | |
 | **Neovim (LazyVim)** | Editor | x | x | x | x |
 | **OpenCode** | AI coding agent | x | x | x | x |
 | **Git** | Version control config | x | x | x | x |

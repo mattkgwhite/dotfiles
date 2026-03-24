@@ -7,8 +7,6 @@ Brewfile.ignore
 .zshenv
 .profile
 .config/zsh
-.config/tmux
-.config/ghostty
 .config/finicky.js
 .gnupg
 .scripts
@@ -25,5 +23,7 @@ Documents
 
 {{ if ne .chezmoi.os "darwin" }}
 # macOS-only targets — not applicable on non-macOS
+.config/tmux
+.config/ghostty
 Library
 {{ end }}
