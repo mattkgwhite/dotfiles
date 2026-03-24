@@ -43,7 +43,7 @@ brew "ripgrep"
 brew "sevenzip" unless ENV["HOMEBREW_CODESPACES"]
 brew "thefuck" unless ENV["HOMEBREW_CODESPACES"]
 brew "timg" unless ENV["HOMEBREW_CODESPACES"] # terminal image/video viewer (kitty graphics)
-brew "tmux" unless ENV["HOMEBREW_CODESPACES"]
+brew "tmux" if OS.mac? unless ENV["HOMEBREW_CODESPACES"]
 brew "tree"
 brew "uv" # python manager
 brew "viu" unless ENV["HOMEBREW_CODESPACES"] # terminal image viewer (kitty graphics)
