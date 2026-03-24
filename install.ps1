@@ -20,7 +20,7 @@ if (-not $isAdmin) {
         Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptPath`"" -Wait
     } else {
         # Running via iex/pipe — re-download and re-launch elevated via a temp file
-        $tmp = "$env:TEMP\dotfiles-install.ps1"
+        $tmp = Join-Path $env:TEMP ([System.IO.Path]::GetRandomFileName() + ".ps1")
         (New-Object System.Net.WebClient).DownloadFile("$rawBase/install.ps1", $tmp)
         Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$tmp`"" -Wait
         Remove-Item $tmp -ErrorAction SilentlyContinue
