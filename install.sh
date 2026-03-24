@@ -14,9 +14,13 @@ repo_url="https://github.com/chipwolf/dotfiles"
 if [ -n "${CODESPACES:-}" ] && [ -z "${DOTFILES_NO_OVERLAY:-}" ]; then
   _dotfiles_fast_path() {
     CRANE_VERSION="v0.20.2"
+    CRANE_BASE="https://github.com/google/go-containerregistry/releases/download/${CRANE_VERSION}"
+    CRANE_TAR="go-containerregistry_Linux_x86_64.tar.gz"
     mkdir -p /tmp/_crane
-    curl -fsSL "https://github.com/google/go-containerregistry/releases/download/${CRANE_VERSION}/go-containerregistry_Linux_x86_64.tar.gz" \
-      | tar -xz -C /tmp/_crane crane
+    curl -fsSL "${CRANE_BASE}/${CRANE_TAR}" -o "/tmp/_crane/${CRANE_TAR}"
+    curl -fsSL "${CRANE_BASE}/checksums.txt" -o /tmp/_crane/checksums.txt
+    (cd /tmp/_crane && grep "${CRANE_TAR}" checksums.txt | sha256sum -c --strict)
+    tar -xzf "/tmp/_crane/${CRANE_TAR}" -C /tmp/_crane crane
     CRANE=/tmp/_crane/crane
 
     OUR_IMAGE="ghcr.io/chipwolf/dotfiles:v1.3.3" # x-release-please-version
