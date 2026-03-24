@@ -35,7 +35,7 @@ fi
 
 if ! command -v brew 2>&1 >/dev/null; then
   export PATH="$PATH:$HOME/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/bin:/opt/homebrew/bin"
-  eval $(brew shellenv)
+  eval "$(brew shellenv)"
 fi
 
 NVIM_PRE_INSTALLED=""
