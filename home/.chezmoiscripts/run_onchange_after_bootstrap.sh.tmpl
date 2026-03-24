@@ -43,8 +43,7 @@ if command -v nvim 2>&1 >/dev/null; then
   NVIM_PRE_INSTALLED=1
 fi
 
-# do not enforce sha
-unset HOMEBREW_CASK_OPTS
+export HOMEBREW_CASK_OPTS="--require-sha"
 export HOMEBREW_NO_AUTO_UPDATE=1
 
 {{- if not .codespaces }}
