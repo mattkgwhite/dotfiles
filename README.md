@@ -141,7 +141,7 @@ This repo ships a pre-baked [overlay container image](https://ghcr.io/chipwolf/d
 If you fork this repo, the main things to update:
 
 1. **`home/Brewfile`**: adjust packages to taste.
-2. **Git identity**: update `home/dot_config/git/` with your name, email, and signing key.
+2. **Git identity**: update `home/dot_gitconfig` with your name, email, and signing key.
 
 The install scripts (`install.sh`, `install.ps1`) have the repo URL interpolated automatically during the release workflow, so forks that use the same workflow get correct URLs in their release assets without editing.
 
