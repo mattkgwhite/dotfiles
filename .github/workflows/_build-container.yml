@@ -43,9 +43,20 @@ jobs:
       - name: Set up crane
         uses: imjasonh/setup-crane@6da1ae018866400525525ce74ff892880c099987 # v0.5
 
+      - name: Install bats
+        run: sudo apt-get update -q && sudo apt-get install -yq bats
+
       - name: Build full image locally
         run: |
           docker build -t dotfiles-full:local .
+
+      - name: Run container tests (dotfiles)
+        run: |
+          docker run --rm -v "$PWD/tests:/tmp/tests:ro" \
+            dotfiles-full:local bats /tmp/tests/container/dotfiles.bats
+
+      - name: Run container tests (overlay)
+        run: bats tests/container/overlay.bats
 
       - name: Extract delta layers and push
         id: push
