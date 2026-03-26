@@ -6,3 +6,9 @@
 
 [bitwarden]
     command = "bw"
+
+{{ if eq .chezmoi.os "windows" -}}
+[interpreters.ps1]
+    command = "pwsh"
+    args = ["-NoLogo", "-NoProfile", "-ExecutionPolicy", "Bypass"]
+{{ end -}}
