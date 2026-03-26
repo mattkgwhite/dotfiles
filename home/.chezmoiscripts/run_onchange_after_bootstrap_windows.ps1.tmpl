@@ -1,4 +1,4 @@
-{{- $chocoPackages := list "bat" "bitwarden-cli" "eza" "fd" "fzf" "jq" "mise" "nerd-fonts-FiraCode" "neovim" "oh-my-posh" "opencode" "powershell-core" "powertoys" "ripgrep" "wezterm" -}}
+{{- $chocoPackages := list "bat" "bitwarden-cli" "discord" "eza" "fd" "fzf" "jq" "mise" "nerd-fonts-FiraCode" "neovim" "oh-my-posh" "opencode" "powershell-core" "powertoys" "ripgrep" "wezterm" -}}
 {{ if eq .chezmoi.os "windows" -}}
 # Chocolatey package list hash (triggers re-run when this list changes):
 # {{ join " " $chocoPackages | sha256sum }}
@@ -27,6 +27,11 @@ $elevatedScript = {
         Write-Host "Installing WSL..."
         wsl --install --no-distribution
         Write-Host "WSL installed. A reboot may be required before WSL is available."
+    }
+
+    if (Get-Command wsl -ErrorAction SilentlyContinue) {
+        Write-Host "Updating WSL to latest pre-release..."
+        wsl --update --pre-release
     }
 
     if (Get-Command wsl -ErrorAction SilentlyContinue) {
