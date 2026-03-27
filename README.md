@@ -1,5 +1,4 @@
-Dotfiles
-===
+# Dotfiles
 
 <!-- start chipwolf/badgesort default -->
 [![macOS](https://img.shields.io/badge/macOS-000000.svg?style=for-the-badge&logo=macos&logoColor=white)](#)
@@ -196,4 +195,3 @@ gh attestation verify oci://ghcr.io/chipwolf/dotfiles:v1.4.0 --repo chipwolf/dot
 | ------------------------------------- | --------------------------------------------------------------- |
 | [docs/yubikey.md](docs/yubikey.md)    | YubiKey SSH workflow, backup strategy, credential hygiene       |
 | [docs/secrets.md](docs/secrets.md)    | Bitwarden integration, GnuPG config, secret introduction order  |
-

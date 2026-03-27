@@ -8,13 +8,14 @@
 #
 # IMPORTANT: _build-container.yml hardcodes DIFF_COUNT=2 (one layer per
 # instruction after FROM). Update that value if you add or remove layers.
-# hadolint ignore=DL3007
-# trivy:ignore:DS-0001
+#trivy:ignore:DS-0001
 # checkov:skip=CKV_DOCKER_7:latest tag is intentional for devcontainers/universal
 # kics-scan ignore-line
+# hadolint ignore=DL3007
 FROM mcr.microsoft.com/devcontainers/universal:latest
 
 USER codespace
+# kics-scan ignore-line
 COPY --chown=codespace:codespace . /tmp/dotfiles
 RUN CODESPACES=1 DOTFILES_NO_OVERLAY=1 /tmp/dotfiles/install.sh \
     && rm -rf /tmp/dotfiles /home/codespace/.config/chezmoi \

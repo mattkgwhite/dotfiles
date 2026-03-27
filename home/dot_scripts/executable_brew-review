@@ -126,7 +126,7 @@ while IFS= read -r key; do
 			extras+=("$key")
 		fi
 	fi
-done <<< "$installed_keys"
+done <<<"$installed_keys"
 
 # Find missing: in Brewfile active lines but not installed
 missing=()
@@ -135,7 +135,7 @@ while IFS= read -r key; do
 	if ! echo "$installed_keys" | grep -qF "$key"; then
 		missing+=("$key")
 	fi
-done <<< "$declared_keys"
+done <<<"$declared_keys"
 
 if [ ${#extras[@]} -eq 0 ] && [ ${#missing[@]} -eq 0 ]; then
 	exit 0
@@ -184,12 +184,12 @@ if [ ${#extras[@]} -gt 0 ]; then
 				if [ -n "$tap_formulae" ]; then
 					while IFS= read -r formula; do
 						printf "     formula: %s\n" "$formula"
-					done <<< "$tap_formulae"
+					done <<<"$tap_formulae"
 				fi
 				if [ -n "$tap_casks" ]; then
 					while IFS= read -r cask; do
 						printf "     cask: %s\n" "$cask"
-					done <<< "$tap_casks"
+					done <<<"$tap_casks"
 				fi
 				printf "  )"
 			fi
@@ -216,14 +216,14 @@ if [ ${#extras[@]} -gt 0 ]; then
 								[ -z "$f" ] && continue
 								echo "  -> Uninstalling formula: $f"
 								brew uninstall "$f"
-							done <<< "$tap_formulae"
+							done <<<"$tap_formulae"
 						fi
 						if [ -n "${tap_casks:-}" ]; then
 							while IFS= read -r c; do
 								[ -z "$c" ] && continue
 								echo "  -> Uninstalling cask: $c"
 								brew uninstall --cask "$c"
-							done <<< "$tap_casks"
+							done <<<"$tap_casks"
 						fi
 						brew untap --force "$pkg"
 					elif [ "$type" = "cask" ]; then

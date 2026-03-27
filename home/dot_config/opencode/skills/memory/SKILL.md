@@ -19,7 +19,8 @@ For rules specific to the chezmoi dotfiles repo itself, use `~/.local/share/chez
 2. Edit it with the Edit tool. Never write from scratch; always preserve existing content.
 3. Run `chezmoi apply` to deploy.
 4. Commit and push:
-   ```
+
+   ```sh
    git -C ~/.local/share/chezmoi add home/dot_config/opencode/AGENTS.md
    git -C ~/.local/share/chezmoi commit -m "chore(opencode): <description>"
    git -C ~/.local/share/chezmoi pull --rebase

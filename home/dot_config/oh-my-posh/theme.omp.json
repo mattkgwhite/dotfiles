@@ -100,9 +100,7 @@
         {
           "type": "text",
           "style": "plain",
-          "foreground_templates": [
-            "{{ if gt .Code 0 }}#f38ba8{{ end }}"
-          ],
+          "foreground_templates": ["{{ if gt .Code 0 }}#f38ba8{{ end }}"],
           "foreground": "#a6e3a1",
           "background": "transparent",
           "template": "\u276f "
@@ -111,9 +109,7 @@
     }
   ],
   "transient_prompt": {
-    "foreground_templates": [
-      "{{ if gt .Code 0 }}#f38ba8{{ end }}"
-    ],
+    "foreground_templates": ["{{ if gt .Code 0 }}#f38ba8{{ end }}"],
     "foreground": "#a6e3a1",
     "background": "transparent",
     "template": "\u276f "

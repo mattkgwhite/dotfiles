@@ -202,4 +202,3 @@ Never set `HOMEBREW_FOO=1` before `brew bundle` — that would result in `ENV["H
 - Never remove rules without explicit user confirmation.
 - Keep this file concise — if it grows beyond ~200 lines of rules (excluding vault context), propose splitting into topic-specific files.
 - When in doubt, append a new rule rather than silently adopting a convention that isn't written down.
-

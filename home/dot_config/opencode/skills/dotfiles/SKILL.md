@@ -31,7 +31,7 @@ Files under `home/` use chezmoi source state attributes:
 
 Directories follow the same attribute rules (`dot_config/` -> `~/.config/`). Scripts in `home/.chezmoiscripts/` do not create a target directory.
 
-When unsure about an attribute, consult https://www.chezmoi.io/reference/source-state-attributes/ rather than guessing.
+When unsure about an attribute, consult <https://www.chezmoi.io/reference/source-state-attributes/> rather than guessing.
 
 ## Workflow: adding or modifying a managed file
 
@@ -39,7 +39,8 @@ When unsure about an attribute, consult https://www.chezmoi.io/reference/source-
 2. Run `chezmoi diff` to verify the change looks correct.
 3. Run `chezmoi apply` to deploy.
 4. Commit and push:
-   ```
+
+   ```sh
    git -C ~/.local/share/chezmoi add <path>
    git -C ~/.local/share/chezmoi commit -m "<type>(<scope>): <description>"
    git -C ~/.local/share/chezmoi pull --rebase
@@ -74,7 +75,7 @@ Shared template fragments go in `home/.chezmoitemplates/<name>.tmpl` and are inv
 
 `home/.chezmoiignore` uses template blocks to control which targets deploy per platform:
 
-```
+```text
 {{ if eq .chezmoi.os "windows" }}
 # unix-only targets
 {{ end }}
