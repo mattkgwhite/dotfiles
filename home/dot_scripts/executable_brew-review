@@ -15,7 +15,7 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 
 # Skip entirely when not interactive
 if [ ! -t 0 ]; then
-  exit 0
+	exit 0
 fi
 
 # Resolve paths — prefer env vars set by chezmoi, fall back to defaults
@@ -24,16 +24,16 @@ BREWFILE="${1:-$CHEZMOI_SOURCE_DIR/Brewfile}"
 IGNOREFILE="${2:-$CHEZMOI_SOURCE_DIR/Brewfile.ignore}"
 
 if [ ! -f "$BREWFILE" ]; then
-  echo "brew-review: Brewfile not found at $BREWFILE" >&2
-  exit 1
+	echo "brew-review: Brewfile not found at $BREWFILE" >&2
+	exit 1
 fi
 
 # Extract base keys from a Brewfile-format file (type + quoted name only)
 # e.g. 'cask "1password" if OS.mac? # work' -> 'cask "1password"'
 _extract_keys() {
-  grep -v '^\s*#' "$1" 2>/dev/null \
-    | grep -oE '(brew|cask|mas|tap|whalebrew)\s+"[^"]+"' \
-    || true
+	grep -v '^\s*#' "$1" 2>/dev/null |
+		grep -oE '(brew|cask|mas|tap|whalebrew)\s+"[^"]+"' ||
+		true
 }
 
 # Sort entries within each section of a Brewfile while preserving the file
@@ -47,8 +47,8 @@ _extract_keys() {
 # including commented-out entries that don't look like package lines) is
 # preserved verbatim.
 _sort_brewfile() {
-  local file="$1"
-  python3 - "$file" <<'PYEOF'
+	local file="$1"
+	python3 - "$file" <<'PYEOF'
 import sys, re
 
 path = sys.argv[1]
@@ -114,31 +114,31 @@ installed_keys=$(_extract_keys "$dump_tmp")
 # Get ignore set
 ignore_keys=""
 if [ -f "$IGNOREFILE" ]; then
-  ignore_keys=$(_extract_keys "$IGNOREFILE")
+	ignore_keys=$(_extract_keys "$IGNOREFILE")
 fi
 
 # Find extras: installed but not in Brewfile and not in ignore
 extras=()
 while IFS= read -r key; do
-  [ -z "$key" ] && continue
-  if ! echo "$declared_keys" | grep -qF "$key"; then
-    if ! echo "$ignore_keys" | grep -qF "$key"; then
-      extras+=("$key")
-    fi
-  fi
+	[ -z "$key" ] && continue
+	if ! echo "$declared_keys" | grep -qF "$key"; then
+		if ! echo "$ignore_keys" | grep -qF "$key"; then
+			extras+=("$key")
+		fi
+	fi
 done <<< "$installed_keys"
 
 # Find missing: in Brewfile active lines but not installed
 missing=()
 while IFS= read -r key; do
-  [ -z "$key" ] && continue
-  if ! echo "$installed_keys" | grep -qF "$key"; then
-    missing+=("$key")
-  fi
+	[ -z "$key" ] && continue
+	if ! echo "$installed_keys" | grep -qF "$key"; then
+		missing+=("$key")
+	fi
 done <<< "$declared_keys"
 
 if [ ${#extras[@]} -eq 0 ] && [ ${#missing[@]} -eq 0 ]; then
-  exit 0
+	exit 0
 fi
 
 echo ""
@@ -147,107 +147,107 @@ echo ""
 
 # Report missing (no prompt — bootstrap will install them)
 if [ ${#missing[@]} -gt 0 ]; then
-  echo "The following packages are declared in Brewfile but not installed:"
-  for key in "${missing[@]}"; do
-    echo "  - $key"
-  done
-  echo "  Run 'chezmoi apply' or 'brew bundle --file \"$BREWFILE\"' to install."
-  echo ""
+	echo "The following packages are declared in Brewfile but not installed:"
+	for key in "${missing[@]}"; do
+		echo "  - $key"
+	done
+	echo "  Run 'chezmoi apply' or 'brew bundle --file \"$BREWFILE\"' to install."
+	echo ""
 fi
 
 # Prompt for extras
 if [ ${#extras[@]} -gt 0 ]; then
-  echo "The following packages are installed but not in Brewfile:"
-  echo ""
-  for key in "${extras[@]}"; do
-    pkg=$(echo "$key" | grep -oE '"[^"]+"' | tr -d '"')
-    type=$(echo "$key" | awk '{print $1}')
+	echo "The following packages are installed but not in Brewfile:"
+	echo ""
+	for key in "${extras[@]}"; do
+		pkg=$(echo "$key" | grep -oE '"[^"]+"' | tr -d '"')
+		type=$(echo "$key" | awk '{print $1}')
 
-    # Skip if already gone (e.g. removed as a tap dependency earlier in this run)
-    case "$type" in
-      tap)
-        brew tap-info "$pkg" &>/dev/null || { echo "  (skipping $key — already removed)"; echo ""; continue; } ;;
-      cask)
-        brew list --cask "$pkg" &>/dev/null || { echo "  (skipping $key — already removed)"; echo ""; continue; } ;;
-      *)
-        brew list --formula "$pkg" &>/dev/null || { echo "  (skipping $key — already removed)"; echo ""; continue; } ;;
-    esac
+		# Skip if already gone (e.g. removed as a tap dependency earlier in this run)
+		case "$type" in
+			tap)
+				brew tap-info "$pkg" &>/dev/null || { echo "  (skipping $key — already removed)"; echo ""; continue; } ;;
+			cask)
+				brew list --cask "$pkg" &>/dev/null || { echo "  (skipping $key — already removed)"; echo ""; continue; } ;;
+			*)
+				brew list --formula "$pkg" &>/dev/null || { echo "  (skipping $key — already removed)"; echo ""; continue; } ;;
+		esac
 
-    # For taps, show contents upfront as context before prompting
-    if [ "$type" = "tap" ]; then
-      tap_info=$(brew tap-info --json "$pkg" 2>/dev/null)
-      tap_formulae=$(echo "$tap_info" | python3 -c "import json,sys; t=json.load(sys.stdin)[0]; [print(f) for f in t.get('formula_names',[])]" 2>/dev/null | while IFS= read -r f; do brew list --formula "$f" &>/dev/null && echo "$f"; done || true)
-      tap_casks=$(echo "$tap_info" | python3 -c "import json,sys; t=json.load(sys.stdin)[0]; [print(c) for c in t.get('cask_tokens',[])]" 2>/dev/null | while IFS= read -r c; do brew list --cask "$c" &>/dev/null && echo "$c"; done || true)
-      printf "  %s" "$key"
-      if [ -n "$tap_formulae" ] || [ -n "$tap_casks" ]; then
-        echo " (contains installed packages:"
-        if [ -n "$tap_formulae" ]; then
-          while IFS= read -r formula; do
-            printf "     formula: %s\n" "$formula"
-          done <<< "$tap_formulae"
-        fi
-        if [ -n "$tap_casks" ]; then
-          while IFS= read -r cask; do
-            printf "     cask: %s\n" "$cask"
-          done <<< "$tap_casks"
-        fi
-        printf "  )"
-      fi
-      echo ""
-    else
-      printf "  %s\n" "$key"
-    fi
+		# For taps, show contents upfront as context before prompting
+		if [ "$type" = "tap" ]; then
+			tap_info=$(brew tap-info --json "$pkg" 2>/dev/null)
+			tap_formulae=$(echo "$tap_info" | python3 -c "import json,sys; t=json.load(sys.stdin)[0]; [print(f) for f in t.get('formula_names',[])]" 2>/dev/null | while IFS= read -r f; do brew list --formula "$f" &>/dev/null && echo "$f"; done || true)
+			tap_casks=$(echo "$tap_info" | python3 -c "import json,sys; t=json.load(sys.stdin)[0]; [print(c) for c in t.get('cask_tokens',[])]" 2>/dev/null | while IFS= read -r c; do brew list --cask "$c" &>/dev/null && echo "$c"; done || true)
+			printf "  %s" "$key"
+			if [ -n "$tap_formulae" ] || [ -n "$tap_casks" ]; then
+				echo " (contains installed packages:"
+				if [ -n "$tap_formulae" ]; then
+					while IFS= read -r formula; do
+						printf "     formula: %s\n" "$formula"
+					done <<< "$tap_formulae"
+				fi
+				if [ -n "$tap_casks" ]; then
+					while IFS= read -r cask; do
+						printf "     cask: %s\n" "$cask"
+					done <<< "$tap_casks"
+				fi
+				printf "  )"
+			fi
+			echo ""
+		else
+			printf "  %s\n" "$key"
+		fi
 
-    while true; do
-      printf "  [a]dd to Brewfile / [r]emove / [i]gnore permanently / [s]kip: "
-      read -r reply </dev/tty
-      case "$reply" in
-        a|A)
-          echo "$key" >> "$BREWFILE"
-          _sort_brewfile "$BREWFILE"
-          echo "  -> Added to $BREWFILE"
-          break
-          ;;
-        r|R)
-          if [ "$type" = "tap" ]; then
-            # Uninstall installed formulae/casks from the tap before untapping
-            if [ -n "${tap_formulae:-}" ]; then
-              while IFS= read -r f; do
-                [ -z "$f" ] && continue
-                echo "  -> Uninstalling formula: $f"
-                brew uninstall "$f"
-              done <<< "$tap_formulae"
-            fi
-            if [ -n "${tap_casks:-}" ]; then
-              while IFS= read -r c; do
-                [ -z "$c" ] && continue
-                echo "  -> Uninstalling cask: $c"
-                brew uninstall --cask "$c"
-              done <<< "$tap_casks"
-            fi
-            brew untap --force "$pkg"
-          elif [ "$type" = "cask" ]; then
-            brew uninstall --cask "$pkg"
-          else
-            brew uninstall "$pkg"
-          fi
-          echo "  -> Removed $pkg"
-          break
-          ;;
-        i|I)
-          echo "$key" >> "$IGNOREFILE"
-          echo "  -> Added to $IGNOREFILE"
-          break
-          ;;
-        s|S|"")
-          echo "  -> Skipped"
-          break
-          ;;
-        *)
-          echo "  Please enter a, r, i, or s."
-          ;;
-      esac
-    done
-    echo ""
-  done
+		while true; do
+			printf "  [a]dd to Brewfile / [r]emove / [i]gnore permanently / [s]kip: "
+			read -r reply </dev/tty
+			case "$reply" in
+				a | A)
+					echo "$key" >> "$BREWFILE"
+					_sort_brewfile "$BREWFILE"
+					echo "  -> Added to $BREWFILE"
+					break
+					;;
+				r | R)
+					if [ "$type" = "tap" ]; then
+						# Uninstall installed formulae/casks from the tap before untapping
+						if [ -n "${tap_formulae:-}" ]; then
+							while IFS= read -r f; do
+								[ -z "$f" ] && continue
+								echo "  -> Uninstalling formula: $f"
+								brew uninstall "$f"
+							done <<< "$tap_formulae"
+						fi
+						if [ -n "${tap_casks:-}" ]; then
+							while IFS= read -r c; do
+								[ -z "$c" ] && continue
+								echo "  -> Uninstalling cask: $c"
+								brew uninstall --cask "$c"
+							done <<< "$tap_casks"
+						fi
+						brew untap --force "$pkg"
+					elif [ "$type" = "cask" ]; then
+						brew uninstall --cask "$pkg"
+					else
+						brew uninstall "$pkg"
+					fi
+					echo "  -> Removed $pkg"
+					break
+					;;
+				i | I)
+					echo "$key" >> "$IGNOREFILE"
+					echo "  -> Added to $IGNOREFILE"
+					break
+					;;
+				s | S | "")
+					echo "  -> Skipped"
+					break
+					;;
+				*)
+					echo "  Please enter a, r, i, or s."
+					;;
+			esac
+		done
+		echo ""
+	done
 fi

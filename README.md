@@ -19,20 +19,20 @@ Opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo config
 
 ## What you get
 
-| Tool | Role | macOS | Linux | Windows | Codespaces |
-|------|------|:---:|:---:|:---:|:---:|
-| **zsh + Powerlevel10k** | Shell and prompt | x | x | | x |
-| **Oh My Posh** | Prompt engine (Windows) | | | x | |
-| **Ghostty** | Terminal emulator | x | | | |
-| **WezTerm** | Terminal emulator (Windows) | | | x | |
-| **tmux** | Terminal multiplexer | x | | | |
-| **Neovim (LazyVim)** | Editor | x | x | x | x |
-| **OpenCode** | AI coding agent | x | x | x | x |
-| **Git** | Version control config | x | x | x | x |
-| **GnuPG** | Encryption and signing | x | x | | |
-| **Homebrew** | Package manager | x | x | | x |
-| **mise** | Runtime manager (node, python, go, etc.) | x | x | x | x |
-| **Finicky** | Default browser router | x | | | |
+| Tool                    | Role                                        | macOS | Linux | Windows | Codespaces |
+| ----------------------- | ------------------------------------------- | :---: | :---: | :-----: | :--------: |
+| **zsh + Powerlevel10k** | Shell and prompt                            | x     | x     |         | x          |
+| **Oh My Posh**          | Prompt engine (Windows)                     |       |       | x       |            |
+| **Ghostty**             | Terminal emulator                           | x     |       |         |            |
+| **WezTerm**             | Terminal emulator (Windows)                 |       |       | x       |            |
+| **tmux**                | Terminal multiplexer                        | x     |       |         |            |
+| **Neovim (LazyVim)**    | Editor                                      | x     | x     | x       | x          |
+| **OpenCode**            | AI coding agent                             | x     | x     | x       | x          |
+| **Git**                 | Version control config                      | x     | x     | x       | x          |
+| **GnuPG**               | Encryption and signing                      | x     | x     |         |            |
+| **Homebrew**            | Package manager                             | x     | x     |         | x          |
+| **mise**                | Runtime manager (node, python, go, etc.)    | x     | x     | x       | x          |
+| **Finicky**             | Default browser router                      | x     |       |         |            |
 
 ---
 
@@ -105,10 +105,10 @@ chezmoi is configured to use Bitwarden CLI (`bw`) as its secret manager, but no 
 
 chezmoi uses two boolean flags to adapt behavior per machine. Both are set automatically in `.chezmoi.toml.tmpl`.
 
-| Flag | When true | What it gates |
-|------|-----------|---------------|
-| `codespaces` | `CODESPACES` env var is set | Skips GUI apps and redundant packages in the Brewfile. Uses the overlay fast path in `install.sh`. |
-| `private` | Windows, or `~/.private` exists | Enables personal-machine config: excludes work-specific MCP servers and Atlassian integrations from OpenCode. |
+| Flag         | When true                          | What it gates                                                                                                          |
+| ------------ | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `codespaces` | `CODESPACES` env var is set        | Skips GUI apps and redundant packages in the Brewfile. Uses the overlay fast path in `install.sh`.                    |
+| `private`    | Windows, or `~/.private` exists    | Enables personal-machine config: excludes work-specific MCP servers and Atlassian integrations from OpenCode.         |
 
 > [!IMPORTANT]
 > To mark a macOS or Linux machine as private, run `touch ~/.private` before `chezmoi apply`.
@@ -192,8 +192,8 @@ gh attestation verify oci://ghcr.io/chipwolf/dotfiles:v1.4.0 --repo chipwolf/dot
 
 ## Further reading
 
-| Document | Contents |
-|----------|----------|
-| [docs/yubikey.md](docs/yubikey.md) | YubiKey SSH workflow, backup strategy, credential hygiene |
-| [docs/secrets.md](docs/secrets.md) | Bitwarden integration, GnuPG config, secret introduction order |
+| Document                              | Contents                                                        |
+| ------------------------------------- | --------------------------------------------------------------- |
+| [docs/yubikey.md](docs/yubikey.md)    | YubiKey SSH workflow, backup strategy, credential hygiene       |
+| [docs/secrets.md](docs/secrets.md)    | Bitwarden integration, GnuPG config, secret introduction order  |
 

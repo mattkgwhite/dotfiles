@@ -8,6 +8,10 @@
 #
 # IMPORTANT: _build-container.yml hardcodes DIFF_COUNT=2 (one layer per
 # instruction after FROM). Update that value if you add or remove layers.
+# hadolint ignore=DL3007
+# trivy:ignore:DS-0001
+# checkov:skip=CKV_DOCKER_7:latest tag is intentional for devcontainers/universal
+# kics-scan ignore-line
 FROM mcr.microsoft.com/devcontainers/universal:latest
 
 USER codespace

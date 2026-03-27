@@ -9,13 +9,13 @@ Never run `python`, `python3`, `pip`, `pip3`, `uv`, or `uvx` directly. All Pytho
 
 ## Running commands
 
-| Task | Command |
-|------|---------|
-| Ad hoc Python command | `mise x -- uv run --no-project python ...` |
-| Run a script | `mise x -- uv run <script>` |
-| Run with extra deps | `mise x -- uv run --with <package> <script>` |
-| Install project dep | `mise x -- uv add <package>` |
-| Install global CLI tool | `mise x -- uv tool install <package>` |
+| Task                    | Command                                              |
+| ----------------------- | ---------------------------------------------------- |
+| Ad hoc Python command   | `mise x -- uv run --no-project python ...`           |
+| Run a script            | `mise x -- uv run <script>`                          |
+| Run with extra deps     | `mise x -- uv run --with <package> <script>`         |
+| Install project dep     | `mise x -- uv add <package>`                         |
+| Install global CLI tool | `mise x -- uv tool install <package>`                |
 
 - Prefer `mise x -- <command>` for ad hoc commands.
 - Use `mise run <task>` for project tasks when available.

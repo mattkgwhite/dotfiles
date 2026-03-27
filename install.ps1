@@ -5,6 +5,9 @@
 # Or clone the repo and run:
 #   .\install.ps1
 
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '', Justification = 'Install script uses Write-Host for coloured terminal output')]
+param()
+
 $repoUrl = "https://github.com/chipwolf/dotfiles"
 $rawBase = "https://github.com/chipwolf/dotfiles/releases/download/v1.4.0" # x-release-please-version
 

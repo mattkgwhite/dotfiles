@@ -11,15 +11,15 @@ config.color_scheme = "Catppuccin Mocha"
 
 -- Window
 wezterm.on("gui-startup", function(cmd)
-  local _, _, window = wezterm.mux.spawn_window(cmd or {})
-  window:gui_window():maximize()
+	local _, _, window = wezterm.mux.spawn_window(cmd or {})
+	window:gui_window():maximize()
 end)
 config.window_decorations = "RESIZE"
 config.window_padding = {
-  left = 0,
-  right = 0,
-  top = 0,
-  bottom = 0,
+	left = 0,
+	right = 0,
+	top = 0,
+	bottom = 0,
 }
 
 -- Cursor

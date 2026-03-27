@@ -11,7 +11,7 @@ REAL="$(PATH="${PATH#*opencode-shims:}" command -v "$BINARY" 2>/dev/null)"
 
 # Under `mise x --`, $_ points to the mise binary
 case "$INVOKER" in
-  */mise) exec "$REAL" "$@" ;;
+*/mise) exec "$REAL" "$@" ;;
 esac
 
 cat >&2 <<EOF
