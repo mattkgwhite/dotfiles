@@ -107,6 +107,11 @@ if ($isAdmin) {
 # Refresh PATH so newly installed tools are available
 $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")
 
+# Set XDG_CONFIG_HOME so XDG-aware tools (nvim, etc.) find configs at ~/.config
+$xdgTarget = "$env:USERPROFILE\.config"
+[System.Environment]::SetEnvironmentVariable("XDG_CONFIG_HOME", $xdgTarget, "User")
+$env:XDG_CONFIG_HOME = $xdgTarget
+
 # Install mise-managed tools (does not require elevation)
 if (Get-Command mise -ErrorAction SilentlyContinue) {
     Write-Host "Running mise install..."
@@ -117,6 +122,6 @@ if (Get-Command mise -ErrorAction SilentlyContinue) {
 # Sync Neovim plugins
 if (Get-Command nvim -ErrorAction SilentlyContinue) {
     Write-Host "Syncing Neovim plugins..."
-    nvim --headless -c "Lazy! sync" -c "qa"
+    nvim --headless "+Lazy! sync" +qa
 }
 {{- end }}
