@@ -21,13 +21,13 @@ These constraints are unconditional. Apply them without being asked.
 
 Load skills on-demand via the `skill` tool. Use subagents for delegated async work.
 
-| Name               | Type     | When to use                                                            |
-| ------------------ | -------- | ---------------------------------------------------------------------- |
-| `memory`           | skill    | Before writing to any AGENTS.md file                                   |
-| `dotfiles`         | skill    | Before any change to chezmoi-managed files                             |
-| `python-toolchain` | skill    | Before any Python, pip, uv, or mise work                               |
-| `retrospective`    | skill    | After completing any non-trivial task                                  |
-| `@daily-note`      | subagent | Logging achievements to today's Obsidian daily note (ask user first)   |
+| Name               | Type     | When to use                                                          |
+| ------------------ | -------- | -------------------------------------------------------------------- |
+| `memory`           | skill    | Before writing to any AGENTS.md file                                 |
+| `dotfiles`         | skill    | Before any change to chezmoi-managed files                           |
+| `python-toolchain` | skill    | Before any Python, pip, uv, or mise work                             |
+| `retrospective`    | skill    | After completing any non-trivial task                                |
+| `@daily-note`      | subagent | Logging achievements to today's Obsidian daily note (ask user first) |
 
 When delegating to subagents at session close, run them in sequence: one at a time, wait for each to complete.
 

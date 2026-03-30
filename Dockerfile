@@ -8,11 +8,10 @@
 #
 # IMPORTANT: _build-container.yml hardcodes DIFF_COUNT=2 (one layer per
 # instruction after FROM). Update that value if you add or remove layers.
-#trivy:ignore:DS-0001
-# checkov:skip=CKV_DOCKER_7:latest tag is intentional for devcontainers/universal
+# Pin a concrete universal image tag (not :latest) for reproducible builds and static analysis (Trivy DS-0001 / Checkov).
 # kics-scan ignore-line
 # hadolint ignore=DL3007
-FROM mcr.microsoft.com/devcontainers/universal:latest
+FROM mcr.microsoft.com/devcontainers/universal:5.1.5-linux
 
 USER codespace
 # kics-scan ignore-line

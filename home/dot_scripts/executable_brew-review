@@ -165,12 +165,27 @@ if [ ${#extras[@]} -gt 0 ]; then
 
 		# Skip if already gone (e.g. removed as a tap dependency earlier in this run)
 		case "$type" in
-			tap)
-				brew tap-info "$pkg" &>/dev/null || { echo "  (skipping $key — already removed)"; echo ""; continue; } ;;
-			cask)
-				brew list --cask "$pkg" &>/dev/null || { echo "  (skipping $key — already removed)"; echo ""; continue; } ;;
-			*)
-				brew list --formula "$pkg" &>/dev/null || { echo "  (skipping $key — already removed)"; echo ""; continue; } ;;
+		tap)
+			brew tap-info "$pkg" &>/dev/null || {
+				echo "  (skipping $key — already removed)"
+				echo ""
+				continue
+			}
+			;;
+		cask)
+			brew list --cask "$pkg" &>/dev/null || {
+				echo "  (skipping $key — already removed)"
+				echo ""
+				continue
+			}
+			;;
+		*)
+			brew list --formula "$pkg" &>/dev/null || {
+				echo "  (skipping $key — already removed)"
+				echo ""
+				continue
+			}
+			;;
 		esac
 
 		# For taps, show contents upfront as context before prompting
@@ -202,50 +217,50 @@ if [ ${#extras[@]} -gt 0 ]; then
 			printf "  [a]dd to Brewfile / [r]emove / [i]gnore permanently / [s]kip: "
 			read -r reply </dev/tty
 			case "$reply" in
-				a | A)
-					echo "$key" >> "$BREWFILE"
-					_sort_brewfile "$BREWFILE"
-					echo "  -> Added to $BREWFILE"
-					break
-					;;
-				r | R)
-					if [ "$type" = "tap" ]; then
-						# Uninstall installed formulae/casks from the tap before untapping
-						if [ -n "${tap_formulae:-}" ]; then
-							while IFS= read -r f; do
-								[ -z "$f" ] && continue
-								echo "  -> Uninstalling formula: $f"
-								brew uninstall "$f"
-							done <<<"$tap_formulae"
-						fi
-						if [ -n "${tap_casks:-}" ]; then
-							while IFS= read -r c; do
-								[ -z "$c" ] && continue
-								echo "  -> Uninstalling cask: $c"
-								brew uninstall --cask "$c"
-							done <<<"$tap_casks"
-						fi
-						brew untap --force "$pkg"
-					elif [ "$type" = "cask" ]; then
-						brew uninstall --cask "$pkg"
-					else
-						brew uninstall "$pkg"
+			a | A)
+				echo "$key" >>"$BREWFILE"
+				_sort_brewfile "$BREWFILE"
+				echo "  -> Added to $BREWFILE"
+				break
+				;;
+			r | R)
+				if [ "$type" = "tap" ]; then
+					# Uninstall installed formulae/casks from the tap before untapping
+					if [ -n "${tap_formulae:-}" ]; then
+						while IFS= read -r f; do
+							[ -z "$f" ] && continue
+							echo "  -> Uninstalling formula: $f"
+							brew uninstall "$f"
+						done <<<"$tap_formulae"
 					fi
-					echo "  -> Removed $pkg"
-					break
-					;;
-				i | I)
-					echo "$key" >> "$IGNOREFILE"
-					echo "  -> Added to $IGNOREFILE"
-					break
-					;;
-				s | S | "")
-					echo "  -> Skipped"
-					break
-					;;
-				*)
-					echo "  Please enter a, r, i, or s."
-					;;
+					if [ -n "${tap_casks:-}" ]; then
+						while IFS= read -r c; do
+							[ -z "$c" ] && continue
+							echo "  -> Uninstalling cask: $c"
+							brew uninstall --cask "$c"
+						done <<<"$tap_casks"
+					fi
+					brew untap --force "$pkg"
+				elif [ "$type" = "cask" ]; then
+					brew uninstall --cask "$pkg"
+				else
+					brew uninstall "$pkg"
+				fi
+				echo "  -> Removed $pkg"
+				break
+				;;
+			i | I)
+				echo "$key" >>"$IGNOREFILE"
+				echo "  -> Added to $IGNOREFILE"
+				break
+				;;
+			s | S | "")
+				echo "  -> Skipped"
+				break
+				;;
+			*)
+				echo "  Please enter a, r, i, or s."
+				;;
 			esac
 		done
 		echo ""

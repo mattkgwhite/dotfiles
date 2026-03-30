@@ -39,10 +39,10 @@ Once templates reference `bitwarden`, those specific targets will fail during ap
 
 The repo manages GnuPG config files under `home/private_dot_gnupg/`:
 
-| Source file              | Target                   | Contents                                                                             |
-| ------------------------ | ------------------------ | ------------------------------------------------------------------------------------ |
-| `private_gpg.conf`       | `~/.gnupg/gpg.conf`      | Algorithm preferences, key display settings, smartcard options                       |
-| `private_scdaemon.conf`  | `~/.gnupg/scdaemon.conf` | `disable-ccid` (uses the system CCID driver instead of GnuPG's built-in one)        |
+| Source file             | Target                   | Contents                                                                     |
+| ----------------------- | ------------------------ | ---------------------------------------------------------------------------- |
+| `private_gpg.conf`      | `~/.gnupg/gpg.conf`      | Algorithm preferences, key display settings, smartcard options               |
+| `private_scdaemon.conf` | `~/.gnupg/scdaemon.conf` | `disable-ccid` (uses the system CCID driver instead of GnuPG's built-in one) |
 
 The `private_` prefix ensures these files are deployed with `0600` permissions (owner read/write only).
 

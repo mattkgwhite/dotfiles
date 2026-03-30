@@ -1,6 +1,7 @@
 # Dotfiles
 
 <!-- start chipwolf/badgesort default -->
+
 [![macOS](https://img.shields.io/badge/macOS-000000.svg?style=for-the-badge&logo=macos&logoColor=white)](#)
 [![BadgeSort](https://img.shields.io/badge/BadgeSort-000000.svg?style=for-the-badge&logo=githubsponsors)](https://github.com/ChipWolf/BadgeSort)
 [![tmux](https://img.shields.io/badge/tmux-1BB91F.svg?style=for-the-badge&logo=tmux&logoColor=white)](#)
@@ -12,26 +13,27 @@
 [![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF.svg?style=for-the-badge&logo=githubactions&logoColor=white)](#)
 [![Bitwarden](https://img.shields.io/badge/Bitwarden-175DDC.svg?style=for-the-badge&logo=bitwarden&logoColor=white)](#)
 [![Python](https://img.shields.io/badge/Python-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](#)
+
 <!-- end chipwolf/badgesort default -->
 
 Opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo configures macOS (primary), Linux, Windows, and GitHub Codespaces. A single bootstrap command installs dependencies, applies configs, and gets a new machine to a working state.
 
 ## What you get
 
-| Tool                    | Role                                        | macOS | Linux | Windows | Codespaces |
-| ----------------------- | ------------------------------------------- | :---: | :---: | :-----: | :--------: |
-| **zsh + Powerlevel10k** | Shell and prompt                            | x     | x     |         | x          |
-| **Oh My Posh**          | Prompt engine (Windows)                     |       |       | x       |            |
-| **Ghostty**             | Terminal emulator                           | x     |       |         |            |
-| **WezTerm**             | Terminal emulator (Windows)                 |       |       | x       |            |
-| **tmux**                | Terminal multiplexer                        | x     |       |         |            |
-| **Neovim (LazyVim)**    | Editor                                      | x     | x     | x       | x          |
-| **OpenCode**            | AI coding agent                             | x     | x     | x       | x          |
-| **Git**                 | Version control config                      | x     | x     | x       | x          |
-| **GnuPG**               | Encryption and signing                      | x     | x     |         |            |
-| **Homebrew**            | Package manager                             | x     | x     |         | x          |
-| **mise**                | Runtime manager (node, python, go, etc.)    | x     | x     | x       | x          |
-| **Finicky**             | Default browser router                      | x     |       |         |            |
+| Tool                    | Role                                     | macOS | Linux | Windows | Codespaces |
+| ----------------------- | ---------------------------------------- | :---: | :---: | :-----: | :--------: |
+| **zsh + Powerlevel10k** | Shell and prompt                         |   x   |   x   |         |     x      |
+| **Oh My Posh**          | Prompt engine (Windows)                  |       |       |    x    |            |
+| **Ghostty**             | Terminal emulator                        |   x   |       |         |            |
+| **WezTerm**             | Terminal emulator (Windows)              |       |       |    x    |            |
+| **tmux**                | Terminal multiplexer                     |   x   |       |         |            |
+| **Neovim (LazyVim)**    | Editor                                   |   x   |   x   |    x    |     x      |
+| **OpenCode**            | AI coding agent                          |   x   |   x   |    x    |     x      |
+| **Git**                 | Version control config                   |   x   |   x   |    x    |     x      |
+| **GnuPG**               | Encryption and signing                   |   x   |   x   |         |            |
+| **Homebrew**            | Package manager                          |   x   |   x   |         |     x      |
+| **mise**                | Runtime manager (node, python, go, etc.) |   x   |   x   |    x    |     x      |
+| **Finicky**             | Default browser router                   |   x   |       |         |            |
 
 ---
 
@@ -45,17 +47,21 @@ Opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo config
 **macOS / Linux**
 
 <!-- x-release-please-start-version -->
+
 ```sh
 sh -c "$(curl -fsSL https://github.com/chipwolf/dotfiles/releases/download/v1.4.0/install.sh)"
 ```
+
 <!-- x-release-please-end -->
 
 **Windows** (PowerShell, the script self-elevates)
 
 <!-- x-release-please-start-version -->
+
 ```powershell
 irm https://github.com/chipwolf/dotfiles/releases/download/v1.4.0/install.ps1 | iex
 ```
+
 <!-- x-release-please-end -->
 
 ### What happens
@@ -104,10 +110,10 @@ chezmoi is configured to use Bitwarden CLI (`bw`) as its secret manager, but no 
 
 chezmoi uses two boolean flags to adapt behavior per machine. Both are set automatically in `.chezmoi.toml.tmpl`.
 
-| Flag         | When true                          | What it gates                                                                                                          |
-| ------------ | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `codespaces` | `CODESPACES` env var is set        | Skips GUI apps and redundant packages in the Brewfile. Uses the overlay fast path in `install.sh`.                    |
-| `private`    | Windows, or `~/.private` exists    | Enables personal-machine config: excludes work-specific MCP servers and Atlassian integrations from OpenCode.         |
+| Flag         | When true                       | What it gates                                                                                                 |
+| ------------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `codespaces` | `CODESPACES` env var is set     | Skips GUI apps and redundant packages in the Brewfile. Uses the overlay fast path in `install.sh`.            |
+| `private`    | Windows, or `~/.private` exists | Enables personal-machine config: excludes work-specific MCP servers and Atlassian integrations from OpenCode. |
 
 > [!IMPORTANT]
 > To mark a macOS or Linux machine as private, run `touch ~/.private` before `chezmoi apply`.
@@ -178,6 +184,7 @@ This covers:
 Verify:
 
 <!-- x-release-please-start-version -->
+
 ```sh
 # Install scripts (download the asset first)
 gh attestation verify install.sh --repo chipwolf/dotfiles
@@ -185,13 +192,14 @@ gh attestation verify install.sh --repo chipwolf/dotfiles
 # Container image
 gh attestation verify oci://ghcr.io/chipwolf/dotfiles:v1.4.0 --repo chipwolf/dotfiles
 ```
+
 <!-- x-release-please-end -->
 
 ---
 
 ## Further reading
 
-| Document                              | Contents                                                        |
-| ------------------------------------- | --------------------------------------------------------------- |
-| [docs/yubikey.md](docs/yubikey.md)    | YubiKey SSH workflow, backup strategy, credential hygiene       |
-| [docs/secrets.md](docs/secrets.md)    | Bitwarden integration, GnuPG config, secret introduction order  |
+| Document                           | Contents                                                       |
+| ---------------------------------- | -------------------------------------------------------------- |
+| [docs/yubikey.md](docs/yubikey.md) | YubiKey SSH workflow, backup strategy, credential hygiene      |
+| [docs/secrets.md](docs/secrets.md) | Bitwarden integration, GnuPG config, secret introduction order |
