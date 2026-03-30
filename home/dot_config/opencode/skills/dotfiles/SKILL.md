@@ -16,7 +16,7 @@ Never edit files under `~/` directly when they are chezmoi-managed. Always edit 
 Files under `home/` use chezmoi source state attributes:
 
 | Prefix               | Effect                                                                    |
-| -------------------- | ------------------------------------------------------------------------- |
+|----------------------|---------------------------------------------------------------------------|
 | `dot_`               | Adds a leading dot to the target name (`dot_gitconfig` -> `~/.gitconfig`) |
 | `private_`           | Target has no group/world permissions                                     |
 | `executable_`        | Target is executable                                                      |
@@ -26,7 +26,7 @@ Files under `home/` use chezmoi source state attributes:
 | `before_` / `after_` | With `run_*`: run before or after updating files                          |
 
 | Suffix  | Effect                        |
-| ------- | ----------------------------- |
+|---------|-------------------------------|
 | `.tmpl` | Content is a Go text/template |
 
 Directories follow the same attribute rules (`dot_config/` -> `~/.config/`). Scripts in `home/.chezmoiscripts/` do not create a target directory.

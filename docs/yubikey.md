@@ -37,7 +37,7 @@ ssh-keygen -t ed25519-sk -C "user@domain.tld" -O resident -O verify-required
 What the flags do:
 
 | Flag                   | Purpose                                                                         |
-| ---------------------- | ------------------------------------------------------------------------------- |
+|------------------------|---------------------------------------------------------------------------------|
 | `-t ed25519-sk`        | Use the Ed25519 algorithm with a FIDO2 security key                             |
 | `-C "user@domain.tld"` | Comment to identify the key (use your email)                                    |
 | `-O resident`          | Store the key handle on the YubiKey itself, making it portable between machines |
@@ -84,7 +84,7 @@ Options:
 ## `verify-required` vs touch-only
 
 | Mode                 | What happens on use                                               |
-| -------------------- | ----------------------------------------------------------------- |
+|----------------------|-------------------------------------------------------------------|
 | Touch-only (default) | YubiKey blinks, you touch it, authentication proceeds             |
 | `verify-required`    | YubiKey blinks, you enter your FIDO2 PIN, authentication proceeds |
 

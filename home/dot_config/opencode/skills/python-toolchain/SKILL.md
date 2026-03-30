@@ -10,7 +10,7 @@ Never run `python`, `python3`, `pip`, `pip3`, `uv`, or `uvx` directly. All Pytho
 ## Running commands
 
 | Task                    | Command                                      |
-| ----------------------- | -------------------------------------------- |
+|-------------------------|----------------------------------------------|
 | Ad hoc Python command   | `mise x -- uv run --no-project python ...`   |
 | Run a script            | `mise x -- uv run <script>`                  |
 | Run with extra deps     | `mise x -- uv run --with <package> <script>` |

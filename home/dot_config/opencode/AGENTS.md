@@ -22,7 +22,7 @@ These constraints are unconditional. Apply them without being asked.
 Load skills on-demand via the `skill` tool. Use subagents for delegated async work.
 
 | Name               | Type     | When to use                                                          |
-| ------------------ | -------- | -------------------------------------------------------------------- |
+|--------------------|----------|----------------------------------------------------------------------|
 | `memory`           | skill    | Before writing to any AGENTS.md file                                 |
 | `dotfiles`         | skill    | Before any change to chezmoi-managed files                           |
 | `python-toolchain` | skill    | Before any Python, pip, uv, or mise work                             |

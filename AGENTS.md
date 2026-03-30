@@ -41,7 +41,7 @@ The file [.chezmoiroot](.chezmoiroot) at the repo root contains `home`. So the *
 Paths under `home/` use chezmoi’s **source state attributes** (prefixes/suffixes). Only the main ones used in this repo are listed here; the full table and order rules are in the reference.
 
 | Prefix               | Effect                                                                  |
-| -------------------- | ----------------------------------------------------------------------- |
+|----------------------|-------------------------------------------------------------------------|
 | `dot_`               | Target name gets a leading dot (e.g. `dot_gitconfig` → `~/.gitconfig`). |
 | `private_`           | Target has no group/world permissions (e.g. `private_dot_gnupg`).       |
 | `executable_`        | Target is executable (e.g. `executable_7zw` → `~/.7zw`).                |
@@ -50,7 +50,7 @@ Paths under `home/` use chezmoi’s **source state attributes** (prefixes/suffix
 | `before_` / `after_` | With `run_*`: run before or after updating files.                       |
 
 | Suffix  | Effect                                                                                                                            |
-| ------- | --------------------------------------------------------------------------------------------------------------------------------- |
+|---------|-----------------------------------------------------------------------------------------------------------------------------------|
 | `.tmpl` | Content is a [text/template](https://pkg.go.dev/text/template) (see [Templating](https://www.chezmoi.io/user-guide/templating/)). |
 
 Other attributes (e.g. `create_`, `modify_`, `remove_`, `encrypted_`, `symlink_`, etc.) exist; see [Source state attributes](https://www.chezmoi.io/reference/source-state-attributes/) and [Target types](https://www.chezmoi.io/reference/target-types/) — **do not guess** prefix/suffix behavior.

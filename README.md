@@ -19,7 +19,7 @@ Opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo config
 ## What you get
 
 | Tool                    | Role                                     | macOS | Linux | Windows | Codespaces |
-| ----------------------- | ---------------------------------------- | :---: | :---: | :-----: | :--------: |
+|-------------------------|------------------------------------------|:-----:|:-----:|:-------:|:----------:|
 | **zsh + Powerlevel10k** | Shell and prompt                         |   x   |   x   |         |     x      |
 | **Oh My Posh**          | Prompt engine (Windows)                  |       |       |    x    |            |
 | **Ghostty**             | Terminal emulator                        |   x   |       |         |            |
@@ -109,7 +109,7 @@ chezmoi is configured to use Bitwarden CLI (`bw`) as its secret manager, but no 
 chezmoi uses two boolean flags to adapt behavior per machine. Both are set automatically in `.chezmoi.toml.tmpl`.
 
 | Flag         | When true                       | What it gates                                                                                                 |
-| ------------ | ------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+|--------------|---------------------------------|---------------------------------------------------------------------------------------------------------------|
 | `codespaces` | `CODESPACES` env var is set     | Skips GUI apps and redundant packages in the Brewfile. Uses the overlay fast path in `install.sh`.            |
 | `private`    | Windows, or `~/.private` exists | Enables personal-machine config: excludes work-specific MCP servers and Atlassian integrations from OpenCode. |
 
@@ -198,6 +198,6 @@ gh attestation verify oci://ghcr.io/chipwolf/dotfiles:v1.4.0 --repo chipwolf/dot
 ## Further reading
 
 | Document                           | Contents                                                       |
-| ---------------------------------- | -------------------------------------------------------------- |
+|------------------------------------|----------------------------------------------------------------|
 | [docs/yubikey.md](docs/yubikey.md) | YubiKey SSH workflow, backup strategy, credential hygiene      |
 | [docs/secrets.md](docs/secrets.md) | Bitwarden integration, GnuPG config, secret introduction order |
