@@ -50,10 +50,9 @@ jobs:
         run: |
           docker build -t dotfiles-full:local .
 
+      # dotfiles.bats runs on the runner (uses docker run per test); the image has no bats.
       - name: Run container tests (dotfiles)
-        run: |
-          docker run --rm -v "$PWD/tests:/tmp/tests:ro" \
-            dotfiles-full:local bats /tmp/tests/container/dotfiles.bats
+        run: bats tests/container/dotfiles.bats
 
       - name: Run container tests (overlay)
         run: bats tests/container/overlay.bats
