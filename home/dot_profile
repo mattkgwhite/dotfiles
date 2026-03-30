@@ -1,4 +1,17 @@
 export XDG_CONFIG_HOME="$HOME/.config"
+
+# Homebrew: add brew-installed CLIs to PATH for login shells. The official install
+# script appends shellenv to ~/.bashrc; bash -lc and other login POSIX shells skip that.
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv sh)"
+elif [ -x /usr/local/bin/brew ]; then
+  eval "$(/usr/local/bin/brew shellenv sh)"
+elif [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv sh)"
+elif [ -x "$HOME/.linuxbrew/bin/brew" ]; then
+  eval "$("$HOME/.linuxbrew/bin/brew" shellenv sh)"
+fi
+
 unset SSH_AGENT_PID
 export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/gnupg/S.gpg-agent.ssh"
 export PINENTRY_PROGRAM="/sbin/pinentry-rofi"
