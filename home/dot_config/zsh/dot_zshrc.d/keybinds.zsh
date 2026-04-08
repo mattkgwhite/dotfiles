@@ -1,5 +1,9 @@
 #!/bin/zsh
 
+autoload -U edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd e edit-command-line
+
 bindkey -M menuselect ' ' accept-and-infer-next-history
 bindkey -M menuselect '^?' undo
 
