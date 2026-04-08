@@ -8,6 +8,24 @@ Reference for all active keybindings across Ghostty, tmux, and zsh.
 
 No custom keybinds are defined; these are all defaults. Since Ghostty starts tmux on launch, native split/tab commands go through tmux in practice, but Ghostty-level window management still works.
 
+### How to list keybinds
+
+Open the command palette with `Cmd+Shift+P` and search for actions, or see the full reference at <https://ghostty.org/docs/config/keybind/reference>.
+
+### How to modify keybinds
+
+Edit the source file, then apply:
+
+```sh
+# Source file (chezmoi-managed)
+~/.local/share/chezmoi/home/dot_config/ghostty/config
+
+# After editing:
+chezmoi apply
+```
+
+Format: `keybind = trigger=action` (e.g. `keybind = cmd+k=clear_screen`). See <https://ghostty.org/docs/config/keybind>.
+
 ### Clipboard
 
 | Key | Action |
@@ -30,7 +48,7 @@ No custom keybinds are defined; these are all defaults. Since Ghostty starts tmu
 | `Cmd+Shift+]` | Next tab |
 | `Ctrl+Shift+Tab` | Previous tab |
 | `Ctrl+Tab` | Next tab |
-| `Cmd+1`–`Cmd+8` | Go to tab 1–8 |
+| `Cmd+1`-`Cmd+8` | Go to tab 1-8 |
 | `Cmd+9` | Go to last tab |
 
 ### Splits (native Ghostty splits, not tmux)
@@ -41,8 +59,8 @@ No custom keybinds are defined; these are all defaults. Since Ghostty starts tmu
 | `Cmd+Shift+D` | New split down |
 | `Cmd+[` | Previous split |
 | `Cmd+]` | Next split |
-| `Cmd+Alt+↑/↓/←/→` | Go to split in direction |
-| `Cmd+Ctrl+↑/↓/←/→` | Resize split |
+| `Cmd+Alt+Up/Down/Left/Right` | Go to split in direction |
+| `Cmd+Ctrl+Up/Down/Left/Right` | Resize split |
 | `Cmd+Ctrl+=` | Equalize splits |
 | `Cmd+Shift+Enter` | Toggle split zoom |
 | `Cmd+Enter` | Toggle fullscreen |
@@ -76,8 +94,8 @@ No custom keybinds are defined; these are all defaults. Since Ghostty starts tmu
 | `Cmd+Page Up` | Scroll page up |
 | `Cmd+Page Down` | Scroll page down |
 | `Cmd+J` | Scroll to selection |
-| `Cmd+↑` / `Cmd+Shift+↑` | Jump to previous prompt |
-| `Cmd+↓` / `Cmd+Shift+↓` | Jump to next prompt |
+| `Cmd+Up` / `Cmd+Shift+Up` | Jump to previous prompt |
+| `Cmd+Down` / `Cmd+Shift+Down` | Jump to next prompt |
 
 ### Screen capture
 
@@ -100,11 +118,11 @@ No custom keybinds are defined; these are all defaults. Since Ghostty starts tmu
 
 | Key | Action |
 |-----|--------|
-| `Cmd+→` | Move to end of line (`^E`) |
-| `Cmd+←` | Move to beginning of line (`^A`) |
+| `Cmd+Right` | Move to end of line (`^E`) |
+| `Cmd+Left` | Move to beginning of line (`^A`) |
 | `Cmd+Backspace` | Delete to beginning of line (`^U`) |
-| `Alt+→` | Forward word |
-| `Alt+←` | Backward word |
+| `Alt+Right` | Forward word |
+| `Alt+Left` | Backward word |
 
 ---
 
@@ -114,6 +132,33 @@ No custom keybinds are defined; these are all defaults. Since Ghostty starts tmu
 
 Stock tmux bindings (`Ctrl-b`) are disabled. All bindings below require the prefix unless marked *(no prefix)*.
 
+### How to list keybinds
+
+```sh
+# In a tmux session:
+Ctrl-a ?          # interactive list (press q to exit)
+
+# From the shell:
+tmux list-keys
+tmux list-keys -T copy-mode-vi
+```
+
+### How to modify keybinds
+
+Edit the local override file, then reload config (`Ctrl-a r`):
+
+```sh
+# Source file (chezmoi-managed)
+~/.local/share/chezmoi/home/dot_config/tmux/tmux.conf.local
+
+# After editing:
+chezmoi apply
+# Config is reloaded automatically on apply; or reload manually:
+tmux source ~/.config/tmux/tmux.conf.local
+```
+
+Do not modify `~/.tmux.conf` (oh-my-tmux base) or `~/.tmux.conf.local` directly; they are symlinked/managed by chezmoi. All custom bindings go in `tmux.conf.local`.
+
 ### Sessions
 
 | Key | Action |
@@ -121,9 +166,13 @@ Stock tmux bindings (`Ctrl-b`) are disabled. All bindings below require the pref
 | `Ctrl-a Ctrl-c` | New session |
 | `Ctrl-a Ctrl-f` | Find/switch session by name |
 | `Ctrl-a Shift-Tab` | Switch to last session |
-| `Ctrl-a s` | Interactive session chooser |
+| `Ctrl-a s` | Interactive session/window tree |
 | `Ctrl-a $` | Rename session |
 | `Ctrl-a d` | Detach |
+| `Ctrl-a (` | Previous client |
+| `Ctrl-a )` | Next client |
+| `Ctrl-a D` | Choose client to detach |
+| `Ctrl-a C-z` | Suspend client |
 
 ### Windows
 
@@ -135,10 +184,17 @@ Stock tmux bindings (`Ctrl-b`) are disabled. All bindings below require the pref
 | `Ctrl-a Ctrl-l` | Next window *(repeatable)* |
 | `Ctrl-a Ctrl-Shift-H` | Swap window left *(repeatable)* |
 | `Ctrl-a Ctrl-Shift-L` | Swap window right *(repeatable)* |
-| `Ctrl-a 0`–`9` | Go to window by number |
+| `Ctrl-a 0`-`9` | Go to window by number |
+| `Ctrl-a '` | Go to window by number (prompt) |
 | `Ctrl-a ,` | Rename window |
-| `Ctrl-a w` | Interactive window chooser |
-| `Ctrl-a &` | Kill window |
+| `Ctrl-a .` | Move window (prompt for target) |
+| `Ctrl-a f` | Find window by content |
+| `Ctrl-a w` | Interactive window/session tree |
+| `Ctrl-a &` | Kill window (with confirmation) |
+| `Ctrl-a M-n` | Next window with alert |
+| `Ctrl-a M-p` | Previous window with alert |
+| `Ctrl-a M-o` | Rotate windows |
+| `Ctrl-a C-o` | Rotate panes in window |
 
 ### Panes
 
@@ -147,7 +203,12 @@ Stock tmux bindings (`Ctrl-b`) are disabled. All bindings below require the pref
 | `Ctrl-a -` | Split pane top/bottom |
 | `Ctrl-a _` | Split pane left/right |
 | `Ctrl-a h/j/k/l` | Select pane left/down/up/right |
-| `Ctrl-a H/J/K/L` | Resize pane left/down/up/right by 2 *(repeatable)* |
+| `Ctrl-a Up/Down/Left/Right` | Select pane in direction *(repeatable)* |
+| `Ctrl-a H/J/K/L` | Resize pane by 2 *(repeatable)* |
+| `Ctrl-a C-Up/Down/Left/Right` | Resize pane by 1 *(repeatable)* |
+| `Ctrl-a M-Up/Down/Left/Right` | Resize pane by 5 *(repeatable)* |
+| `Ctrl-a o` | Cycle to next pane |
+| `Ctrl-a ;` | Last active pane |
 | `Ctrl-a >` | Swap pane with next |
 | `Ctrl-a <` | Swap pane with previous |
 | `Ctrl-a {` | Swap pane with previous (stock) |
@@ -156,28 +217,90 @@ Stock tmux bindings (`Ctrl-b`) are disabled. All bindings below require the pref
 | `Ctrl-a z` | Toggle pane zoom |
 | `Ctrl-a !` | Break pane into new window |
 | `Ctrl-a q` | Display pane numbers |
-| `Ctrl-a x` | Kill pane |
-| `Ctrl-a Space` | Next layout |
+| `Ctrl-a x` | Kill pane (with confirmation) |
+| `Ctrl-a M` | Toggle marked pane |
+| `Ctrl-a Space` | Cycle to next layout |
+| `Ctrl-a E` | Equalize pane sizes |
+| `Ctrl-a M-1` | Layout: even-horizontal |
+| `Ctrl-a M-2` | Layout: even-vertical |
+| `Ctrl-a M-3` | Layout: main-horizontal |
+| `Ctrl-a M-4` | Layout: main-vertical |
+| `Ctrl-a M-5` | Layout: tiled |
+| `Ctrl-a i` | Show pane info |
 
 ### Copy mode (vi bindings)
 
+Enter with `Ctrl-a Enter`. Uses `copy-mode-vi` key table.
+
+#### Navigation
+
 | Key | Action |
 |-----|--------|
-| `Ctrl-a Enter` | Enter copy mode |
-| `v` | Begin selection |
+| `h/j/k/l` | Cursor left/down/up/right |
+| `w/W` | Next word start (word/WORD) |
+| `b/B` | Previous word start (word/WORD) |
+| `e/E` | Next word end (word/WORD) |
+| `0` / `^` | Start of line / first non-blank |
+| `$` | End of line |
+| `H` | Start of line *(oh-my-tmux: remapped from top-of-screen)* |
+| `L` | End of line *(oh-my-tmux: remapped from bottom-of-screen)* |
+| `M` | Middle line on screen |
+| `g` / `G` | Top / bottom of history |
+| `:` | Go to line (prompt) |
+| `{` / `}` | Previous / next paragraph |
+| `%` | Jump to matching bracket |
+| `f<c>` / `F<c>` | Jump forward/backward to character |
+| `t<c>` / `T<c>` | Jump forward/backward before character |
+| `;` / `,` | Repeat last jump / reverse last jump |
+| `C-u` / `C-d` | Half page up/down |
+| `C-b` / `C-f` | Page up/down |
+| `C-e` / `C-y` | Scroll down/up one line |
+| `J` / `K` | Scroll down/up *(oh-my-tmux bindings)* |
+| `z` | Centre view on cursor |
+| `PPage` / `NPage` | Page up/down |
+
+#### Selection & copy
+
+| Key | Action |
+|-----|--------|
+| `v` / `Space` | Begin selection |
+| `V` | Select entire line |
 | `Ctrl-v` | Toggle rectangle selection |
-| `y` | Copy selection and exit |
-| `H` | Start of line |
-| `L` | End of line |
-| `Escape` | Cancel / exit copy mode |
+| `o` | Move to other end of selection |
+| `y` / `Enter` | Copy selection and exit copy mode |
+| `C-j` | Copy selection (stay in copy mode) |
+| `A` | Append selection and exit copy mode |
+| `D` | Copy from cursor to end of line and exit |
+| `Escape` / `q` | Cancel / exit copy mode |
+
+#### Search
+
+| Key | Action |
+|-----|--------|
+| `/` | Search forward (prompt) |
+| `?` | Search backward (prompt) |
+| `n` / `N` | Next / previous match |
+| `*` | Search forward for word under cursor |
+| `#` | Search backward for word under cursor |
+| `C-r` | Incremental search backward *(copy-mode only)* |
+| `C-s` | Incremental search forward *(copy-mode only)* |
+
+#### Marks
+
+| Key | Action |
+|-----|--------|
+| `X` | Set mark |
+| `M-x` | Jump to mark |
 
 ### Paste buffers
 
 | Key | Action |
 |-----|--------|
-| `Ctrl-a p` | Paste from top buffer |
-| `Ctrl-a P` | Choose buffer to paste from |
-| `Ctrl-a b` | List paste buffers |
+| `Ctrl-a p` / `Ctrl-a ]` | Paste from top buffer |
+| `Ctrl-a P` | Choose buffer to paste (basic list) |
+| `Ctrl-a =` | Choose buffer to paste (interactive) |
+| `Ctrl-a b` / `Ctrl-a #` | List paste buffers |
+| `Ctrl-a y` | Yank top buffer to system clipboard |
 
 ### Utilities
 
@@ -191,11 +314,46 @@ Stock tmux bindings (`Ctrl-b`) are disabled. All bindings below require the pref
 | `Ctrl-a t` | Show clock |
 | `Ctrl-a :` | Command prompt |
 | `Ctrl-a ?` | List all keybindings |
+| `Ctrl-a ~` | Show message log |
+| `Ctrl-a C-a` | Send prefix through to shell (pass-through `Ctrl-a`) |
 | `Ctrl-L` *(no prefix)* | Clear screen and scrollback history |
 
 ---
 
 ## zsh
+
+### How to list keybinds
+
+```sh
+# List all keymaps
+bindkey -l
+
+# List bindings in a specific keymap
+bindkey -M vicmd   # normal mode
+bindkey -M viins   # insert mode
+bindkey -M menuselect  # completion menu
+
+# List all ZLE widgets (including custom ones)
+zle -al
+
+# Show what a specific key is bound to
+bindkey -M vicmd 'e'
+```
+
+### How to modify keybinds
+
+Edit the keybinds file, then reload zsh or source the file:
+
+```sh
+# Source file (chezmoi-managed)
+~/.local/share/chezmoi/home/dot_config/zsh/dot_zshrc.d/keybinds.zsh
+
+# After editing:
+chezmoi apply
+source ~/.config/zsh/.zshrc.d/keybinds.zsh  # or open a new shell
+```
+
+Format: `bindkey -M <keymap> '<keys>' <widget>`. Custom widgets must be defined with `zle -N <widget> <function>` before binding. See `man zshzle`.
 
 ### vi mode
 
@@ -234,8 +392,8 @@ Searches only within history entries that match what you've already typed.
 
 | Key | Action |
 |-----|--------|
-| `↑` | Search history backward (substring match) |
-| `↓` | Search history forward (substring match) |
+| `Up` | Search history backward (substring match) |
+| `Down` | Search history forward (substring match) |
 
 ### zsh-autosuggestions
 
@@ -243,8 +401,8 @@ Suggestions appear greyed out as you type, based on history.
 
 | Key | Action |
 |-----|--------|
-| `→` or `End` | Accept full suggestion |
-| `Alt+→` or word-forward motion | Accept suggestion up to next word |
+| `Right` or `End` | Accept full suggestion |
+| `Alt+Right` or word-forward motion | Accept suggestion up to next word |
 | Any history navigation key | Clear suggestion |
 
 ### Completion menu
@@ -263,5 +421,31 @@ Active when a completion menu is open (`Tab` to open).
 
 | Key | Action |
 |-----|--------|
-| `Alt+←` | Backward word |
-| `Alt+→` | Forward word |
+| `Alt+Left` | Backward word |
+| `Alt+Right` | Forward word |
+
+---
+
+## Visual keybind explorer
+
+An interactive keyboard/chord visualization is available in:
+
+- `docs/keybinds.html`
+- `docs/keybinds.css`
+- `docs/keybinds.js`
+- `docs/keybinds.data.json`
+
+### How to run it
+
+Serve the `docs/` directory locally, then open the page:
+
+```sh
+python3 -m http.server --directory docs 4173
+open http://localhost:4173/keybinds.html
+```
+
+### How to update it
+
+1. Edit this file (`docs/keybinds.md`) as the human-readable reference.
+2. Update `docs/keybinds.data.json` so all shortcuts are represented in the visual app.
+3. Reload `keybinds.html` and verify filters, keyboard highlights, and chord steps still match the docs.
