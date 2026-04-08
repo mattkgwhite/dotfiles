@@ -42,3 +42,9 @@ copy-on-select = clipboard
 
 # --- Links ---
 link-url = true
+
+# --- Keyboard ---
+# Send Alt escape sequences for the left Option key so tmux M- chords work
+# (e.g. Ctrl-a M-1 through M-7 for select-layout). Right Option still
+# produces macOS special characters.
+macos-option-as-alt = left
