@@ -205,13 +205,15 @@ zsh runs in vi mode (from `oh-my-zsh/vi-mode`). Press `Esc` to enter normal mode
 
 | Key | Action |
 |-----|--------|
-| `vv` | Edit command in `$EDITOR` |
+| `vv` | Edit command in `$EDITOR` *(see note below)* |
 | `e` | Edit command in vim *(custom)* |
 | Standard vi motions | `h/l` move cursor, `w/b/e` word movement, `0/$` line start/end, etc. |
 | `p` / `P` | Paste from clipboard |
 | `y` + motion | Yank to clipboard |
 | `d` + motion | Delete to clipboard |
 | `c` + motion | Change to clipboard |
+
+> **Note on `vv`:** This requires two `v` keypresses within `$KEYTIMEOUT` milliseconds (zsh default: 40ms). With the default timeout it is nearly impossible to trigger reliably because the first `v` dispatches immediately to `visual-mode`. Raising `KEYTIMEOUT` to 15+ makes it usable. The `e` binding is provided as a single-keystroke alternative that avoids this issue entirely.
 
 #### Insert mode
 
