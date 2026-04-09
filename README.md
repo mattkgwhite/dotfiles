@@ -127,6 +127,12 @@ Pull the latest changes from the repo and re-apply:
 chezmoi update
 ```
 
+For local repo checks before commit:
+
+```sh
+pre-commit install
+```
+
 ---
 
 ## Codespaces

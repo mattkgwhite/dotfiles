@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: source-tests
+        name: source tests (bats)
+        entry: bats tests/source/
+        language: system
+        pass_filenames: false
+        always_run: true
