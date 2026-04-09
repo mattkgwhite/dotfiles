@@ -209,5 +209,6 @@ gh attestation verify oci://ghcr.io/chipwolf/dotfiles:v1.5.1 --repo chipwolf/dot
 
 | Document                           | Contents                                                       |
 |------------------------------------|----------------------------------------------------------------|
+| [docs/brew-review.md](docs/brew-review.md) | Homebrew drift review flow, prompts, and safe tap handling     |
 | [docs/yubikey.md](docs/yubikey.md) | YubiKey SSH workflow, backup strategy, credential hygiene      |
 | [docs/secrets.md](docs/secrets.md) | Bitwarden integration, GnuPG config, secret introduction order |

@@ -9,6 +9,12 @@
     "obsidianPreview.vaultPath": "{{ .chezmoi.homeDir }}/Documents/Obsidian/Vault",
     "update.releaseTrack": "prerelease"{{ if eq .chezmoi.os "windows" }},
     "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono",
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.profiles.linux": {
+      "zsh": {
+        "path": "zsh"
+      }
+    },
     "terminal.integrated.defaultProfile.windows": "WSL Bash",
     "terminal.integrated.profiles.windows": {
         "WSL Bash": {

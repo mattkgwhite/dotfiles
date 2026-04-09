@@ -22,9 +22,15 @@
   "winlibs"
   "wezterm"
 -}}
+{{- $wingetPackages := list
+  "Wakatime.CLIWakatime"
+  "Wakatime.DesktopWakatime"
+-}}
 {{ if eq .chezmoi.os "windows" -}}
 # Chocolatey package list hash (triggers re-run when this list changes):
 # {{ join " " $chocoPackages | sha256sum }}
+# Winget package list hash (triggers re-run when this list changes):
+# {{ join " " $wingetPackages | sha256sum }}
 
 $ErrorActionPreference = "Stop"
 
@@ -44,6 +50,18 @@ $elevatedScript = {
 
     Write-Host "Installing Chocolatey packages..."
     choco install {{ join " " $chocoPackages }} -y --no-progress
+
+    $wingetPackages = "{{ join " " $wingetPackages }}".Split(" ", [System.StringSplitOptions]::RemoveEmptyEntries)
+    foreach ($wingetPackage in $wingetPackages) {
+        $existing = winget list --id $wingetPackage --exact --accept-source-agreements 2>$null | Out-String
+        if ($existing -match [Regex]::Escape($wingetPackage)) {
+            Write-Host "Winget package already installed: $wingetPackage"
+            continue
+        }
+
+        Write-Host "Installing Winget package: $wingetPackage"
+        winget install --id $wingetPackage --exact --silent --accept-package-agreements --accept-source-agreements
+    }
 
     # --- WSL ---
     if (-not (Get-Command wsl -ErrorAction SilentlyContinue)) {
