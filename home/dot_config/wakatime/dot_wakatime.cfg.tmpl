@@ -1,0 +1,4 @@
+[settings]
+{{- if not .codespaces }}
+api_key = {{ (bitwarden "item" "wakatime-api-key").login.password | quote }}
+{{- end }}

@@ -1,4 +1,5 @@
 export XDG_CONFIG_HOME="$HOME/.config"
+export WAKATIME_HOME="${WAKATIME_HOME:-$XDG_CONFIG_HOME/wakatime}"
 
 # Homebrew: add brew-installed CLIs to PATH for login shells. The official install
 # script appends shellenv to ~/.bashrc; bash -lc and other login POSIX shells skip that.

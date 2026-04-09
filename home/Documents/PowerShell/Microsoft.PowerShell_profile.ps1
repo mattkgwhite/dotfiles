@@ -15,6 +15,9 @@ if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
     }
 }
 
+$xdgConfigHome = if ($env:XDG_CONFIG_HOME) { $env:XDG_CONFIG_HOME } else { Join-Path $env:USERPROFILE ".config" }
+$env:WAKATIME_HOME = if ($env:WAKATIME_HOME) { $env:WAKATIME_HOME } else { Join-Path $xdgConfigHome "wakatime" }
+
 Set-Alias -Name which -Value Get-Command
 Set-Alias -Name ll -Value Get-ChildItem
 

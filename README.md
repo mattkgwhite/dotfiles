@@ -106,7 +106,7 @@ The bootstrap scripts handle most dependencies. You need:
 
 ### Secrets and Bitwarden
 
-chezmoi is configured to use Bitwarden CLI (`bw`) as its secret manager, but no templates currently require it. `chezmoi apply` works fully without a Bitwarden session today. See [docs/secrets.md](docs/secrets.md) for details.
+chezmoi is configured to use Bitwarden CLI (`bw`) as its secret manager. Some templates (for example WakaTime API key config) read values from Bitwarden at apply time, so unlock Bitwarden before `chezmoi apply` when those targets are in scope. See [docs/secrets.md](docs/secrets.md) for details.
 
 ### Template flags
 

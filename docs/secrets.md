@@ -25,11 +25,11 @@ This tells chezmoi to resolve `bitwarden` template function calls via the `bw` C
 
 ### Current state
 
-No templates in the source state currently call the `bitwarden` template function. The `[bitwarden]` config block is present so that when templates are added that reference Bitwarden, chezmoi knows which command to use. As a result, `chezmoi apply` works fully without a Bitwarden session today.
+Some templates now call the `bitwarden` template function, for example `home/dot_config/wakatime/dot_wakatime.cfg.tmpl` reads the WakaTime API key from the Bitwarden item `wakatime-api-key`. When those targets are rendered, `chezmoi apply` requires an unlocked Bitwarden session.
 
 ### When Bitwarden-backed templates are added
 
-Once templates reference `bitwarden`, those specific targets will fail during apply when the vault is not unlocked. The rest of the apply still succeeds. The workflow on a fresh machine would be:
+Bitwarden-backed targets fail during apply when the vault is not unlocked. The rest of the apply still succeeds. The workflow on a fresh machine is:
 
 1. Run the bootstrap (`install.sh` / `install.ps1`): configs deploy, secret-dependent targets error or are skipped.
 2. Log in and unlock: `bw login && export BW_SESSION=$(bw unlock --raw)`
