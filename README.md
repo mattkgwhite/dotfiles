@@ -27,12 +27,14 @@ Opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo config
 | **tmux**                | Terminal multiplexer                     |   x   |       |         |            |
 | **Neovim (LazyVim)**    | Editor                                   |   x   |   x   |    x    |     x      |
 | **OpenCode**            | AI coding agent                          |   x   |   x   |    x    |     x      |
+| **tree-sitter CLI**     | Treesitter parser generator              |       |       |    x    |            |
 | **Git**                 | Version control config                   |   x   |   x   |    x    |     x      |
 | **GnuPG**               | Encryption and signing                   |   x   |   x   |         |            |
 | **Homebrew**            | Package manager                          |   x   |   x   |         |     x      |
 | **mise**                | Runtime manager (node, python, go, etc.) |   x   |   x   |    x    |     x      |
 | **Finicky**             | Default browser router                   |   x   |       |         |            |
 | **Sysinternals**        | Windows diagnostics utilities            |       |       |    x    |            |
+| **WinLibs (GCC)**       | C compiler toolchain (Windows)           |       |       |    x    |            |
 
 ---
 
