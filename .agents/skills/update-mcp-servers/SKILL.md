@@ -21,8 +21,8 @@ Each entry in `mcpServers` should follow this shape:
 
 - `id`, `enabled`
 - optional `conditions` object, each key/value is matched against global chezmoi data
-- `targets.opencode.enabled`
-- `targets.cursor.enabled`
+- optional `targets.opencode.enabled` (defaults to `true`)
+- optional `targets.cursor.enabled` (defaults to `true`)
 - either `local` or `remote`
 
 Local shape:
@@ -30,7 +30,7 @@ Local shape:
 - `local.command` string
 - `local.args` array
 - optional `local.env`
-- optional `local.appendDataArgs` array of chezmoi data keys to append as args
+- args can include `$data.<key>` tokens to interpolate global chezmoi data values in-place
 
 Remote shape:
 
@@ -41,7 +41,7 @@ Remote shape:
 ## Editing rules
 
 1. Keep a single canonical `local` or `remote` config per server.
-2. Do not re-introduce per-target transport overrides.
+2. Keep transport configuration at server level, use `targets` only for enablement.
 3. Do not re-introduce duplicate fields like parallel `cursorLocal` and `local`.
 4. Keep command execution via `mise` where applicable.
 

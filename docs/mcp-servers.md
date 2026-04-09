@@ -1,70 +1,136 @@
-# MCP Server Configuration
+# MCP Servers (How To)
 
-This repo defines MCP servers in one canonical file:
+Use this file to manage MCP servers:
 
-- `home/.chezmoidata/mcp-servers.yaml`
+- [`home/.chezmoidata/mcp-servers.yaml`](../home/.chezmoidata/mcp-servers.yaml)
 
-That data is rendered into:
+Chezmoi renders that into:
 
-- Cursor: `home/dot_cursor/mcp.json.tmpl`
-- OpenCode: `home/dot_config/opencode/opencode.jsonc.tmpl`
+- Cursor config via [`home/dot_cursor/mcp.json.tmpl`](../home/dot_cursor/mcp.json.tmpl)
+- OpenCode config via [`home/dot_config/opencode/opencode.jsonc.tmpl`](../home/dot_config/opencode/opencode.jsonc.tmpl)
 
-## Design Rules
+## Quick Start
 
-- Single transport config per server, use either `local` or `remote`.
-- No per-target transport overrides under `targets`.
-- `targets` only controls enablement per client (`cursor` and `opencode`).
-- Template logic should trust schema-required fields.
+### Add a remote server
 
-## Server Shape
+```yaml
+- id: context7
+  enabled: true
+  targets:
+    cursor: {}
+    opencode: {}
+  remote:
+    url: "https://mcp.context7.com/mcp"
+```
 
-Each `mcpServers` entry has:
+### Add a local server
 
-- `id` (server id)
-- `enabled` (boolean)
-- optional `conditions` (generic key/value matches against global chezmoi data)
-- `targets.cursor.enabled`
-- `targets.opencode.enabled`
-- one of:
-  - `local` with required `command` and `args`, optional `env`, optional `appendDataArgs`
-  - `remote` with required `url`, optional `transport`, optional `headers`
+```yaml
+- id: obsidian
+  enabled: true
+  targets:
+    cursor: {}
+    opencode: {}
+  local:
+    command: "mise"
+    args:
+      - "x"
+      - "node@22"
+      - "--"
+      - "npx"
+      - "-y"
+      - "@mauricio.wolff/mcp-obsidian@0.8.2"
+    env: {}
+```
 
-## Conditions
+## Common Tasks
 
-`conditions` are evaluated against the root template data object. A server is included only when all condition key/value pairs match.
+### Disable a server for one client
 
-Example:
+`targets.*.enabled` defaults to `true`. Only set `false` when needed.
+
+```yaml
+targets:
+  cursor:
+    enabled: false
+  opencode: {}
+```
+
+### Show a server only on certain machines
+
+Use `conditions` to match global chezmoi data keys from [`home/.chezmoi.toml.tmpl`](../home/.chezmoi.toml.tmpl).
 
 ```yaml
 conditions:
   private: false
 ```
 
-This means the server only renders when `.private` is `false` in chezmoi data.
+This means the server is rendered only when `.private == false`.
 
-## appendDataArgs
+### Interpolate data values in args
 
-For local servers, `appendDataArgs` appends values from global template data to the command args list.
+Use `$data.<key>` tokens in `args` when a local command needs values from global data in [`home/.chezmoi.toml.tmpl`](../home/.chezmoi.toml.tmpl).
 
-Example:
+In this repo:
+
+- Key source: [`home/.chezmoi.toml.tmpl`](../home/.chezmoi.toml.tmpl) defines `obsidianVaultPath` in `[data]`
+- Server usage: [`home/.chezmoidata/mcp-servers.yaml`](../home/.chezmoidata/mcp-servers.yaml) uses `$data.obsidianVaultPath` for the `obsidian` server
 
 ```yaml
 local:
   command: "mise"
-  args: ["x", "node@22", "--", "npx", "-y", "@mauricio.wolff/mcp-obsidian@0.8.2"]
-  appendDataArgs:
-    - "obsidianVaultPath"
+  args: ["x", "node@22", "--", "npx", "-y", "@mauricio.wolff/mcp-obsidian@0.8.2", "$data.obsidianVaultPath"]
 ```
 
-If `obsidianVaultPath` exists in template data, its value is appended to `args`.
+If `obsidianVaultPath` exists in template data, `$data.obsidianVaultPath` resolves to that value.
 
-## Validation
+Rendered result (example):
 
-Schema:
+```json
+{
+  "command": "mise",
+  "args": [
+    "x",
+    "node@22",
+    "--",
+    "npx",
+    "-y",
+    "@mauricio.wolff/mcp-obsidian@0.8.2",
+    "/home/wolf/Documents/Obsidian/Vault"
+  ]
+}
+```
 
-- `schemas/mcp-servers.schema.json`
+In other words, each `$data.<key>` token is replaced inline in the final argument list.
 
-Recommended checks after changes:
+## Fields
+
+### Top-level server fields
+
+- `id`: unique server id, used as the rendered key in Cursor/OpenCode MCP config.
+- `enabled`: whether this server is rendered at all.
+- `conditions` (optional): key/value filters matched against global chezmoi data from [`home/.chezmoi.toml.tmpl`](../home/.chezmoi.toml.tmpl) (for example `private: false`).
+- `targets`: where this server should appear.
+  - `targets.cursor.enabled` (optional): default `true`, set `false` to hide from Cursor.
+  - `targets.opencode.enabled` (optional): default `true`, set `false` to hide from OpenCode.
+- `local` or `remote`: exactly one transport block per server.
+
+### `local` transport fields
+
+- `command` (required): command to run the MCP process.
+- `args` (required): command arguments.
+- `env` (optional): environment variables for the process.
+- `args` supports inline `$data.<key>` tokens, replaced from [`home/.chezmoi.toml.tmpl`](../home/.chezmoi.toml.tmpl) at render time.
+
+### `remote` transport fields
+
+- `url` (required): remote MCP URL.
+- `transport` (optional): transport mode; defaults to `streamableHttp` in Cursor template rendering.
+- `headers` (optional): HTTP headers map for remote calls.
+
+Field requirements are validated by [`schemas/mcp-servers.schema.json`](../schemas/mcp-servers.schema.json).
+
+## Validate Changes
 
 1. Render both templates with `chezmoi execute-template`.
 2. Validate rendered Cursor MCP JSON.

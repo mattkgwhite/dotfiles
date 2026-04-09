@@ -5,10 +5,8 @@ mcpServers:
     conditions:
       private: false
     targets:
-      opencode:
-        enabled: true
-      cursor:
-        enabled: true
+      opencode: {}
+      cursor: {}
     remote:
       url: "https://mcp.atlassian.com/v1/mcp"
 
@@ -17,8 +15,7 @@ mcpServers:
     conditions:
       private: false
     targets:
-      opencode:
-        enabled: true
+      opencode: {}
       cursor:
         enabled: false
     local:
@@ -31,10 +28,8 @@ mcpServers:
   - id: obsidian
     enabled: true
     targets:
-      opencode:
-        enabled: true
-      cursor:
-        enabled: true
+      opencode: {}
+      cursor: {}
     local:
       command: "mise"
       args:
@@ -44,17 +39,14 @@ mcpServers:
         - "npx"
         - "-y"
         - "@mauricio.wolff/mcp-obsidian@0.8.2"
-      appendDataArgs:
-        - "obsidianVaultPath"
+        - "$data.obsidianVaultPath"
       env: {}
 
   - id: chrome-devtools
     enabled: true
     targets:
-      opencode:
-        enabled: true
-      cursor:
-        enabled: true
+      opencode: {}
+      cursor: {}
     local:
       command: "mise"
       args:
@@ -69,19 +61,15 @@ mcpServers:
   - id: context7
     enabled: true
     targets:
-      opencode:
-        enabled: true
-      cursor:
-        enabled: true
+      opencode: {}
+      cursor: {}
     remote:
       url: "https://mcp.context7.com/mcp"
 
   - id: grep
     enabled: true
     targets:
-      opencode:
-        enabled: true
-      cursor:
-        enabled: true
+      opencode: {}
+      cursor: {}
     remote:
       url: "https://mcp.grep.app"

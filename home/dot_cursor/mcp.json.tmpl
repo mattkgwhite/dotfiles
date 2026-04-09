@@ -12,18 +12,25 @@
 {{- end -}}
 {{- end -}}
 {{- end -}}
-{{- if and $server.targets.cursor.enabled $conditionsMatch -}}
+{{- $cursorEnabled := true -}}
+{{- if hasKey $server.targets.cursor "enabled" -}}
+{{- $cursorEnabled = $server.targets.cursor.enabled -}}
+{{- end -}}
+{{- if and $cursorEnabled $conditionsMatch -}}
 {{- if hasKey $server "local" -}}
 {{- $cursorCommand := $server.local.command -}}
-{{- $cursorArgs := $server.local.args -}}
-{{- $cursorEnv := (default (dict) $server.local.env) -}}
-{{- if hasKey $server.local "appendDataArgs" -}}
-{{- range $dataKey := $server.local.appendDataArgs -}}
+{{- $cursorArgs := list -}}
+{{- range $arg := $server.local.args -}}
+{{- $resolvedArg := $arg -}}
+{{- if hasPrefix $arg "$data." -}}
+{{- $dataKey := trimPrefix "$data." $arg -}}
 {{- if hasKey $ $dataKey -}}
-{{- $cursorArgs = append $cursorArgs (index $ $dataKey) -}}
+{{- $resolvedArg = (index $ $dataKey) -}}
 {{- end -}}
 {{- end -}}
+{{- $cursorArgs = append $cursorArgs $resolvedArg -}}
 {{- end -}}
+{{- $cursorEnv := (default (dict) $server.local.env) -}}
 {{- if $first }}{{- $first = false }}{{ else }},{{ end }}
     "{{ $server.id }}": {
       "command": "{{ $cursorCommand }}",

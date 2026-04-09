@@ -164,20 +164,27 @@
 {{- end -}}
 {{- end -}}
 {{- end -}}
-{{- if and $server.targets.opencode.enabled $conditionsMatch -}}
+{{- $opencodeEnabled := true -}}
+{{- if hasKey $server.targets.opencode "enabled" -}}
+{{- $opencodeEnabled = $server.targets.opencode.enabled -}}
+{{- end -}}
+{{- if and $opencodeEnabled $conditionsMatch -}}
 {{- if $first }}{{- $first = false }}{{ else }},{{ end }}
     "{{ $server.id }}": {
 {{- if hasKey $server "local" }}
 {{- $openCodeCommandName := $server.local.command -}}
-{{- $openCodeCommandArgs := $server.local.args -}}
-{{- $openCodeCommand := prepend $openCodeCommandArgs $openCodeCommandName -}}
-{{- if hasKey $server.local "appendDataArgs" -}}
-{{- range $dataKey := $server.local.appendDataArgs -}}
+{{- $openCodeCommandArgs := list -}}
+{{- range $arg := $server.local.args -}}
+{{- $resolvedArg := $arg -}}
+{{- if hasPrefix $arg "$data." -}}
+{{- $dataKey := trimPrefix "$data." $arg -}}
 {{- if hasKey $ $dataKey -}}
-{{- $openCodeCommand = append $openCodeCommand (index $ $dataKey) -}}
+{{- $resolvedArg = (index $ $dataKey) -}}
 {{- end -}}
 {{- end -}}
+{{- $openCodeCommandArgs = append $openCodeCommandArgs $resolvedArg -}}
 {{- end -}}
+{{- $openCodeCommand := prepend $openCodeCommandArgs $openCodeCommandName -}}
       "type": "local",
       "command": {{ $openCodeCommand | toPrettyJson "      " }},
 {{- else if hasKey $server "remote" }}

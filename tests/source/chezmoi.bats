@@ -71,7 +71,7 @@ render_template_with_override_data() {
     {
       "id": "shape-local-base",
       "enabled": true,
-      "targets": { "cursor": { "enabled": true }, "opencode": { "enabled": true } },
+      "targets": { "cursor": {}, "opencode": {} },
       "local": {
         "command": "mise",
         "args": ["x", "node", "--", "npx", "-y", "pkg-local-base@latest"],
@@ -81,7 +81,7 @@ render_template_with_override_data() {
     {
       "id": "shape-remote-base",
       "enabled": true,
-      "targets": { "cursor": { "enabled": true }, "opencode": { "enabled": true } },
+      "targets": { "cursor": {}, "opencode": {} },
       "remote": { "url": "https://example.com/base" }
     }
   ]
@@ -110,13 +110,13 @@ EOF
       "id": "shape-private-blocked",
       "enabled": true,
       "conditions": { "private": false },
-      "targets": { "cursor": { "enabled": true }, "opencode": { "enabled": true } },
+      "targets": { "cursor": {}, "opencode": {} },
       "remote": { "url": "https://example.com/private-blocked" }
     },
     {
       "id": "shape-private-allowed",
       "enabled": true,
-      "targets": { "cursor": { "enabled": true }, "opencode": { "enabled": true } },
+      "targets": { "cursor": {}, "opencode": {} },
       "remote": { "url": "https://example.com/private-allowed" }
     }
   ]
@@ -141,7 +141,7 @@ EOF
     {
       "id": "shape-op-local-base",
       "enabled": true,
-      "targets": { "cursor": { "enabled": true }, "opencode": { "enabled": true } },
+      "targets": { "cursor": {}, "opencode": {} },
       "local": {
         "command": "mise",
         "args": ["x", "node", "--", "npx", "-y", "pkg-op-local-base@latest"],
@@ -151,7 +151,7 @@ EOF
     {
       "id": "shape-op-remote-base",
       "enabled": true,
-      "targets": { "cursor": { "enabled": true }, "opencode": { "enabled": true } },
+      "targets": { "cursor": {}, "opencode": {} },
       "remote": { "url": "https://example.com/op-base" }
     }
   ]
@@ -189,7 +189,7 @@ EOF
     data = JSON.parse(File.read(data_path))
     is_private = data.fetch("private", false)
     expected_ids = data.fetch("mcpServers")
-      .select { |s| s.dig("targets", "cursor", "enabled") }
+      .reject { |s| s.dig("targets", "cursor", "enabled") == false }
       .select do |s|
         conditions = s.fetch("conditions", {})
         conditions.all? { |k, v| data.key?(k) && data[k] == v }
@@ -274,7 +274,7 @@ EOF
     data = JSON.parse(File.read(data_path))
     is_private = data.fetch("private", false)
     expected_ids = data.fetch("mcpServers")
-      .select { |s| s.dig("targets", "opencode", "enabled") }
+      .reject { |s| s.dig("targets", "opencode", "enabled") == false }
       .select do |s|
         conditions = s.fetch("conditions", {})
         conditions.all? { |k, v| data.key?(k) && data[k] == v }
