@@ -1,0 +1,13 @@
+{{ if eq .chezmoi.os "windows" -}}
+$ErrorActionPreference = "Stop"
+
+if (Get-Command choco -ErrorAction SilentlyContinue) {
+    Write-Host "Updating Chocolatey packages..."
+    choco upgrade all -y --no-progress
+}
+
+if (Get-Command winget -ErrorAction SilentlyContinue) {
+    Write-Host "Updating Winget packages..."
+    winget upgrade --all --silent --accept-package-agreements --accept-source-agreements
+}
+{{- end }}

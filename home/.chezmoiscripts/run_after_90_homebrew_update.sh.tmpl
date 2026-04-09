@@ -1,0 +1,15 @@
+{{ if ne .chezmoi.os "windows" -}}
+#!/bin/bash
+
+# -e: exit on error
+# -u: exit on unset variables
+set -eu
+
+if command -v brew >/dev/null 2>&1; then
+  brew update
+  brew outdated --greedy --verbose
+  brew upgrade --cask --greedy
+  brew upgrade --greedy
+  brew cleanup
+fi
+{{- end }}
