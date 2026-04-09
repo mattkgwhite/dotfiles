@@ -110,11 +110,11 @@ chezmoi is configured to use Bitwarden CLI (`bw`) as its secret manager. Some te
 
 ### Template flags
 
-chezmoi uses two boolean flags to adapt behavior per machine. Both are set automatically in `.chezmoi.toml.tmpl`.
+chezmoi uses two boolean flags to adapt behavior per machine. Both are set automatically in [`home/.chezmoi.toml.tmpl`](home/.chezmoi.toml.tmpl).
 
 | Flag         | When true                       | What it gates                                                                                                 |
 |--------------|---------------------------------|---------------------------------------------------------------------------------------------------------------|
-| `codespaces` | `CODESPACES` env var is set     | Skips GUI apps and redundant packages in the Brewfile. Uses the overlay fast path in `install.sh`.            |
+| `codespaces` | `CODESPACES` env var is set     | Skips GUI apps and redundant packages in the Brewfile. Uses the overlay fast path in [`install.sh`](install.sh). |
 | `private`    | Windows, or `~/.private` exists | Enables personal-machine config: excludes work-specific MCP servers and Atlassian integrations from OpenCode. |
 
 > [!IMPORTANT]
@@ -153,13 +153,13 @@ This repo ships a pre-baked [overlay container image](https://ghcr.io/chipwolf/d
 
 If you fork this repo, the main things to update:
 
-1. **`home/Brewfile`**: adjust packages to taste.
-2. **Git identity**: update `home/dot_gitconfig` with your name, email, and signing key.
+1. **[`home/Brewfile`](home/Brewfile)**: adjust packages to taste.
+2. **Git identity**: update [`home/dot_gitconfig`](home/dot_gitconfig) with your name, email, and signing key.
 
-The install scripts (`install.sh`, `install.ps1`) have the repo URL interpolated automatically during the release workflow, so forks that use the same workflow get correct URLs in their release assets without editing.
+The install scripts ([`install.sh`](install.sh), [`install.ps1`](install.ps1)) have the repo URL interpolated automatically during the release workflow, so forks that use the same workflow get correct URLs in their release assets without editing.
 
 > [!TIP]
-> The chezmoi source state lives under `home/` (set by `.chezmoiroot`). Filenames use chezmoi's attribute prefixes: `dot_` becomes a leading `.`, `private_` restricts permissions, `executable_` adds the execute bit. `home/dot_config/nvim/` deploys to `~/.config/nvim/`.
+> The chezmoi source state lives under [`home/`](home/) (set by [`.chezmoiroot`](.chezmoiroot)). Filenames use chezmoi's attribute prefixes: `dot_` becomes a leading `.`, `private_` restricts permissions, `executable_` adds the execute bit. [`home/dot_config/nvim/`](home/dot_config/nvim/) deploys to `~/.config/nvim/`.
 
 ---
 
@@ -183,7 +183,7 @@ All release artifacts are built with [SLSA Build L3](https://slsa.dev/spec/v1.0/
 
 This covers:
 
-- **Install scripts** (`install.sh`, `install.ps1`): published as [GitHub Release](https://github.com/chipwolf/dotfiles/releases/tag/v1.6.0) assets. <!-- x-release-please-version -->
+- **Install scripts** ([`install.sh`](install.sh), [`install.ps1`](install.ps1)): published as [GitHub Release](https://github.com/chipwolf/dotfiles/releases/tag/v1.6.0) assets. <!-- x-release-please-version -->
 - **Codespaces overlay image** ([ghcr.io/chipwolf/dotfiles](https://ghcr.io/chipwolf/dotfiles)): published to GHCR.
 
 > [!NOTE]
@@ -210,5 +210,6 @@ gh attestation verify oci://ghcr.io/chipwolf/dotfiles:v1.6.0 --repo chipwolf/dot
 | Document                           | Contents                                                       |
 |------------------------------------|----------------------------------------------------------------|
 | [docs/brew-review.md](docs/brew-review.md) | Homebrew drift review flow, prompts, and safe tap handling     |
+| [docs/mcp-servers.md](docs/mcp-servers.md) | MCP server setup, conditions, targets, and arg interpolation   |
 | [docs/yubikey.md](docs/yubikey.md) | YubiKey SSH workflow, backup strategy, credential hygiene      |
 | [docs/secrets.md](docs/secrets.md) | Bitwarden integration, GnuPG config, secret introduction order |
