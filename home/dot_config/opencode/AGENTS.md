@@ -26,6 +26,8 @@ Load skills on-demand via the `skill` tool. Use subagents for delegated async wo
 | `memory`           | skill    | Before writing to any AGENTS.md file                                 |
 | `dotfiles`         | skill    | Before any change to chezmoi-managed files                           |
 | `python-toolchain` | skill    | Before any Python, pip, uv, or mise work                             |
+| `git-commit-push`  | skill    | For commit and push requests, including auth and non-fast-forward remediation |
+| `create-opencode-skill` | skill | For creating or updating OpenCode skills with valid format and memory integration |
 | `retrospective`    | skill    | After completing any non-trivial task                                |
 | `@daily-note`      | subagent | Logging achievements to today's Obsidian daily note (ask user first) |
 
@@ -46,6 +48,8 @@ Ask the user before logging to the daily note. Never log proactively.
 Global memory is `~/.config/opencode/AGENTS.md` (source: `~/.local/share/chezmoi/home/dot_config/opencode/AGENTS.md`).
 Local memory is the `AGENTS.md` in the current project root (or nearest ancestor).
 
+- Load `create-opencode-skill` before creating or modifying OpenCode skills.
+
 Never edit `~/.config/opencode/AGENTS.md` directly; it is chezmoi-managed. Load the `memory` skill for all writes.
 
 For rules specific to the chezmoi dotfiles repo itself, the target is `~/.local/share/chezmoi/AGENTS.md`.
@@ -56,6 +60,7 @@ When updating any memory file: review nearby rules for contradictions, duplicati
 
 ## Git and commits
 
+- Load `git-commit-push` for commit or push operations.
 - Before committing, run `git diff --staged` and confirm the change is atomic and in-scope. Do not commit unrelated modifications.
 - Commit message format: `type(scope): description`. Types: `feat`, `fix`, `chore`. Check `git log --oneline` to match repo style.
 
