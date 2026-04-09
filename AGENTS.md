@@ -113,6 +113,9 @@ Deleting a file from the chezmoi source does **not** remove it from the target (
 
 ## Repo-specific conventions
 
+- **Repo-local skills** – Shared project skills live under `.agents/skills/`.
+- **MCP server updates** – Load `.agents/skills/update-mcp-servers/SKILL.md` before changing `home/.chezmoidata/mcp-servers.yaml`, `home/dot_cursor/mcp.json.tmpl`, or `home/dot_config/opencode/opencode.jsonc.tmpl`.
+- **Homebrew updates** – Load `.agents/skills/homebrew-management/SKILL.md` before changing `home/Brewfile`, `home/Brewfile.ignore`, brew-related chezmoiscripts, or `home/dot_scripts/executable_brew-review`.
 - **Zsh** – Primary config under `home/dot_config/zsh/`: `dot_zshrc`, `dot_zshenv`, `dot_zprofile`, `dot_zplugins`, `dot_zshrc.d/`, `dot_zfunctions/`, `dot_p10k.zsh`. Top-level `home/dot_zshenv` and `home/dot_profile` set `ZDOTDIR` / `XDG_CONFIG_HOME` and are sourced by the shell.
 - **Neovim** – `home/dot_config/nvim/` (LazyVim-style: `init.lua`, `lua/config/`, `lua/plugins/`).
 - **OpenCode** – `home/dot_config/opencode/opencode.jsonc.tmpl` (→ `~/.config/opencode/opencode.jsonc`). This is the global OpenCode config: model, MCP servers, permissions, etc. It is a chezmoi template (uses `.chezmoi.homeDir` for the Obsidian vault path). Edit the source here when updating OpenCode settings.
@@ -144,16 +147,7 @@ Deleting a file from the chezmoi source does **not** remove it from the target (
 
 ## Homebrew management
 
-- **`home/Brewfile`** and **`home/Brewfile.ignore`** are source-dir only — listed in `home/.chezmoiignore` and never applied to `~/`.
-- **`home/.chezmoiscripts/run_onchange_after_bootstrap.sh.tmpl`** – runs `brew bundle install` when `Brewfile` changes (uses `{{ include "Brewfile" | sha256sum }}` in a comment to trigger).
-- **`home/.chezmoiscripts/run_onchange_after_brew_review.sh.tmpl`** – calls `brew-review` via `bash "$CHEZMOI_SOURCE_DIR/dot_scripts/brew-review" || true` when `Brewfile` changes.
-- **`$CHEZMOI_SOURCE_DIR` in script context** points to `home/` (the chezmoiroot), so paths within scripts use `dot_scripts/brew-review` not `.scripts/brew-review`.
-- **Brewfile conventions:** alphabetised within each section (brew, cask, mas); commented-out entries sorted inline with active lines by package name; darwin-only entries use `if OS.mac?` conditionals; Codespaces-irrelevant entries (GUI apps, Docker, cloud CLIs, decorative tools, packages pre-installed in Codespaces like `gh`, `git`, `zsh`) use `unless ENV["HOMEBREW_CODESPACES"]` — Homebrew renames the `CODESPACES` env var to `HOMEBREW_CODESPACES` in the Ruby context that evaluates the Brewfile, so `ENV["CODESPACES"]` will never match; entries are never regenerated wholesale.
-- **brew-review add action:** appends the new entry then calls `_sort_brewfile` (a Python-based sort function embedded in the script) to re-sort the whole file in place. The sort preserves the file header, keeps section order, and sorts active and commented-out lines together by package name (case-insensitive).
-- **`brew-review` must NOT be in `dot_zfunctions/`** — autoloaded zsh functions run in the current shell, so `exit` kills the terminal. It lives in `dot_scripts/` instead, deployed to `~/.scripts/` which is on PATH via the `path` array in `dot_config/zsh/dot_zshenv`.
-- **PATH for `~/.scripts`** – added to the `path` array with `(N)` glob qualifier in `dot_config/zsh/dot_zshenv`, not as a raw `$PATH` string export.
-- **When removing a tap:** uninstall all installed formulae/casks from that tap first, then untap. `brew tap-info --json` returns all tap contents — filter with `brew list --formula` / `brew list --cask` to get only installed ones.
-- **`brew update` in scripts** must NOT have `|| true` — failures are real errors.
+- Load `.agents/skills/homebrew-management/SKILL.md` before changing Brewfile entries, brew scripts, brew-review, tap logic, or Brewfile env var handling.
 
 ---
 
@@ -181,17 +175,6 @@ After applying changes to the Finicky config (`~/.config/finicky.js`), reload it
 3. Close the foreground window manually (AppleScript window close is not available without assistive access)
 
 Finicky's built-in auto-reload does NOT work when the config is managed by chezmoi. Chezmoi replaces the file with a new inode on every write; Finicky's fsnotify watcher (kqueue on macOS) tracks by inode and loses the watch when this happens. A restart is always required.
-
----
-
-## Brewfile env var convention
-
-Homebrew renames env vars set before `brew bundle` by adding the `HOMEBREW_` prefix in the Brewfile Ruby context. So:
-
-- In the bootstrap script, set the short name: `CODESPACES=1 brew bundle ...` or `PRIVATE=1 brew bundle ...`
-- In the Brewfile, access the prefixed name: `ENV["HOMEBREW_CODESPACES"]` or `ENV["HOMEBREW_PRIVATE"]`
-
-Never set `HOMEBREW_FOO=1` before `brew bundle` — that would result in `ENV["HOMEBREW_HOMEBREW_FOO"]` in the Brewfile.
 
 ---
 
