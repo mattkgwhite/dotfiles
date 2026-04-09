@@ -34,6 +34,8 @@
   tool = vimdiff
 [pull]
   rebase = true
+[credential]
+  helper = !gh auth git-credential
 [include]
   path = ~/.gitconfig.overrides
 [init]
