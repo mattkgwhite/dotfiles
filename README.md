@@ -32,6 +32,7 @@ Opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo config
 | **Homebrew**            | Package manager                          |   x   |   x   |         |     x      |
 | **mise**                | Runtime manager (node, python, go, etc.) |   x   |   x   |    x    |     x      |
 | **Finicky**             | Default browser router                   |   x   |       |         |            |
+| **Sysinternals**        | Windows diagnostics utilities            |       |       |    x    |            |
 
 ---
 
