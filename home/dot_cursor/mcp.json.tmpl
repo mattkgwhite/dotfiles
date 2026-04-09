@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+{{- $servers := index . "mcpServers" -}}
+{{- $isPrivate := and (hasKey . "private") .private -}}
+{{- $first := true -}}
+{{- range $server := $servers -}}
+{{- $isPrivateBlocked := and (hasKey $server "conditions") (index $server.conditions "requirePrivateFalse") $isPrivate -}}
+{{- if and $server.targets.cursor (not $isPrivateBlocked) -}}
+{{- if hasKey $server "local" -}}
+{{- $cursorArgs := $server.cursorLocal.args -}}
+{{- if and (hasKey $server.cursorLocal "appendVaultPath") $server.cursorLocal.appendVaultPath -}}
+{{- $cursorArgs = append $cursorArgs (printf "%s/Documents/Obsidian/Vault" $.chezmoi.homeDir) -}}
+{{- end -}}
+{{- if $first }}{{- $first = false }}{{ else }},{{ end }}
+    "{{ $server.id }}": {
+      "command": "{{ $server.cursorLocal.command }}",
+      "env": {{ $server.cursorLocal.env | toPrettyJson "      " }},
+      "args": {{ $cursorArgs | toPrettyJson "      " }}
+    }
+{{- else if hasKey $server "remote" -}}
+{{- if $first }}{{- $first = false }}{{ else }},{{ end }}
+    "{{ $server.id }}": {
+      "transport": "{{ $server.cursorRemote.transport }}",
+      "url": "{{ $server.cursorRemote.url }}",
+      "headers": {{ $server.cursorRemote.headers | toPrettyJson "      " }}
+    }
+{{- end -}}
+{{- end -}}
+{{- end }}
+  }
+}
