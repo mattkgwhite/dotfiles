@@ -5,24 +5,78 @@
 {{- $first := true -}}
 {{- range $server := $servers -}}
 {{- $isPrivateBlocked := and (hasKey $server "conditions") (index $server.conditions "requirePrivateFalse") $isPrivate -}}
-{{- if and $server.targets.cursor (not $isPrivateBlocked) -}}
-{{- if hasKey $server "local" -}}
-{{- $cursorArgs := $server.cursorLocal.args -}}
-{{- if and (hasKey $server.cursorLocal "appendVaultPath") $server.cursorLocal.appendVaultPath -}}
+{{- if and $server.targets.cursor.enabled (not $isPrivateBlocked) -}}
+{{- if hasKey $server.targets.cursor "local" -}}
+{{- $cursorCommand := $server.local.command -}}
+{{- if hasKey $server.targets.cursor.local "command" -}}
+{{- $cursorCommand = $server.targets.cursor.local.command -}}
+{{- end -}}
+{{- $cursorArgs := $server.local.args -}}
+{{- if hasKey $server.targets.cursor.local "args" -}}
+{{- $cursorArgs = $server.targets.cursor.local.args -}}
+{{- end -}}
+{{- $cursorEnv := (default (dict) $server.local.env) -}}
+{{- if hasKey $server.targets.cursor.local "env" -}}
+{{- $cursorEnv = $server.targets.cursor.local.env -}}
+{{- end -}}
+{{- if hasKey $server.targets.cursor.local "appendVaultPath" -}}
+{{- if $server.targets.cursor.local.appendVaultPath -}}
+{{- $cursorArgs = append $cursorArgs (printf "%s/Documents/Obsidian/Vault" $.chezmoi.homeDir) -}}
+{{- end -}}
+{{- else if and (hasKey $server.local "appendVaultPath") $server.local.appendVaultPath -}}
 {{- $cursorArgs = append $cursorArgs (printf "%s/Documents/Obsidian/Vault" $.chezmoi.homeDir) -}}
 {{- end -}}
 {{- if $first }}{{- $first = false }}{{ else }},{{ end }}
     "{{ $server.id }}": {
-      "command": "{{ $server.cursorLocal.command }}",
-      "env": {{ $server.cursorLocal.env | toPrettyJson "      " }},
+      "command": "{{ $cursorCommand }}",
+      "env": {{ $cursorEnv | toPrettyJson "      " }},
       "args": {{ $cursorArgs | toPrettyJson "      " }}
     }
-{{- else if hasKey $server "remote" -}}
+{{- else if hasKey $server "local" -}}
+{{- $cursorCommand := $server.local.command -}}
+{{- $cursorArgs := $server.local.args -}}
+{{- if and (hasKey $server.local "appendVaultPath") $server.local.appendVaultPath -}}
+{{- $cursorArgs = append $cursorArgs (printf "%s/Documents/Obsidian/Vault" $.chezmoi.homeDir) -}}
+{{- end -}}
 {{- if $first }}{{- $first = false }}{{ else }},{{ end }}
     "{{ $server.id }}": {
-      "transport": "{{ $server.cursorRemote.transport }}",
-      "url": "{{ $server.cursorRemote.url }}",
-      "headers": {{ $server.cursorRemote.headers | toPrettyJson "      " }}
+      "command": "{{ $cursorCommand }}",
+      "env": {{ (default (dict) $server.local.env) | toPrettyJson "      " }},
+      "args": {{ $cursorArgs | toPrettyJson "      " }}
+    }
+{{- else if hasKey $server.targets.cursor "remote" -}}
+{{- $cursorTransport := "streamableHttp" -}}
+{{- if hasKey $server.targets.cursor.remote "transport" -}}
+{{- $cursorTransport = $server.targets.cursor.remote.transport -}}
+{{- end -}}
+{{- $cursorUrl := $server.remote.url -}}
+{{- if hasKey $server.targets.cursor.remote "url" -}}
+{{- $cursorUrl = $server.targets.cursor.remote.url -}}
+{{- end -}}
+{{- $cursorHeaders := dict -}}
+{{- if hasKey $server.targets.cursor.remote "headers" -}}
+{{- $cursorHeaders = $server.targets.cursor.remote.headers -}}
+{{- end -}}
+{{- if $first }}{{- $first = false }}{{ else }},{{ end }}
+    "{{ $server.id }}": {
+      "transport": "{{ $cursorTransport }}",
+      "url": "{{ $cursorUrl }}",
+      "headers": {{ $cursorHeaders | toPrettyJson "      " }}
+    }
+{{- else if hasKey $server "remote" -}}
+{{- $cursorTransport := "streamableHttp" -}}
+{{- if hasKey $server.remote "transport" -}}
+{{- $cursorTransport = $server.remote.transport -}}
+{{- end -}}
+{{- $cursorHeaders := dict -}}
+{{- if hasKey $server.remote "headers" -}}
+{{- $cursorHeaders = $server.remote.headers -}}
+{{- end -}}
+{{- if $first }}{{- $first = false }}{{ else }},{{ end }}
+    "{{ $server.id }}": {
+      "transport": "{{ $cursorTransport }}",
+      "url": "{{ $server.remote.url }}",
+      "headers": {{ $cursorHeaders | toPrettyJson "      " }}
     }
 {{- end -}}
 {{- end -}}

@@ -4,25 +4,25 @@ mcpServers:
     conditions:
       requirePrivateFalse: true
     targets:
-      opencode: true
-      cursor: true
+      opencode:
+        enabled: true
+      cursor:
+        enabled: true
     remote:
       url: "https://mcp.atlassian.com/v1/mcp"
-    cursorRemote:
-      transport: "streamableHttp"
-      url: "https://mcp.atlassian.com/v1/mcp"
-      headers: {}
 
   - id: mcp-atlassian
     enabled: true
     conditions:
       requirePrivateFalse: true
     targets:
-      opencode: true
-      cursor: false
+      opencode:
+        enabled: true
+      cursor:
+        enabled: false
     local:
-      command:
-        - "bash"
+      command: "bash"
+      args:
         - "-c"
         - "set -a; source ~/.config/opencode/mcp-atlassian.env; set +a; exec mise x python -- uvx mcp-atlassian"
       env: {}
@@ -30,20 +30,11 @@ mcpServers:
   - id: obsidian
     enabled: true
     targets:
-      opencode: true
-      cursor: true
+      opencode:
+        enabled: true
+      cursor:
+        enabled: true
     local:
-      command:
-        - "mise"
-        - "x"
-        - "node"
-        - "--"
-        - "npx"
-        - "-y"
-        - "@mauricio.wolff/mcp-obsidian@latest"
-      appendVaultPath: true
-      env: {}
-    cursorLocal:
       command: "mise"
       args:
         - "x"
@@ -58,19 +49,11 @@ mcpServers:
   - id: chrome-devtools
     enabled: true
     targets:
-      opencode: true
-      cursor: true
+      opencode:
+        enabled: true
+      cursor:
+        enabled: true
     local:
-      command:
-        - "mise"
-        - "x"
-        - "node"
-        - "--"
-        - "npx"
-        - "-y"
-        - "chrome-devtools-mcp@latest"
-      env: {}
-    cursorLocal:
       command: "mise"
       args:
         - "x"
@@ -84,23 +67,19 @@ mcpServers:
   - id: context7
     enabled: true
     targets:
-      opencode: true
-      cursor: true
+      opencode:
+        enabled: true
+      cursor:
+        enabled: true
     remote:
       url: "https://mcp.context7.com/mcp"
-    cursorRemote:
-      transport: "streamableHttp"
-      url: "https://mcp.context7.com/mcp"
-      headers: {}
 
   - id: grep
     enabled: true
     targets:
-      opencode: true
-      cursor: true
+      opencode:
+        enabled: true
+      cursor:
+        enabled: true
     remote:
       url: "https://mcp.grep.app"
-    cursorRemote:
-      transport: "streamableHttp"
-      url: "https://mcp.grep.app"
-      headers: {}
