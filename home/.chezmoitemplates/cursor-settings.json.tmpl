@@ -7,7 +7,7 @@
     "cursor.composer.usageSummaryDisplay": "always",
     "cursor.general.enableShadowWorkspace": true,
     "obsidianPreview.vaultPath": "{{ .chezmoi.homeDir }}/Documents/Obsidian/Vault",
-    "update.releaseTrack": "prerelease"{{ if eq .chezmoi.os "windows" }},
+    "update.releaseTrack": "prerelease",
     "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono",
     "terminal.integrated.defaultProfile.linux": "zsh",
     "terminal.integrated.profiles.linux": {
@@ -21,6 +21,6 @@
             "path": "C:\\Windows\\System32\\wsl.exe",
             "args": ["-e", "bash", "--login"]
         }
-    }{{ end }},
+    },
     "git.replaceTagsWhenPull": true
 }
