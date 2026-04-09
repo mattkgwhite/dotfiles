@@ -1,13 +1,29 @@
 {{ if eq .chezmoi.os "windows" -}}
 $ErrorActionPreference = "Stop"
 
-if (Get-Command choco -ErrorAction SilentlyContinue) {
-    Write-Host "Updating Chocolatey packages..."
-    choco upgrade all -y --no-progress
+$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+$elevatedScript = {
+    $ErrorActionPreference = "Stop"
+
+    if (Get-Command choco -ErrorAction SilentlyContinue) {
+        Write-Host "Updating Chocolatey packages..."
+        choco upgrade all -y --no-progress
+    }
+
+    if (Get-Command winget -ErrorAction SilentlyContinue) {
+        Write-Host "Updating Winget packages..."
+        winget upgrade --all --silent --accept-package-agreements --accept-source-agreements
+    }
 }
 
-if (Get-Command winget -ErrorAction SilentlyContinue) {
-    Write-Host "Updating Winget packages..."
-    winget upgrade --all --silent --accept-package-agreements --accept-source-agreements
+if ($isAdmin) {
+    & $elevatedScript
+} else {
+    $scriptFile = "$env:TEMP\chezmoi-package-updates-elevated.ps1"
+    $elevatedScript.ToString() | Out-File $scriptFile -Encoding ascii
+    Write-Host "Elevating for package updates..."
+    Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptFile`"" -Wait
+    Remove-Item $scriptFile -ErrorAction SilentlyContinue
 }
 {{- end }}
