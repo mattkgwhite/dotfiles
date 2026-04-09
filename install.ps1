@@ -72,10 +72,10 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     }
 }
 
-# Ensure gh is on PATH before chezmoi init (git credential helper depends on it)
-if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
-    Write-Host "Installing GitHub CLI..." -ForegroundColor Cyan
-    choco install gh -y --no-progress
+# Ensure mise is available before chezmoi init (git credential helper uses `mise x -- gh`)
+if (-not (Get-Command mise -ErrorAction SilentlyContinue)) {
+    Write-Host "Installing mise..." -ForegroundColor Cyan
+    choco install mise -y --no-progress
     $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")
 }
 
