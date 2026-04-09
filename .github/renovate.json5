@@ -16,6 +16,24 @@
       depNameTemplate: "google/go-containerregistry",
       datasourceTemplate: "github-releases",
     },
+    {
+      customType: "regex",
+      managerFilePatterns: ["/home\\/\\.chezmoidata\\/mcp-servers\\.yaml$/"],
+      matchStrings: [
+        "\"(?<package>[^\"]+?)@(?<currentValue>[^\"]+)\"",
+      ],
+      depNameTemplate: "{{package}}",
+      datasourceTemplate: "npm",
+    },
+    {
+      customType: "regex",
+      managerFilePatterns: ["/home\\/\\.chezmoidata\\/mcp-servers\\.yaml$/"],
+      matchStrings: [
+        "uvx\\s+(?<package>[^=\\s\"]+)==(?<currentValue>[^\\s\"]+)",
+      ],
+      depNameTemplate: "{{package}}",
+      datasourceTemplate: "pypi",
+    },
   ],
   packageRules: [
     {

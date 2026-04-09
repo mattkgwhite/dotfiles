@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../../schemas/mcp-servers.schema.json
 mcpServers:
   - id: atlassian
     enabled: true
@@ -24,7 +25,7 @@ mcpServers:
       command: "bash"
       args:
         - "-c"
-        - "set -a; source ~/.config/opencode/mcp-atlassian.env; set +a; exec mise x python -- uvx mcp-atlassian"
+        - "set -a; source ~/.config/opencode/mcp-atlassian.env; set +a; exec mise x python -- uvx mcp-atlassian==0.21.0"
       env: {}
 
   - id: obsidian
@@ -38,11 +39,11 @@ mcpServers:
       command: "mise"
       args:
         - "x"
-        - "node"
+        - "node@22"
         - "--"
         - "npx"
         - "-y"
-        - "@mauricio.wolff/mcp-obsidian@latest"
+        - "@mauricio.wolff/mcp-obsidian@0.8.2"
       appendVaultPath: true
       env: {}
 
@@ -61,7 +62,7 @@ mcpServers:
         - "--"
         - "npx"
         - "-y"
-        - "chrome-devtools-mcp@latest"
+        - "chrome-devtools-mcp@0.21.0"
       env: {}
 
   - id: context7
