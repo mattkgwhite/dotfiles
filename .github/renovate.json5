@@ -6,6 +6,7 @@
     ":semanticCommits",
     ":timezone(Europe/London)",
   ],
+  prHourlyLimit: 0,
   customManagers: [
     {
       customType: "regex",
@@ -40,6 +41,12 @@
       description: "Auto-merge patch and minor updates",
       matchUpdateTypes: ["minor", "patch", "digest"],
       automerge: true,
+    },
+    {
+      description: "Keep MCP runtime on Node 22",
+      matchFileNames: ["home/.chezmoidata/mcp-servers.yaml"],
+      matchPackageNames: ["node"],
+      enabled: false,
     },
   ],
 }
