@@ -423,29 +423,3 @@ Active when a completion menu is open (`Tab` to open).
 |-----|--------|
 | `Alt+Left` | Backward word |
 | `Alt+Right` | Forward word |
-
----
-
-## Visual keybind explorer
-
-An interactive keyboard/chord visualization is available in:
-
-- `docs/keybinds.html`
-- `docs/keybinds.css`
-- `docs/keybinds.js`
-- `docs/keybinds.data.json`
-
-### How to run it
-
-Serve the `docs/` directory locally, then open the page:
-
-```sh
-python3 -m http.server --directory docs 4173
-open http://localhost:4173/keybinds.html
-```
-
-### How to update it
-
-1. Edit this file (`docs/keybinds.md`) as the human-readable reference.
-2. Update `docs/keybinds.data.json` so all shortcuts are represented in the visual app.
-3. Reload `keybinds.html` and verify filters, keyboard highlights, and chord steps still match the docs.
