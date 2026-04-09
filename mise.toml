@@ -1,6 +1,11 @@
 [tools]
 gh = "2.89.0"
-pre-commit = "4.4.0"
+uv = "latest"
+"pipx:pre-commit" = "4.5.1"
 
 [tasks.pre-commit-install]
 run = "pre-commit install"
+
+[tasks.pre-commit]
+run = "pre-commit run --all-files --show-diff-on-failure"
+run_windows = "set SKIP=source-tests&& pre-commit run --all-files --show-diff-on-failure"
