@@ -72,6 +72,13 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     }
 }
 
+# Ensure gh is on PATH before chezmoi init (git credential helper depends on it)
+if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
+    Write-Host "Installing GitHub CLI..." -ForegroundColor Cyan
+    choco install gh -y --no-progress
+    $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")
+}
+
 # Initialise and apply chezmoi dotfiles.
 # If the script is running from a local clone, use that as the source.
 # Otherwise (e.g. irm | iex), let chezmoi clone from GitHub into the default location.

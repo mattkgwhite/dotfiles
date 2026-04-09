@@ -182,6 +182,7 @@ Finicky's built-in auto-reload does NOT work when the config is managed by chezm
 
 - After every substantive conversation, review whether this file needs updating.
 - Add convention rules when the user establishes a new pattern or corrects agent behaviour.
+- If stderr shows `mise WARN missing: ...` during commands in this repo, run `mise install` before continuing.
 - Before ending a session, check that the git working directory is clean. If it is not clean, either commit/apply/push when appropriate, or ask the user via the question tool when intent is unclear.
 - Never remove rules without explicit user confirmation.
 - Keep this file concise — if it grows beyond ~200 lines of rules (excluding vault context), propose splitting into topic-specific files.
