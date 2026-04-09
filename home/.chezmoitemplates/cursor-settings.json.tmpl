@@ -6,7 +6,7 @@
     "workbench.iconTheme": "catppuccin-mocha",
     "cursor.composer.usageSummaryDisplay": "always",
     "cursor.general.enableShadowWorkspace": true,
-    "obsidianPreview.vaultPath": "{{ .chezmoi.homeDir }}/Documents/Obsidian/Vault",
+    "obsidianPreview.vaultPath": "{{ if hasKey . `obsidianVaultPath` }}{{ index . `obsidianVaultPath` }}{{ else }}{{ .chezmoi.homeDir }}/Documents/Obsidian/Vault{{ end }}",
     "update.releaseTrack": "prerelease",
     "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono",
     "terminal.integrated.defaultProfile.linux": "zsh",

@@ -62,7 +62,7 @@ render_template_with_override_data() {
 
 # --- MCP template rendering ---
 
-@test "Cursor MCP template renders local/remote shapes and target overrides correctly" {
+@test "Cursor MCP template renders canonical local/remote shapes correctly" {
   local data_file="$BATS_TEST_TMPDIR/mcp-shapes-cursor.json"
   cat >"$data_file" <<'EOF'
 {
@@ -79,45 +79,10 @@ render_template_with_override_data() {
       }
     },
     {
-      "id": "shape-local-override",
-      "enabled": true,
-      "targets": {
-        "cursor": {
-          "enabled": true,
-          "local": {
-            "args": ["x", "node@22", "--", "npx", "-y", "pkg-local-override@latest"],
-            "env": { "CURSOR_ONLY": "1" }
-          }
-        },
-        "opencode": { "enabled": true }
-      },
-      "local": {
-        "command": "mise",
-        "args": ["x", "node", "--", "npx", "-y", "pkg-local-base-ignored@latest"],
-        "env": {}
-      }
-    },
-    {
       "id": "shape-remote-base",
       "enabled": true,
       "targets": { "cursor": { "enabled": true }, "opencode": { "enabled": true } },
       "remote": { "url": "https://example.com/base" }
-    },
-    {
-      "id": "shape-remote-override",
-      "enabled": true,
-      "targets": {
-        "cursor": {
-          "enabled": true,
-          "remote": {
-            "transport": "streamableHttp",
-            "url": "https://example.com/cursor-override",
-            "headers": { "X-Cursor": "1" }
-          }
-        },
-        "opencode": { "enabled": true }
-      },
-      "remote": { "url": "https://example.com/base-ignored" }
     }
   ]
 }
@@ -128,20 +93,14 @@ EOF
     j = JSON.parse(STDIN.read)
     s = j.fetch("mcpServers")
     raise "missing local base" unless s.key?("shape-local-base")
-    raise "missing local override" unless s.key?("shape-local-override")
     raise "missing remote base" unless s.key?("shape-remote-base")
-    raise "missing remote override" unless s.key?("shape-remote-override")
     raise "local base command mismatch" unless s["shape-local-base"]["command"] == "mise"
     raise "local base arg mismatch" unless s["shape-local-base"]["args"].include?("pkg-local-base@latest")
-    raise "local override arg not applied" unless s["shape-local-override"]["args"].include?("node@22")
-    raise "local override env not applied" unless s["shape-local-override"]["env"]["CURSOR_ONLY"] == "1"
     raise "remote base url mismatch" unless s["shape-remote-base"]["url"] == "https://example.com/base"
-    raise "remote override url mismatch" unless s["shape-remote-override"]["url"] == "https://example.com/cursor-override"
-    raise "remote override header missing" unless s["shape-remote-override"]["headers"]["X-Cursor"] == "1"
   '
 }
 
-@test "Cursor MCP template applies private gating for requirePrivateFalse" {
+@test "Cursor MCP template applies generic condition gating" {
   local data_file="$BATS_TEST_TMPDIR/mcp-private-cursor.json"
   cat >"$data_file" <<'EOF'
 {
@@ -150,7 +109,7 @@ EOF
     {
       "id": "shape-private-blocked",
       "enabled": true,
-      "conditions": { "requirePrivateFalse": true },
+      "conditions": { "private": false },
       "targets": { "cursor": { "enabled": true }, "opencode": { "enabled": true } },
       "remote": { "url": "https://example.com/private-blocked" }
     },
@@ -173,7 +132,7 @@ EOF
   '
 }
 
-@test "OpenCode MCP template renders local/remote shapes and target overrides correctly" {
+@test "OpenCode MCP template renders canonical local/remote shapes correctly" {
   local data_file="$BATS_TEST_TMPDIR/mcp-shapes-opencode.json"
   cat >"$data_file" <<'EOF'
 {
@@ -190,40 +149,10 @@ EOF
       }
     },
     {
-      "id": "shape-op-local-override",
-      "enabled": true,
-      "targets": {
-        "cursor": { "enabled": true },
-        "opencode": {
-          "enabled": true,
-          "local": {
-            "args": ["x", "node@22", "--", "npx", "-y", "pkg-op-local-override@latest"]
-          }
-        }
-      },
-      "local": {
-        "command": "mise",
-        "args": ["x", "node", "--", "npx", "-y", "pkg-op-local-base-ignored@latest"],
-        "env": {}
-      }
-    },
-    {
       "id": "shape-op-remote-base",
       "enabled": true,
       "targets": { "cursor": { "enabled": true }, "opencode": { "enabled": true } },
       "remote": { "url": "https://example.com/op-base" }
-    },
-    {
-      "id": "shape-op-remote-override",
-      "enabled": true,
-      "targets": {
-        "cursor": { "enabled": true },
-        "opencode": {
-          "enabled": true,
-          "remote": { "url": "https://example.com/op-override" }
-        }
-      },
-      "remote": { "url": "https://example.com/op-base-ignored" }
     }
   ]
 }
@@ -232,12 +161,8 @@ EOF
   output=$(render_template_with_override_data "$SOURCE_DIR/dot_config/opencode/opencode.jsonc.tmpl" "$data_file")
   echo "$output" | grep -q '"shape-op-local-base"'
   echo "$output" | grep -q '"pkg-op-local-base@latest"'
-  echo "$output" | grep -q '"shape-op-local-override"'
-  echo "$output" | grep -q '"pkg-op-local-override@latest"'
   echo "$output" | grep -q '"shape-op-remote-base"'
   echo "$output" | grep -q 'https://example.com/op-base'
-  echo "$output" | grep -q '"shape-op-remote-override"'
-  echo "$output" | grep -q 'https://example.com/op-override'
 }
 
 @test "Cursor MCP template with real chezmoidata renders valid schema and enabled IDs" {
@@ -265,7 +190,10 @@ EOF
     is_private = data.fetch("private", false)
     expected_ids = data.fetch("mcpServers")
       .select { |s| s.dig("targets", "cursor", "enabled") }
-      .reject { |s| s.dig("conditions", "requirePrivateFalse") && is_private }
+      .select do |s|
+        conditions = s.fetch("conditions", {})
+        conditions.all? { |k, v| data.key?(k) && data[k] == v }
+      end
       .map { |s| s.fetch("id") }
       .sort
 
@@ -347,7 +275,10 @@ EOF
     is_private = data.fetch("private", false)
     expected_ids = data.fetch("mcpServers")
       .select { |s| s.dig("targets", "opencode", "enabled") }
-      .reject { |s| s.dig("conditions", "requirePrivateFalse") && is_private }
+      .select do |s|
+        conditions = s.fetch("conditions", {})
+        conditions.all? { |k, v| data.key?(k) && data[k] == v }
+      end
       .map { |s| s.fetch("id") }
       .sort
 

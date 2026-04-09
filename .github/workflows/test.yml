@@ -16,11 +16,19 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
+      - name: Install mise
+        run: |
+          curl https://mise.run | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
       - name: Install dependencies
         run: |
           sudo apt-get update -q
           sudo apt-get install -yq bats
           sh -c "$(curl -fsLS get.chezmoi.io)" -- -b /usr/local/bin
 
-      - name: Run source tests
-        run: bats tests/source/
+      - name: Install toolchain
+        run: mise install
+
+      - name: Run tests via pre-commit
+        run: mise x -- pre-commit run --all-files --show-diff-on-failure

@@ -153,46 +153,33 @@
 
   "mcp": {
 {{- $servers := index . "mcpServers" -}}
-{{- $isPrivate := and (hasKey . "private") .private -}}
 {{- $first := true -}}
 {{- range $server := $servers -}}
-{{- $isPrivateBlocked := and (hasKey $server "conditions") (index $server.conditions "requirePrivateFalse") $isPrivate -}}
-{{- if and $server.targets.opencode.enabled (not $isPrivateBlocked) -}}
+{{- $conditionsMatch := true -}}
+{{- if hasKey $server "conditions" -}}
+{{- range $conditionKey, $expected := $server.conditions -}}
+{{- if and (hasKey $ $conditionKey) (eq (index $ $conditionKey) $expected) -}}
+{{- else -}}
+{{- $conditionsMatch = false -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- if and $server.targets.opencode.enabled $conditionsMatch -}}
 {{- if $first }}{{- $first = false }}{{ else }},{{ end }}
     "{{ $server.id }}": {
-{{- if hasKey $server.targets.opencode "local" }}
+{{- if hasKey $server "local" }}
 {{- $openCodeCommandName := $server.local.command -}}
-{{- if hasKey $server.targets.opencode.local "command" -}}
-{{- $openCodeCommandName = $server.targets.opencode.local.command -}}
-{{- end -}}
 {{- $openCodeCommandArgs := $server.local.args -}}
-{{- if hasKey $server.targets.opencode.local "args" -}}
-{{- $openCodeCommandArgs = $server.targets.opencode.local.args -}}
-{{- end -}}
 {{- $openCodeCommand := prepend $openCodeCommandArgs $openCodeCommandName -}}
-{{- if hasKey $server.targets.opencode.local "appendVaultPath" -}}
-{{- if $server.targets.opencode.local.appendVaultPath -}}
-{{- $openCodeCommand = append $openCodeCommand (printf "%s/Documents/Obsidian/Vault" $.chezmoi.homeDir) -}}
+{{- if hasKey $server.local "appendDataArgs" -}}
+{{- range $dataKey := $server.local.appendDataArgs -}}
+{{- if hasKey $ $dataKey -}}
+{{- $openCodeCommand = append $openCodeCommand (index $ $dataKey) -}}
 {{- end -}}
-{{- else if and (hasKey $server.local "appendVaultPath") $server.local.appendVaultPath -}}
-{{- $openCodeCommand = append $openCodeCommand (printf "%s/Documents/Obsidian/Vault" $.chezmoi.homeDir) -}}
 {{- end -}}
-      "type": "local",
-      "command": {{ $openCodeCommand | toPrettyJson "      " }},
-{{- else if hasKey $server "local" }}
-{{- $openCodeCommand := prepend $server.local.args $server.local.command -}}
-{{- if and (hasKey $server.local "appendVaultPath") $server.local.appendVaultPath -}}
-{{- $openCodeCommand = append $openCodeCommand (printf "%s/Documents/Obsidian/Vault" $.chezmoi.homeDir) -}}
 {{- end -}}
       "type": "local",
       "command": {{ $openCodeCommand | toPrettyJson "      " }},
-{{- else if hasKey $server.targets.opencode "remote" }}
-{{- $openCodeUrl := $server.remote.url -}}
-{{- if hasKey $server.targets.opencode.remote "url" -}}
-{{- $openCodeUrl = $server.targets.opencode.remote.url -}}
-{{- end -}}
-      "type": "remote",
-      "url": "{{ $openCodeUrl }}",
 {{- else if hasKey $server "remote" }}
       "type": "remote",
       "url": "{{ $server.remote.url }}",

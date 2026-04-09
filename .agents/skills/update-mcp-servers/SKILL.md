@@ -1,6 +1,6 @@
 ---
 name: update-mcp-servers
-description: Update canonical MCP server definitions for this chezmoi repo, including target overrides and template rendering checks. Use when editing mcp-servers.yaml, Cursor MCP template output, or OpenCode MCP config generation.
+description: Update canonical MCP server definitions for this chezmoi repo and template rendering checks. Use when editing mcp-servers.yaml, Cursor MCP template output, or OpenCode MCP config generation.
 ---
 
 # Update MCP Servers
@@ -13,14 +13,14 @@ Use this skill when changing MCP server configuration in this repo.
 - Cursor render template: `home/dot_cursor/mcp.json.tmpl`
 - OpenCode render template: `home/dot_config/opencode/opencode.jsonc.tmpl`
 
-Treat `mcp-servers.yaml` as the single source of truth. Keep target-specific config only as explicit overrides.
+Treat `mcp-servers.yaml` as the single source of truth.
 
 ## Canonical schema
 
 Each entry in `mcpServers` should follow this shape:
 
 - `id`, `enabled`
-- optional `conditions.requirePrivateFalse`
+- optional `conditions` object, each key/value is matched against global chezmoi data
 - `targets.opencode.enabled`
 - `targets.cursor.enabled`
 - either `local` or `remote`
@@ -30,7 +30,7 @@ Local shape:
 - `local.command` string
 - `local.args` array
 - optional `local.env`
-- optional `local.appendVaultPath`
+- optional `local.appendDataArgs` array of chezmoi data keys to append as args
 
 Remote shape:
 
@@ -38,17 +38,10 @@ Remote shape:
 - optional `remote.transport`
 - optional `remote.headers`
 
-Optional target override shape:
-
-- `targets.opencode.local` or `targets.opencode.remote`
-- `targets.cursor.local` or `targets.cursor.remote`
-
-Only include override keys that actually differ from canonical values.
-
 ## Editing rules
 
-1. Prefer canonical values over per-target overrides.
-2. Keep overrides minimal, only for true target differences.
+1. Keep a single canonical `local` or `remote` config per server.
+2. Do not re-introduce per-target transport overrides.
 3. Do not re-introduce duplicate fields like parallel `cursorLocal` and `local`.
 4. Keep command execution via `mise` where applicable.
 
@@ -61,4 +54,4 @@ After MCP changes:
 3. Validate the rendered Cursor MCP output is valid JSON.
 4. Confirm expected server entries and args in rendered output.
 
-If templates fail due to missing keys, use `hasKey` checks and safe defaults in templates, do not force duplication in YAML.
+Templates should trust schema-required fields. Use `hasKey` checks only for optional fields.

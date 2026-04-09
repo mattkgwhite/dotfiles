@@ -3,7 +3,7 @@ mcpServers:
   - id: atlassian
     enabled: true
     conditions:
-      requirePrivateFalse: true
+      private: false
     targets:
       opencode:
         enabled: true
@@ -15,7 +15,7 @@ mcpServers:
   - id: mcp-atlassian
     enabled: true
     conditions:
-      requirePrivateFalse: true
+      private: false
     targets:
       opencode:
         enabled: true
@@ -44,7 +44,8 @@ mcpServers:
         - "npx"
         - "-y"
         - "@mauricio.wolff/mcp-obsidian@0.8.2"
-      appendVaultPath: true
+      appendDataArgs:
+        - "obsidianVaultPath"
       env: {}
 
   - id: chrome-devtools

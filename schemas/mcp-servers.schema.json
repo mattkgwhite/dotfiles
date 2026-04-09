@@ -33,7 +33,10 @@
           "items": { "type": "string" }
         },
         "env": { "$ref": "#/$defs/envMap" },
-        "appendVaultPath": { "type": "boolean" }
+        "appendDataArgs": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
       }
     },
     "remoteConfig": {
@@ -48,27 +51,15 @@
     },
     "conditions": {
       "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "requirePrivateFalse": { "type": "boolean" }
-      }
+      "additionalProperties": true
     },
     "targetConfig": {
       "type": "object",
       "additionalProperties": false,
       "required": ["enabled"],
       "properties": {
-        "enabled": { "type": "boolean" },
-        "local": { "$ref": "#/$defs/localConfig" },
-        "remote": { "$ref": "#/$defs/remoteConfig" }
-      },
-      "allOf": [
-        {
-          "not": {
-            "required": ["local", "remote"]
-          }
-        }
-      ]
+        "enabled": { "type": "boolean" }
+      }
     },
     "mcpServer": {
       "type": "object",

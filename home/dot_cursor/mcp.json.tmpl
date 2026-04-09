@@ -1,67 +1,34 @@
 {
   "mcpServers": {
 {{- $servers := index . "mcpServers" -}}
-{{- $isPrivate := and (hasKey . "private") .private -}}
 {{- $first := true -}}
 {{- range $server := $servers -}}
-{{- $isPrivateBlocked := and (hasKey $server "conditions") (index $server.conditions "requirePrivateFalse") $isPrivate -}}
-{{- if and $server.targets.cursor.enabled (not $isPrivateBlocked) -}}
-{{- if hasKey $server.targets.cursor "local" -}}
+{{- $conditionsMatch := true -}}
+{{- if hasKey $server "conditions" -}}
+{{- range $conditionKey, $expected := $server.conditions -}}
+{{- if and (hasKey $ $conditionKey) (eq (index $ $conditionKey) $expected) -}}
+{{- else -}}
+{{- $conditionsMatch = false -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- if and $server.targets.cursor.enabled $conditionsMatch -}}
+{{- if hasKey $server "local" -}}
 {{- $cursorCommand := $server.local.command -}}
-{{- if hasKey $server.targets.cursor.local "command" -}}
-{{- $cursorCommand = $server.targets.cursor.local.command -}}
-{{- end -}}
 {{- $cursorArgs := $server.local.args -}}
-{{- if hasKey $server.targets.cursor.local "args" -}}
-{{- $cursorArgs = $server.targets.cursor.local.args -}}
-{{- end -}}
 {{- $cursorEnv := (default (dict) $server.local.env) -}}
-{{- if hasKey $server.targets.cursor.local "env" -}}
-{{- $cursorEnv = $server.targets.cursor.local.env -}}
+{{- if hasKey $server.local "appendDataArgs" -}}
+{{- range $dataKey := $server.local.appendDataArgs -}}
+{{- if hasKey $ $dataKey -}}
+{{- $cursorArgs = append $cursorArgs (index $ $dataKey) -}}
 {{- end -}}
-{{- if hasKey $server.targets.cursor.local "appendVaultPath" -}}
-{{- if $server.targets.cursor.local.appendVaultPath -}}
-{{- $cursorArgs = append $cursorArgs (printf "%s/Documents/Obsidian/Vault" $.chezmoi.homeDir) -}}
 {{- end -}}
-{{- else if and (hasKey $server.local "appendVaultPath") $server.local.appendVaultPath -}}
-{{- $cursorArgs = append $cursorArgs (printf "%s/Documents/Obsidian/Vault" $.chezmoi.homeDir) -}}
 {{- end -}}
 {{- if $first }}{{- $first = false }}{{ else }},{{ end }}
     "{{ $server.id }}": {
       "command": "{{ $cursorCommand }}",
       "env": {{ $cursorEnv | toPrettyJson "      " }},
       "args": {{ $cursorArgs | toPrettyJson "      " }}
-    }
-{{- else if hasKey $server "local" -}}
-{{- $cursorCommand := $server.local.command -}}
-{{- $cursorArgs := $server.local.args -}}
-{{- if and (hasKey $server.local "appendVaultPath") $server.local.appendVaultPath -}}
-{{- $cursorArgs = append $cursorArgs (printf "%s/Documents/Obsidian/Vault" $.chezmoi.homeDir) -}}
-{{- end -}}
-{{- if $first }}{{- $first = false }}{{ else }},{{ end }}
-    "{{ $server.id }}": {
-      "command": "{{ $cursorCommand }}",
-      "env": {{ (default (dict) $server.local.env) | toPrettyJson "      " }},
-      "args": {{ $cursorArgs | toPrettyJson "      " }}
-    }
-{{- else if hasKey $server.targets.cursor "remote" -}}
-{{- $cursorTransport := "streamableHttp" -}}
-{{- if hasKey $server.targets.cursor.remote "transport" -}}
-{{- $cursorTransport = $server.targets.cursor.remote.transport -}}
-{{- end -}}
-{{- $cursorUrl := $server.remote.url -}}
-{{- if hasKey $server.targets.cursor.remote "url" -}}
-{{- $cursorUrl = $server.targets.cursor.remote.url -}}
-{{- end -}}
-{{- $cursorHeaders := dict -}}
-{{- if hasKey $server.targets.cursor.remote "headers" -}}
-{{- $cursorHeaders = $server.targets.cursor.remote.headers -}}
-{{- end -}}
-{{- if $first }}{{- $first = false }}{{ else }},{{ end }}
-    "{{ $server.id }}": {
-      "transport": "{{ $cursorTransport }}",
-      "url": "{{ $cursorUrl }}",
-      "headers": {{ $cursorHeaders | toPrettyJson "      " }}
     }
 {{- else if hasKey $server "remote" -}}
 {{- $cursorTransport := "streamableHttp" -}}
