@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://chipwolf.github.io/dotfiles/schemas/brew-overlays.schema.json",
+  "$id": "https://example.com/schemas/brew-overlays.schema.json",
   "title": "Brew overlays",
   "type": "object",
   "additionalProperties": false,
