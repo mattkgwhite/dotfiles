@@ -5,3 +5,8 @@ DISABLE:
 SARIF_REPORTER: true
 
 LUA_LUACHECK_ARGUMENTS: "--globals vim"
+
+# DevSkim flags literal md5sum/sha1sum strings in this policy data file as
+# banned hash algorithm usage, but these are command-permission patterns, not
+# cryptographic implementations.
+REPOSITORY_DEVSKIM_FILTER_REGEX_EXCLUDE: home/.chezmoidata/agent-permissions/00-base.yaml
