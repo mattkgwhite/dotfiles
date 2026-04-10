@@ -13,7 +13,7 @@
         "CursorWrap": false,
         "EnvironmentVariables": true,
         "FancyZones": true,
-        "File Explorer": true,
+        "File Explorer Preview": true,
         "File Locksmith": true,
         "FindMyMouse": true,
         "Hosts": true,
@@ -27,6 +27,7 @@
         "MouseWithoutBorders": false,
         "NewPlus": false,
         "Peek": true,
+        "PowerDisplay": false,
         "PowerRename": true,
         "PowerToys Run": false,
         "QuickAccent": false,
@@ -58,7 +59,8 @@
       },
       "theme": "system",
       "system_theme": "dark",
-      "powertoys_version": "v0.98.0",
+      "powertoys_version": "v0.98.1",
+      "action_name": "",
       "ignored_conflict_properties": {
         "ignored_shortcuts": []
       }
