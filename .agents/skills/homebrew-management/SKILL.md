@@ -12,7 +12,6 @@ Use this skill before changing Homebrew-related files in this repo.
 - `home/Brewfile.tmpl`
 - `home/.chezmoidata/brew/*.yaml`
 - `schemas/brew-overlays.schema.json`
-- `home/Brewfile` (generated artifact)
 - `home/Brewfile.ignore`
 - `home/.chezmoiscripts/run_onchange_after_bootstrap.sh.tmpl`
 - `home/.chezmoiscripts/run_onchange_after_brew_review.sh.tmpl`
@@ -23,10 +22,9 @@ Use this skill before changing Homebrew-related files in this repo.
 ## Key conventions
 
 - Homebrew source of truth is overlay data in `home/.chezmoidata/brew/*.yaml`.
-- `home/Brewfile` is generated from `home/Brewfile.tmpl` + overlay data and should not be hand-edited.
 - `home/Brewfile.tmpl` renders all overlays found in `home/.chezmoidata/brew/*.yaml` (lexical file order).
-- `home/Brewfile` and `home/Brewfile.ignore` are source-dir only, listed in `home/.chezmoiignore`, and not applied to `~/`.
-- `run_onchange_after_bootstrap.sh.tmpl` runs `brew bundle` against the generated `home/Brewfile`.
+- `home/Brewfile.ignore` is source-dir only, listed in `home/.chezmoiignore`, and not applied to `~/`.
+- `run_onchange_after_bootstrap.sh.tmpl` renders `home/Brewfile.tmpl` at runtime and runs `brew bundle` against the rendered file.
 - `run_onchange_after_brew_review.sh.tmpl` runs `brew-review` from `dot_scripts/brew-review`.
 - In chezmoiscripts context, `$CHEZMOI_SOURCE_DIR` points at `home/` (the chezmoiroot), so paths should use `dot_scripts/...`.
 
@@ -39,8 +37,8 @@ Use this skill before changing Homebrew-related files in this repo.
   - `{ kind: env, name: PRIVATE, op: set }`
 - Keep package notes as inline YAML comments on the `name` line.
 - Keep disabled/optional packages as commented-out YAML blocks in the relevant overlay file.
-- After editing overlay/template files, regenerate `home/Brewfile`:
-  - `chezmoi execute-template --file home/Brewfile.tmpl > home/Brewfile`
+- After editing overlay/template files, validate render output:
+  - `chezmoi execute-template --file home/Brewfile.tmpl | ruby -c`
 
 ## Brewfile env var rule
 
@@ -56,7 +54,7 @@ Homebrew adds a `HOMEBREW_` prefix to env vars in Brewfile Ruby evaluation:
 
 - `brew-review` must stay in `dot_scripts/`, not `dot_zfunctions/`.
 - `~/.scripts` is added to PATH via the `path` array in `home/dot_config/zsh/dot_zshenv`.
-- `brew-review` add-flow must write to a selected overlay data file and regenerate `home/Brewfile`.
+- `brew-review` add-flow must write to a selected overlay data file and re-render the declared bundle for in-session drift checks.
 
 ## Tap removal workflow
 

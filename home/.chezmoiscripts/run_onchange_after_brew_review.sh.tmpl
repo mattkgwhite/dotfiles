@@ -4,8 +4,8 @@
 # Run interactive Homebrew drift review after Brewfile changes.
 # Exits silently when stdin is not a tty (non-interactive apply).
 
-# Brewfile hash (triggers re-run when Brewfile changes):
-# {{ include "Brewfile" | sha256sum }}
+# Brewfile inputs hash (triggers re-run when template or overlay data changes):
+# tmpl={{ include "Brewfile.tmpl" | sha256sum }} overlays={{ .brew.overlays | toJson | sha256sum }}
 
 {{- if eq .chezmoi.os "darwin" "linux" }}
 export HOMEBREW_NO_AUTO_UPDATE=1

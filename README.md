@@ -72,7 +72,7 @@ irm https://github.com/chipwolf/dotfiles/releases/download/v1.6.0/install.ps1 | 
 
 1. Installs Homebrew (if missing) and chezmoi.
 2. `chezmoi init --apply` clones this repo and writes configs to `~/`.
-3. `brew bundle` installs everything in the Brewfile. `brew upgrade` and `brew cleanup` run after.
+3. `brew bundle` installs everything from the rendered Homebrew bundle template. `brew upgrade` and `brew cleanup` run after.
 4. Antidote (zsh plugin manager) prewarms the plugin cache.
 5. mise installs managed runtimes. Neovim syncs plugins.
 6. Sets the Homebrew-installed zsh as the default shell.
@@ -156,8 +156,7 @@ Recommended fork workflow:
 1. Fork this repo on GitHub.
 2. Clone your fork locally.
 3. Update identity and package overlays (checklist below).
-4. Run `chezmoi execute-template --file home/Brewfile.tmpl > home/Brewfile`.
-5. Run `chezmoi apply` and validate your machine state.
+4. Run `chezmoi apply` and validate your machine state.
 
 ### Fork checklist
 
@@ -173,7 +172,7 @@ Change these files first:
 - **Homebrew packages**: `home/.chezmoidata/brew/*.yaml`
   - Keep `00-base.yaml` for shared packages.
   - Replace `10-chipwolf.yaml` with your own overlay file (for example `10-yourname.yaml`) and adjust package entries.
-  - Regenerate `home/Brewfile` after any overlay/template change.
+  - Keep package state in `home/Brewfile.tmpl` and `home/.chezmoidata/brew/*.yaml`; no checked-in rendered Brewfile is required.
 - **Agent permissions** (optional but common): `home/.chezmoidata/agent-permissions/*.yaml`
   - Keep `00-base.yaml` for shared rules.
   - Replace `10-chipwolf.yaml` with your own overlay file.
@@ -245,7 +244,7 @@ gh attestation verify oci://ghcr.io/chipwolf/dotfiles:v1.6.0 --repo chipwolf/dot
 
 | Document                           | Contents                                                       |
 |------------------------------------|----------------------------------------------------------------|
-| [docs/brew.md](docs/brew.md) | Homebrew overlays, Brewfile generation, and brew-review workflow |
+| [docs/brew.md](docs/brew.md) | Homebrew overlays, template rendering, and brew-review workflow |
 | [docs/agent-permissions.md](docs/agent-permissions.md) | Shared agent permission rule schema, overlays, and rendering model |
 | [docs/mcp-servers.md](docs/mcp-servers.md) | MCP server setup, conditions, targets, and arg interpolation   |
 | [docs/yubikey.md](docs/yubikey.md) | YubiKey SSH workflow, backup strategy, credential hygiene      |

@@ -26,17 +26,14 @@ Condition objects are one-line maps, for example:
 
 ## Generation
 
-`home/Brewfile` is generated from:
+Homebrew bundle content is rendered from:
 
 - template: `home/Brewfile.tmpl`
 - data: `home/.chezmoidata/brew/*.yaml`
 - all overlays discovered in lexical filename order
 
-Render manually:
-
-```bash
-chezmoi execute-template --file home/Brewfile.tmpl > home/Brewfile
-```
+This repo keeps only template and overlay data in git. Scripts render the
+bundle at runtime for `brew bundle` and drift review.
 
 The template prefixes env conditions with `HOMEBREW_` during render because Homebrew evaluates Brewfile entries in its own bundle context and exposes passed env vars with a `HOMEBREW_` prefix (for example, script `CODESPACES=1` becomes Brewfile `ENV["HOMEBREW_CODESPACES"]`).
 
@@ -46,7 +43,8 @@ Bootstrap script:
 
 - `home/.chezmoiscripts/run_onchange_after_bootstrap.sh.tmpl`
 
-It runs `brew bundle --file="$CHEZMOI_SOURCE_DIR/Brewfile"` with short env vars:
+It renders `home/Brewfile.tmpl` to a temporary file, then runs `brew bundle`
+against that file with short env vars:
 
 - `CODESPACES=1` for Codespaces
 - `PRIVATE=1` for private machines
@@ -64,12 +62,12 @@ Homebrew itself evaluates these as `ENV["HOMEBREW_CODESPACES"]` and `ENV["HOMEBR
 It compares:
 
 - installed set (`brew bundle dump`)
-- declared set (`home/Brewfile`)
+- declared set (runtime-rendered `home/Brewfile.tmpl`)
 - ignore set (`home/Brewfile.ignore`)
 
 For installed-but-undeclared packages, prompts:
 
-- **add**: choose an overlay file, append a structured package entry there, then regenerate `home/Brewfile`
+- **add**: choose an overlay file, append a structured package entry there, then re-render the declared bundle
 - **remove**: uninstall package
 - **ignore permanently**: append key to `home/Brewfile.ignore`
 - **skip**: no action
@@ -81,5 +79,4 @@ Installed formulae/casks from taps are removed before untapping.
 Source tests include `tests/source/brewfile.bats` which verify:
 
 - rendered Brewfile is valid Ruby
-- rendered output matches the checked-in `home/Brewfile`
 - expected env-prefix and condition formatting semantics

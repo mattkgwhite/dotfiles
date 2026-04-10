@@ -116,7 +116,7 @@ Deleting a file from the chezmoi source does **not** remove it from the target (
 - **Repo-local skills** – Shared project skills live under `.agents/skills/`.
 - **MCP server updates** – Load `.agents/skills/update-mcp-servers/SKILL.md` before changing `home/.chezmoidata/mcps/*.yaml`, `home/dot_cursor/mcp.json.tmpl`, or `home/dot_config/opencode/opencode.jsonc.tmpl`.
 - **Agent permission updates** – Load `.agents/skills/update-agent-permissions/SKILL.md` before changing `home/.chezmoidata/agent-permissions/*.yaml`, `schemas/agent-permissions.schema.json`, or OpenCode permission template rendering.
-- **Homebrew updates** – Load `.agents/skills/homebrew-management/SKILL.md` before changing `home/Brewfile`, `home/Brewfile.ignore`, brew-related chezmoiscripts, or `home/dot_scripts/executable_brew-review`.
+- **Homebrew updates** – Load `.agents/skills/homebrew-management/SKILL.md` before changing `home/Brewfile.tmpl`, `home/Brewfile.ignore`, brew overlay data, brew-related chezmoiscripts, or `home/dot_scripts/executable_brew-review`.
 - **Zsh** – Primary config under `home/dot_config/zsh/`: `dot_zshrc`, `dot_zshenv`, `dot_zprofile`, `dot_zplugins`, `dot_zshrc.d/`, `dot_zfunctions/`, `dot_p10k.zsh`. Top-level `home/dot_zshenv` and `home/dot_profile` set `ZDOTDIR` / `XDG_CONFIG_HOME` and are sourced by the shell.
 - **Neovim** – `home/dot_config/nvim/` (LazyVim-style: `init.lua`, `lua/config/`, `lua/plugins/`).
 - **OpenCode** – `home/dot_config/opencode/opencode.jsonc.tmpl` (→ `~/.config/opencode/opencode.jsonc`). This is the global OpenCode config: model, MCP servers, permissions, etc. It is a chezmoi template (uses `.chezmoi.homeDir` for the Obsidian vault path). Edit the source here when updating OpenCode settings.

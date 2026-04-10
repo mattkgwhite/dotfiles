@@ -1,5 +1,4 @@
 # .chezmoiignore — source-dir-only files that should not be applied to ~/
-Brewfile
 Brewfile.ignore
 
 {{ if eq .chezmoi.os "windows" }}

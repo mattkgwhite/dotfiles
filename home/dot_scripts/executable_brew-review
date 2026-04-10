@@ -2,10 +2,10 @@
 # brew-review — interactive Homebrew drift review
 #
 # Compares what is actually installed (brew bundle dump) against the
-# declared Brewfile in the chezmoi source directory. Prompts for each
+# declared Homebrew bundle rendered from the chezmoi source template. Prompts for each
 # package that is installed but not declared.
 #
-# Usage: brew-review [--brewfile <path>] [--ignore <path>]
+# Usage: brew-review [<brewfile-path>] [<ignorefile-path>]
 #
 # Exits silently if there is no drift or if stdin is not a tty.
 
@@ -20,19 +20,27 @@ fi
 
 # Resolve paths — prefer env vars set by chezmoi, fall back to defaults
 CHEZMOI_SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-$(chezmoi source-path 2>/dev/null || echo "$HOME/.local/share/chezmoi")}"
-BREWFILE="${1:-$CHEZMOI_SOURCE_DIR/Brewfile}"
+BREWFILE_ARG="${1:-}"
+BREWFILE=""
+BREWFILE_IS_TEMP=0
 IGNOREFILE="${2:-$CHEZMOI_SOURCE_DIR/Brewfile.ignore}"
 BREWFILE_TMPL="$CHEZMOI_SOURCE_DIR/Brewfile.tmpl"
 BREW_DATA_DIR="$CHEZMOI_SOURCE_DIR/.chezmoidata/brew"
 
-if [ ! -f "$BREWFILE" ]; then
-	echo "brew-review: Brewfile not found at $BREWFILE" >&2
-	exit 1
-fi
-
 if [ ! -f "$BREWFILE_TMPL" ] || [ ! -d "$BREW_DATA_DIR" ]; then
 	echo "brew-review: Brew overlay source files not found under $BREW_DATA_DIR" >&2
 	exit 1
+fi
+
+if [ -n "$BREWFILE_ARG" ]; then
+	BREWFILE="$BREWFILE_ARG"
+	if [ ! -f "$BREWFILE" ]; then
+		echo "brew-review: Brewfile not found at $BREWFILE" >&2
+		exit 1
+	fi
+else
+	BREWFILE="$(mktemp)"
+	BREWFILE_IS_TEMP=1
 fi
 
 # Extract base keys from a Brewfile-format file (type + quoted name only)
@@ -139,12 +147,24 @@ _rerender_brewfile() {
 	chezmoi execute-template --file "$BREWFILE_TMPL" >"$BREWFILE"
 }
 
-# Extract declared keys from Brewfile directly (preserves type prefix; strips conditionals/comments)
-declared_keys=$(_extract_keys "$BREWFILE")
-
 # Get installed set via brew bundle dump
 dump_tmp=$(mktemp)
-trap 'rm -f "$dump_tmp"' EXIT
+cleanup() {
+	rm -f "$dump_tmp"
+	if [ "$BREWFILE_IS_TEMP" -eq 1 ]; then
+		rm -f "$BREWFILE"
+	fi
+}
+trap cleanup EXIT INT TERM
+
+if ! _rerender_brewfile; then
+	echo "brew-review: failed to render declared bundle from $BREWFILE_TMPL" >&2
+	exit 1
+fi
+
+# Extract declared keys from the rendered bundle (preserves type prefix; strips conditionals/comments)
+declared_keys=$(_extract_keys "$BREWFILE")
+
 brew bundle dump --file="$dump_tmp" --force --quiet 2>/dev/null
 installed_keys=$(_extract_keys "$dump_tmp")
 
