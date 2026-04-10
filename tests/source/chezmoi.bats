@@ -20,13 +20,13 @@ render_template() {
   chezmoi execute-template --init \
     --promptBool "codespaces=false" \
     --promptBool "private=false" \
-    <"$template_path"
+    --file "$template_path"
 }
 
 render_template_with_override_data() {
   local template_path="$1"
   local data_file="$2"
-  chezmoi execute-template --override-data-file "$data_file" <"$template_path"
+  chezmoi execute-template --override-data-file "$data_file" --file "$template_path"
 }
 
 # --- .chezmoi.toml.tmpl renders without error ---
@@ -365,7 +365,7 @@ EOF
 
   output=$(chezmoi execute-template \
     --override-data-file "$merged_data_file" \
-    <"$SOURCE_DIR/dot_cursor/mcp.json.tmpl")
+    --file "$SOURCE_DIR/dot_cursor/mcp.json.tmpl")
   printf '%s' "$output" >"$rendered_file"
 
   ruby -rjson -e '
@@ -423,7 +423,7 @@ EOF
 
   output=$(chezmoi execute-template \
     --override-data-file "$merged_data_file" \
-    <"$SOURCE_DIR/dot_config/opencode/opencode.jsonc.tmpl")
+    --file "$SOURCE_DIR/dot_config/opencode/opencode.jsonc.tmpl")
   printf '%s' "$output" >"$rendered_file"
 
   ruby -rjson -e '
@@ -510,7 +510,7 @@ EOF
     err=$(chezmoi execute-template --init \
       --promptBool "codespaces=false" \
       --promptBool "private=false" \
-      <"$tmpl" 2>&1) || {
+      --file "$tmpl" 2>&1) || {
         if echo "$err" | grep -qi "parse"; then
           echo "PARSE ERROR in $tmpl:"
           echo "$err"
