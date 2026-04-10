@@ -1,0 +1,6 @@
+{{/*
+PowerToys rewrites this file as minified JSON.
+Render from structured chezmoidata with toJson so chezmoi output matches
+PowerToys formatting and avoids whitespace-only diffs.
+*/}}
+{{ .powertoys.settings | toJson }}
