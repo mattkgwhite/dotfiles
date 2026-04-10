@@ -1,3 +1,4 @@
+{{- $workChromeProfile := (bitwarden "item" "work-domain").name -}}
 // ~/.finicky.js
 
 export default {
@@ -10,28 +11,28 @@ export default {
 
   handlers: [
     {
-      match: ['on-running.com/*', '*.on-running.com/*'],
-      browser: 'Google Chrome:on-running.com'
+      match: ['{{ $workChromeProfile }}/*', '*.{{ $workChromeProfile }}/*'],
+      browser: 'Google Chrome:{{ $workChromeProfile }}'
     },
     {
       match: ['*.atlassian.net/*', 'atlassian.com/*', '*.atlassian.com/*'],
-      browser: 'Google Chrome:on-running.com'
+      browser: 'Google Chrome:{{ $workChromeProfile }}'
     },
     {
       match: 'github.com/*',
-      browser: 'Google Chrome:on-running.com'
+      browser: 'Google Chrome:{{ $workChromeProfile }}'
     },
     {
       match: ['google.com/*', '*.google.com/*'],
-      browser: 'Google Chrome:on-running.com'
+      browser: 'Google Chrome:{{ $workChromeProfile }}'
     },
     {
       match: ['okta.com/*', '*.okta.com/*'],
-      browser: 'Google Chrome:on-running.com'
+      browser: 'Google Chrome:{{ $workChromeProfile }}'
     },
     {
       match: ['slack.com/*', '*.slack.com/*'],
-      browser: 'Google Chrome:on-running.com'
+      browser: 'Google Chrome:{{ $workChromeProfile }}'
     }
   ]
 }

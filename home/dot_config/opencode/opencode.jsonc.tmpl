@@ -1,148 +1,13 @@
 {
   "$schema": "https://opencode.ai/config.json",
   // User preferences (override in project opencode.json if needed)
-  "autoupdate": true,
+  "autoupdate": false,
 
   // GitHub Copilot: run /connect and select "GitHub Copilot", then sign in at github.com/login/device
   "model": "github-copilot/claude-sonnet-4.6",
 
   "permission": {
-    // Require approval before running any shell command (with specific exceptions)
-    "bash": {
-      "*": "ask",
-      // Chezmoi
-      "chezmoi apply": "allow",
-      "chezmoi apply *": "allow",
-      // Shell and environment inspection
-      "echo": "allow",
-      "echo *": "allow",
-      "printf *": "allow",
-      "pwd": "allow",
-      "which *": "allow",
-      "type *": "allow",
-      "command -v *": "allow",
-      "uname": "allow",
-      "uname *": "allow",
-      "env": "allow",
-      "printenv": "allow",
-      "printenv *": "allow",
-      "locale": "allow",
-      "locale *": "allow",
-      "id": "allow",
-      "whoami": "allow",
-      "groups": "allow",
-      "date": "allow",
-      "date *": "allow",
-      // File and text inspection
-      "ls": "allow",
-      "ls *": "allow",
-      "find *": "allow",
-      "stat *": "allow",
-      "file *": "allow",
-      "du *": "allow",
-      "du -s *": "allow",
-      "du -h *": "allow",
-      "wc *": "allow",
-      "head *": "allow",
-      "tail *": "allow",
-      // GitHub CLI
-      "gh run view *": "allow",
-      "cat *": "allow",
-      "grep *": "allow",
-      "egrep *": "allow",
-      "fgrep *": "allow",
-      "rg *": "allow",
-      "sort *": "allow",
-      "uniq *": "allow",
-      "cut *": "allow",
-      "awk *": "allow",
-      "jq *": "allow",
-      "column *": "allow",
-      "nl *": "allow",
-      "base64 *": "allow",
-      "xxd *": "allow",
-      "strings *": "allow",
-      "md5sum *": "allow",
-      "sha1sum *": "allow",
-      "sha256sum *": "allow",
-      "shasum *": "allow",
-      "cksum *": "allow",
-      "realpath *": "allow",
-      "readlink *": "allow",
-      // System and process inspection
-      "ps": "allow",
-      "ps *": "allow",
-      "pgrep *": "allow",
-      "df": "allow",
-      "df *": "allow",
-      "uptime": "allow",
-      "uptime *": "allow",
-      "lsof *": "allow",
-      // Git inspection
-      "git status": "allow",
-      "git status *": "allow",
-      "git diff": "allow",
-      "git diff *": "allow",
-      "git show": "allow",
-      "git show *": "allow",
-      "git log": "allow",
-      "git log *": "allow",
-      "git branch": "allow",
-      "git branch *": "allow",
-      "git remote -v": "allow",
-      "git remote show *": "allow",
-      "git rev-parse *": "allow",
-      "git describe *": "allow",
-      "git ls-files": "allow",
-      "git ls-files *": "allow",
-      "git grep *": "allow",
-      "git blame *": "allow",
-      // Network inspection
-      "ping *": "allow",
-      "nslookup *": "allow",
-      "dig *": "allow",
-      "host *": "allow",
-      "netstat": "allow",
-      "netstat *": "allow",
-      "ifconfig": "allow",
-      "ifconfig *": "allow",
-      // Kubernetes and containers
-      "kubectl config get-contexts": "allow",
-      "kubectl config current-context": "allow",
-      "kubectl get *": "allow",
-      "docker ps": "allow",
-      "docker ps *": "allow",
-      "docker images": "allow",
-      "docker images *": "allow"
-    },
-
-    // Allow reads and edits to the chezmoi source tree (global memory lives there)
-    "external_directory": {
-      "~/.local/share/chezmoi/**": "allow",
-      "/tmp/**": "allow",
-      "{{ .chezmoi.homeDir }}/AppData/Local/Temp/**": "allow"
-    }
-{{- if not .private }},
-
-    // Require approval before any Atlassian MCP tool is invoked
-    "atlassian_*": "ask",
-
-    // Require approval before any sooperset/mcp-atlassian tool is invoked
-    "mcp-atlassian_*": "ask",
-
-    // Read-only Atlassian tools (only read:* scopes) — allow without prompting
-    "atlassian_get*": "allow",
-    "atlassian_search*": "allow",
-    // Outliers with read-only scopes that don't match above patterns
-    "atlassian_atlassianUserInfo": "allow",
-    "atlassian_fetch": "allow",
-    "atlassian_lookupJiraAccountId": "allow",
-
-    // Read-only mcp-atlassian (sooperset) tools — allow without prompting
-    "mcp-atlassian_jira_get_*": "allow",
-    "mcp-atlassian_jira_search*": "allow",
-    "mcp-atlassian_jira_batch_get_changelogs": "allow"
-{{- end }}
+{{- template "opencode-permission.tmpl" . }}
   },
 
   "plugin": [
@@ -152,48 +17,6 @@
   ],
 
   "mcp": {
-{{- $servers := index . "mcpServers" -}}
-{{- $first := true -}}
-{{- range $server := $servers -}}
-{{- $conditionsMatch := true -}}
-{{- if hasKey $server "conditions" -}}
-{{- range $conditionKey, $expected := $server.conditions -}}
-{{- if and (hasKey $ $conditionKey) (eq (index $ $conditionKey) $expected) -}}
-{{- else -}}
-{{- $conditionsMatch = false -}}
-{{- end -}}
-{{- end -}}
-{{- end -}}
-{{- $opencodeEnabled := true -}}
-{{- if hasKey $server.targets.opencode "enabled" -}}
-{{- $opencodeEnabled = $server.targets.opencode.enabled -}}
-{{- end -}}
-{{- if and $opencodeEnabled $conditionsMatch -}}
-{{- if $first }}{{- $first = false }}{{ else }},{{ end }}
-    "{{ $server.id }}": {
-{{- if hasKey $server "local" }}
-{{- $openCodeCommandName := $server.local.command -}}
-{{- $openCodeCommandArgs := list -}}
-{{- range $arg := $server.local.args -}}
-{{- $resolvedArg := $arg -}}
-{{- if hasPrefix $arg "$data." -}}
-{{- $dataKey := trimPrefix "$data." $arg -}}
-{{- if hasKey $ $dataKey -}}
-{{- $resolvedArg = (index $ $dataKey) -}}
-{{- end -}}
-{{- end -}}
-{{- $openCodeCommandArgs = append $openCodeCommandArgs $resolvedArg -}}
-{{- end -}}
-{{- $openCodeCommand := prepend $openCodeCommandArgs $openCodeCommandName -}}
-      "type": "local",
-      "command": {{ $openCodeCommand | toPrettyJson "      " }},
-{{- else if hasKey $server "remote" }}
-      "type": "remote",
-      "url": "{{ $server.remote.url }}",
-{{- end }}
-      "enabled": {{ $server.enabled | toPrettyJson }}
-    }
-{{- end -}}
-{{- end }}
+{{- template "opencode-mcp.jsonc.tmpl" . }}
   }
 }

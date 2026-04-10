@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=../../../schemas/mcp-servers.schema.json
+mcp:
+  serversById:
+    obsidian:
+      enabled: true
+      local:
+        command: "mise"
+        args:
+          - "x"
+          - "node@22"
+          - "--"
+          - "npx"
+          - "-y"
+          - "@mauricio.wolff/mcp-obsidian@0.8.2"
+          - "$data.obsidianVaultPath"
+        env: {}
+
+    chrome-devtools:
+      enabled: true
+      local:
+        command: "mise"
+        args:
+          - "x"
+          - "node@22"
+          - "--"
+          - "npx"
+          - "-y"
+          - "chrome-devtools-mcp@0.21.0"
+        env: {}
+
+    context7:
+      enabled: true
+      remote:
+        url: "https://mcp.context7.com/mcp"
+
+    grep:
+      enabled: true
+      remote:
+        url: "https://mcp.grep.app"

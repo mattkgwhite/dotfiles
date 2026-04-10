@@ -22,9 +22,16 @@ fi
 CHEZMOI_SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-$(chezmoi source-path 2>/dev/null || echo "$HOME/.local/share/chezmoi")}"
 BREWFILE="${1:-$CHEZMOI_SOURCE_DIR/Brewfile}"
 IGNOREFILE="${2:-$CHEZMOI_SOURCE_DIR/Brewfile.ignore}"
+BREWFILE_TMPL="$CHEZMOI_SOURCE_DIR/Brewfile.tmpl"
+BREW_DATA_DIR="$CHEZMOI_SOURCE_DIR/.chezmoidata/brew"
 
 if [ ! -f "$BREWFILE" ]; then
 	echo "brew-review: Brewfile not found at $BREWFILE" >&2
+	exit 1
+fi
+
+if [ ! -f "$BREWFILE_TMPL" ] || [ ! -d "$BREW_DATA_DIR" ]; then
+	echo "brew-review: Brew overlay source files not found under $BREW_DATA_DIR" >&2
 	exit 1
 fi
 
@@ -36,70 +43,100 @@ _extract_keys() {
 		true
 }
 
-# Sort entries within each section of a Brewfile while preserving the file
-# header and section order (tap, brew, cask, mas).
-#
-# Within each section, active lines and commented-out entries are sorted
-# together alphabetically by package name (case-insensitive). The sort key
-# is the first quoted token on the line, stripping any leading "# ".
-#
-# The file header (everything before the first tap/brew/cask/mas line,
-# including commented-out entries that don't look like package lines) is
-# preserved verbatim.
-_sort_brewfile() {
-	local file="$1"
-	python3 - "$file" <<'PYEOF'
-import sys, re
+_load_overlay_map() {
+	local -a files=()
+	shopt -s nullglob
+	files=("$BREW_DATA_DIR"/*.yaml)
+	shopt -u nullglob
+	if [ ${#files[@]} -eq 0 ]; then
+		return 1
+	fi
 
-path = sys.argv[1]
-with open(path) as f:
-    lines = f.readlines()
+	while IFS=$'\t' read -r overlay_id overlay_file; do
+		[ -z "$overlay_id" ] && continue
+		[ "$overlay_id" = "base" ] && continue
+		OVERLAY_IDS+=("$overlay_id")
+		OVERLAY_FILES+=("$overlay_file")
+	done < <(
+		ruby -ryaml -e '
+			ARGV.sort.each do |file|
+			  data = YAML.load_file(file) || {}
+			  overlays = data.dig("brew", "overlays")
+			  next unless overlays.is_a?(Hash)
+			  overlays.each_key { |id| puts "#{id}\t#{file}" }
+			end
+		' "${files[@]}"
+	)
 
-TYPES = ("tap", "brew", "cask", "mas", "whalebrew")
-# Matches active or commented-out package lines
-PKG_RE = re.compile(r'^\s*#?\s*(?:' + '|'.join(TYPES) + r')\s+"([^"]+)"')
+	[ ${#OVERLAY_IDS[@]} -gt 0 ]
+}
 
-def sort_key(line):
-    m = PKG_RE.match(line)
-    return m.group(1).lower() if m else ""
+_overlay_file_for_id() {
+	local overlay_id="$1"
+	local i
+	for ((i = 0; i < ${#OVERLAY_IDS[@]}; i++)); do
+		if [ "${OVERLAY_IDS[$i]}" = "$overlay_id" ]; then
+			printf '%s\n' "${OVERLAY_FILES[$i]}"
+			return 0
+		fi
+	done
+	return 1
+}
 
-def is_pkg_line(line):
-    return bool(PKG_RE.match(line))
+_choose_overlay_id() {
+	local default_overlay="$1"
+	local i
+	echo "  Select overlay target:" >&2
+	for ((i = 0; i < ${#OVERLAY_IDS[@]}; i++)); do
+		printf "    [%d] %s\n" "$((i + 1))" "${OVERLAY_IDS[$i]}" >&2
+	done
 
-def section_type(line):
-    stripped = line.lstrip("# \t")
-    for t in TYPES:
-        if stripped.startswith(t + " ") or stripped.startswith(t + "\t"):
-            return t
-    return None
+	local default_index=1
+	for ((i = 0; i < ${#OVERLAY_IDS[@]}; i++)); do
+		if [ "${OVERLAY_IDS[$i]}" = "$default_overlay" ]; then
+			default_index=$((i + 1))
+			break
+		fi
+	done
 
-# Split into header + sections
-# Header = everything before the first package line
-header = []
-sections = {}   # type -> [lines]
-section_order = []
-current_type = None
+	while true; do
+		printf "  Overlay number [%d]: " "$default_index" >&2
+		read -r overlay_choice </dev/tty
+		[ -z "$overlay_choice" ] && overlay_choice="$default_index"
+		if [[ "$overlay_choice" =~ ^[0-9]+$ ]] && [ "$overlay_choice" -ge 1 ] && [ "$overlay_choice" -le "${#OVERLAY_IDS[@]}" ]; then
+			printf '%s\n' "${OVERLAY_IDS[$((overlay_choice - 1))]}"
+			return 0
+		fi
+		echo "  Please enter a valid overlay number." >&2
+	done
+}
 
-for line in lines:
-    t = section_type(line)
-    if t is None and current_type is None:
-        header.append(line)
-    else:
-        if t is not None and t != current_type:
-            current_type = t
-            if t not in sections:
-                sections[t] = []
-                section_order.append(t)
-        sections[current_type].append(line)
+_append_package_to_overlay() {
+	local overlay_id="$1"
+	local pkg_type="$2"
+	local pkg_name="$3"
+	local mas_id="${4:-}"
+	local overlay_file
+	overlay_file="$(_overlay_file_for_id "$overlay_id")" || return 1
 
-# Sort each section's lines by package name
-out = header[:]
-for t in section_order:
-    out.extend(sorted(sections[t], key=sort_key))
+	{
+		echo ""
+		echo "        - type: $pkg_type"
+		echo "          name: $pkg_name"
+		if [ "$pkg_type" = "cask" ]; then
+			echo "          conditions:"
+			echo "            - { kind: os, op: is, value: mac }"
+		elif [ "$pkg_type" = "mas" ]; then
+			echo "          masId: $mas_id"
+			echo "          conditions:"
+			echo "            - { kind: os, op: is, value: mac }"
+			echo "            - { kind: tty, op: is, value: true }"
+		fi
+	} >>"$overlay_file"
+}
 
-with open(path, "w") as f:
-    f.writelines(out)
-PYEOF
+_rerender_brewfile() {
+	chezmoi execute-template --file "$BREWFILE_TMPL" >"$BREWFILE"
 }
 
 # Extract declared keys from Brewfile directly (preserves type prefix; strips conditionals/comments)
@@ -157,6 +194,14 @@ fi
 
 # Prompt for extras
 if [ ${#extras[@]} -gt 0 ]; then
+	OVERLAY_IDS=()
+	OVERLAY_FILES=()
+	if ! _load_overlay_map; then
+		echo "brew-review: no non-base brew overlays found in $BREW_DATA_DIR" >&2
+		exit 1
+	fi
+	DEFAULT_OVERLAY="${OVERLAY_IDS[0]}"
+
 	echo "The following packages are installed but not in Brewfile:"
 	echo ""
 	for key in "${extras[@]}"; do
@@ -178,6 +223,10 @@ if [ ${#extras[@]} -gt 0 ]; then
 				echo ""
 				continue
 			}
+			;;
+		mas)
+			# mas apps are not formulae/casks and require special handling later.
+			:
 			;;
 		*)
 			brew list --formula "$pkg" &>/dev/null || {
@@ -214,13 +263,28 @@ if [ ${#extras[@]} -gt 0 ]; then
 		fi
 
 		while true; do
-			printf "  [a]dd to Brewfile / [r]emove / [i]gnore permanently / [s]kip: "
+			printf "  [a]dd to brew overlay / [r]emove / [i]gnore permanently / [s]kip: "
 			read -r reply </dev/tty
 			case "$reply" in
 			a | A)
-				echo "$key" >>"$BREWFILE"
-				_sort_brewfile "$BREWFILE"
-				echo "  -> Added to $BREWFILE"
+				selected_overlay="$(_choose_overlay_id "$DEFAULT_OVERLAY")"
+				DEFAULT_OVERLAY="$selected_overlay"
+				if [ "$type" = "mas" ]; then
+					printf "  Enter MAS app id for %s: " "$pkg"
+					read -r mas_id </dev/tty
+					if ! [[ "$mas_id" =~ ^[0-9]+$ ]]; then
+						echo "  -> Invalid MAS id, skipping"
+						break
+					fi
+					_append_package_to_overlay "$selected_overlay" "$type" "$pkg" "$mas_id"
+				else
+					_append_package_to_overlay "$selected_overlay" "$type" "$pkg"
+				fi
+				if _rerender_brewfile; then
+					echo "  -> Added $key to overlay '$selected_overlay' and regenerated Brewfile"
+				else
+					echo "  -> Added $key to overlay '$selected_overlay', but failed to regenerate Brewfile" >&2
+				fi
 				break
 				;;
 			r | R)

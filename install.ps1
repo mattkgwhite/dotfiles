@@ -1,9 +1,5 @@
-# install.ps1 — Bootstrap chezmoi dotfiles on Windows.
+h# install.ps1 — Bootstrap chezmoi dotfiles on Windows.
 # Forks: update $repoUrl below to point at your fork.
-# Usage (elevated PowerShell not required — script self-elevates):
-#   irm https://github.com/chipwolf/dotfiles/releases/download/v1.6.0/install.ps1 | iex # x-release-please-version
-# Or clone the repo and run:
-#   .\install.ps1
 
 [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '', Justification = 'Install script uses Write-Host for coloured terminal output')]
 param()

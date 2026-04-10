@@ -19,7 +19,7 @@
     },
     {
       customType: "regex",
-      managerFilePatterns: ["/home\\/\\.chezmoidata\\/mcp-servers\\.yaml$/"],
+      managerFilePatterns: ["/home\\/\\.chezmoidata\\/mcps\\/.*\\.ya?ml$/"],
       matchStrings: [
         "\"(?<package>[^\"]+?)@(?<currentValue>[^\"]+)\"",
       ],
@@ -28,7 +28,7 @@
     },
     {
       customType: "regex",
-      managerFilePatterns: ["/home\\/\\.chezmoidata\\/mcp-servers\\.yaml$/"],
+      managerFilePatterns: ["/home\\/\\.chezmoidata\\/mcps\\/.*\\.ya?ml$/"],
       matchStrings: [
         "uvx\\s+(?<package>[^=\\s\"]+)==(?<currentValue>[^\\s\"]+)",
       ],
@@ -44,7 +44,7 @@
     },
     {
       description: "Keep MCP runtime on Node 22",
-      matchFileNames: ["home/.chezmoidata/mcp-servers.yaml"],
+      matchFileNames: ["home/.chezmoidata/mcps/00-base.yaml"],
       matchPackageNames: ["node"],
       enabled: false,
     },

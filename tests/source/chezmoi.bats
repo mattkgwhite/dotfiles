@@ -60,6 +60,84 @@ render_template_with_override_data() {
   grep -q '\.config/wezterm' "$SOURCE_DIR/.chezmoiignore"
 }
 
+# --- OpenCode permission template rendering ---
+
+@test "OpenCode permission template applies conditional top-level rules" {
+  local data_file_false="$BATS_TEST_TMPDIR/opencode-permission-private-false.json"
+  cat >"$data_file_false" <<'EOF'
+{
+  "private": false,
+  "agentPermissions": {
+    "kinds": {
+      "bash": {
+        "destinationType": "namespaced",
+        "destinationKey": "bash",
+        "supportsMatchMode": true,
+        "defaultMatchMode": "exact",
+        "wildcardSuffix": " *"
+      },
+      "external_directory": {
+        "destinationType": "namespaced",
+        "destinationKey": "external_directory"
+      },
+      "permission_key": {
+        "destinationType": "top_level"
+      }
+    },
+    "rules": [
+        { "kind": "bash", "pattern": "*", "op": "ask", "bashMatchMode": "exact" },
+        { "kind": "bash", "pattern": "docker ps", "op": "allow", "bashMatchMode": "exactAndWithArgs" },
+        { "kind": "external_directory", "pattern": "/tmp/**", "op": "allow" },
+        { "kind": "permission_key", "pattern": "atlassian_*", "op": "ask", "conditions": { "private": false } },
+        { "kind": "permission_key", "pattern": "always_*", "op": "allow" }
+      ]
+  }
+}
+EOF
+
+  local data_file_true="$BATS_TEST_TMPDIR/opencode-permission-private-true.json"
+  cat >"$data_file_true" <<'EOF'
+{
+  "private": true,
+  "agentPermissions": {
+    "kinds": {
+      "bash": {
+        "destinationType": "namespaced",
+        "destinationKey": "bash",
+        "supportsMatchMode": true,
+        "defaultMatchMode": "exact",
+        "wildcardSuffix": " *"
+      },
+      "external_directory": {
+        "destinationType": "namespaced",
+        "destinationKey": "external_directory"
+      },
+      "permission_key": {
+        "destinationType": "top_level"
+      }
+    },
+    "rules": [
+        { "kind": "bash", "pattern": "*", "op": "ask", "bashMatchMode": "exact" },
+        { "kind": "bash", "pattern": "docker ps", "op": "allow", "bashMatchMode": "exactAndWithArgs" },
+        { "kind": "external_directory", "pattern": "/tmp/**", "op": "allow" },
+        { "kind": "permission_key", "pattern": "atlassian_*", "op": "ask", "conditions": { "private": false } },
+        { "kind": "permission_key", "pattern": "always_*", "op": "allow" }
+      ]
+  }
+}
+EOF
+
+  output_false=$(render_template_with_override_data "$SOURCE_DIR/dot_config/opencode/opencode.jsonc.tmpl" "$data_file_false")
+  echo "$output_false" | grep -Fq '"atlassian_*": "ask"'
+  echo "$output_false" | grep -Fq '"always_*": "allow"'
+  echo "$output_false" | grep -Fq '"docker ps": "allow"'
+  echo "$output_false" | grep -Fq '"docker ps *": "allow"'
+
+  output_true=$(render_template_with_override_data "$SOURCE_DIR/dot_config/opencode/opencode.jsonc.tmpl" "$data_file_true")
+  ! echo "$output_true" | grep -Fq '"atlassian_*": "ask"'
+  echo "$output_true" | grep -Fq '"always_*": "allow"'
+}
+
 # --- MCP template rendering ---
 
 @test "Cursor MCP template renders canonical local/remote shapes correctly" {
@@ -67,24 +145,24 @@ render_template_with_override_data() {
   cat >"$data_file" <<'EOF'
 {
   "private": false,
-  "mcpServers": [
-    {
-      "id": "shape-local-base",
-      "enabled": true,
-      "targets": { "cursor": {}, "opencode": {} },
-      "local": {
-        "command": "mise",
-        "args": ["x", "node", "--", "npx", "-y", "pkg-local-base@latest"],
-        "env": {}
+  "mcp": {
+    "serversById": {
+      "shape-local-base": {
+        "enabled": true,
+        "targets": { "cursor": {}, "opencode": {} },
+        "local": {
+          "command": "mise",
+          "args": ["x", "node", "--", "npx", "-y", "pkg-local-base@latest"],
+          "env": {}
+        }
+      },
+      "shape-remote-base": {
+        "enabled": true,
+        "targets": { "cursor": {}, "opencode": {} },
+        "remote": { "url": "https://example.com/base" }
       }
-    },
-    {
-      "id": "shape-remote-base",
-      "enabled": true,
-      "targets": { "cursor": {}, "opencode": {} },
-      "remote": { "url": "https://example.com/base" }
     }
-  ]
+  }
 }
 EOF
 
@@ -105,21 +183,21 @@ EOF
   cat >"$data_file" <<'EOF'
 {
   "private": true,
-  "mcpServers": [
-    {
-      "id": "shape-private-blocked",
-      "enabled": true,
-      "conditions": { "private": false },
-      "targets": { "cursor": {}, "opencode": {} },
-      "remote": { "url": "https://example.com/private-blocked" }
-    },
-    {
-      "id": "shape-private-allowed",
-      "enabled": true,
-      "targets": { "cursor": {}, "opencode": {} },
-      "remote": { "url": "https://example.com/private-allowed" }
+  "mcp": {
+    "serversById": {
+      "shape-private-blocked": {
+        "enabled": true,
+        "conditions": { "private": false },
+        "targets": { "cursor": {}, "opencode": {} },
+        "remote": { "url": "https://example.com/private-blocked" }
+      },
+      "shape-private-allowed": {
+        "enabled": true,
+        "targets": { "cursor": {}, "opencode": {} },
+        "remote": { "url": "https://example.com/private-allowed" }
+      }
     }
-  ]
+  }
 }
 EOF
 
@@ -132,29 +210,84 @@ EOF
   '
 }
 
+@test "Cursor MCP template defaults targets to enabled when omitted" {
+  local data_file="$BATS_TEST_TMPDIR/mcp-no-targets-cursor.json"
+  cat >"$data_file" <<'EOF'
+{
+  "private": false,
+  "mcp": {
+    "serversById": {
+      "shape-no-targets": {
+        "enabled": true,
+        "remote": { "url": "https://example.com/no-targets" }
+      }
+    }
+  }
+}
+EOF
+
+  output=$(render_template_with_override_data "$SOURCE_DIR/dot_cursor/mcp.json.tmpl" "$data_file")
+  echo "$output" | ruby -rjson -e '
+    j = JSON.parse(STDIN.read)
+    s = j.fetch("mcpServers")
+    raise "server with omitted targets missing" unless s.key?("shape-no-targets")
+  '
+}
+
+@test "Cursor MCP template respects enabled false" {
+  local data_file="$BATS_TEST_TMPDIR/mcp-overrides-cursor.json"
+  cat >"$data_file" <<'EOF'
+{
+  "private": false,
+  "mcp": {
+    "serversById": {
+      "shape-disabled": {
+        "enabled": true,
+        "targets": { "cursor": {}, "opencode": {} },
+        "remote": { "url": "https://example.com/disabled" }
+      },
+      "shape-disabled-explicit": {
+        "enabled": false,
+        "targets": { "cursor": {}, "opencode": {} },
+        "remote": { "url": "https://example.com/enabled" }
+      }
+    }
+  }
+}
+EOF
+
+  output=$(render_template_with_override_data "$SOURCE_DIR/dot_cursor/mcp.json.tmpl" "$data_file")
+  echo "$output" | ruby -rjson -e '
+    j = JSON.parse(STDIN.read)
+    s = j.fetch("mcpServers")
+    raise "enabled server missing" unless s.key?("shape-disabled")
+    raise "explicit-disabled server rendered" if s.key?("shape-disabled-explicit")
+  '
+}
+
 @test "OpenCode MCP template renders canonical local/remote shapes correctly" {
   local data_file="$BATS_TEST_TMPDIR/mcp-shapes-opencode.json"
   cat >"$data_file" <<'EOF'
 {
   "private": false,
-  "mcpServers": [
-    {
-      "id": "shape-op-local-base",
-      "enabled": true,
-      "targets": { "cursor": {}, "opencode": {} },
-      "local": {
-        "command": "mise",
-        "args": ["x", "node", "--", "npx", "-y", "pkg-op-local-base@latest"],
-        "env": {}
+  "mcp": {
+    "serversById": {
+      "shape-op-local-base": {
+        "enabled": true,
+        "targets": { "cursor": {}, "opencode": {} },
+        "local": {
+          "command": "mise",
+          "args": ["x", "node", "--", "npx", "-y", "pkg-op-local-base@latest"],
+          "env": {}
+        }
+      },
+      "shape-op-remote-base": {
+        "enabled": true,
+        "targets": { "cursor": {}, "opencode": {} },
+        "remote": { "url": "https://example.com/op-base" }
       }
-    },
-    {
-      "id": "shape-op-remote-base",
-      "enabled": true,
-      "targets": { "cursor": {}, "opencode": {} },
-      "remote": { "url": "https://example.com/op-base" }
     }
-  ]
+  }
 }
 EOF
 
@@ -165,14 +298,70 @@ EOF
   echo "$output" | grep -q 'https://example.com/op-base'
 }
 
+@test "OpenCode MCP template defaults targets to enabled when omitted" {
+  local data_file="$BATS_TEST_TMPDIR/mcp-no-targets-opencode.json"
+  cat >"$data_file" <<'EOF'
+{
+  "private": false,
+  "mcp": {
+    "serversById": {
+      "shape-op-no-targets": {
+        "enabled": true,
+        "remote": { "url": "https://example.com/op-no-targets" }
+      }
+    }
+  }
+}
+EOF
+
+  output=$(render_template_with_override_data "$SOURCE_DIR/dot_config/opencode/opencode.jsonc.tmpl" "$data_file")
+  echo "$output" | grep -q '"shape-op-no-targets"'
+}
+
+@test "OpenCode MCP template respects enabled false" {
+  local data_file="$BATS_TEST_TMPDIR/mcp-overrides-opencode.json"
+  cat >"$data_file" <<'EOF'
+{
+  "private": false,
+  "mcp": {
+    "serversById": {
+      "shape-op-disabled": {
+        "enabled": true,
+        "targets": { "cursor": {}, "opencode": {} },
+        "remote": { "url": "https://example.com/op-disabled" }
+      },
+      "shape-op-disabled-explicit": {
+        "enabled": false,
+        "targets": { "cursor": {}, "opencode": {} },
+        "remote": { "url": "https://example.com/op-enabled" }
+      }
+    }
+  }
+}
+EOF
+
+  output=$(render_template_with_override_data "$SOURCE_DIR/dot_config/opencode/opencode.jsonc.tmpl" "$data_file")
+  ! echo "$output" | grep -q '"shape-op-disabled"'
+  ! echo "$output" | grep -q '"shape-op-disabled-explicit"'
+}
+
 @test "Cursor MCP template with real chezmoidata renders valid schema and enabled IDs" {
   local merged_data_file="$BATS_TEST_TMPDIR/mcp-realdata-cursor.json"
   local rendered_file="$BATS_TEST_TMPDIR/cursor-mcp-rendered.json"
   ruby -ryaml -rjson -e '
-    raw = YAML.load_file(ARGV[0])
-    merged = { "private" => false, "mcpServers" => raw.fetch("mcpServers") }
+    def deep_merge(a, b)
+      return b unless a.is_a?(Hash) && b.is_a?(Hash)
+      a.merge(b) { |_k, av, bv| deep_merge(av, bv) }
+    end
+
+    merged = { "private" => false }
+    Dir.glob(ARGV[0]).sort.each do |file|
+      data = YAML.load_file(file) || {}
+      merged = deep_merge(merged, data)
+    end
+
     File.write(ARGV[1], JSON.generate(merged))
-  ' "$SOURCE_DIR/.chezmoidata/mcp-servers.yaml" "$merged_data_file"
+  ' "$SOURCE_DIR/.chezmoidata/mcps/*.yaml" "$merged_data_file"
 
   output=$(chezmoi execute-template \
     --override-data-file "$merged_data_file" \
@@ -188,13 +377,14 @@ EOF
 
     data = JSON.parse(File.read(data_path))
     is_private = data.fetch("private", false)
-    expected_ids = data.fetch("mcpServers")
-      .reject { |s| s.dig("targets", "cursor", "enabled") == false }
-      .select do |s|
+    expected_ids = data.fetch("mcp").fetch("serversById")
+      .select { |_id, s| s.fetch("enabled", true) }
+      .reject { |_id, s| s.dig("targets", "cursor", "enabled") == false }
+      .select do |_id, s|
         conditions = s.fetch("conditions", {})
         conditions.all? { |k, v| data.key?(k) && data[k] == v }
       end
-      .map { |s| s.fetch("id") }
+      .map { |id, _s| id }
       .sort
 
     actual_ids = servers.keys.sort
@@ -217,10 +407,19 @@ EOF
   local merged_data_file="$BATS_TEST_TMPDIR/mcp-realdata-opencode.json"
   local rendered_file="$BATS_TEST_TMPDIR/opencode-rendered.jsonc"
   ruby -ryaml -rjson -e '
-    raw = YAML.load_file(ARGV[0])
-    merged = { "private" => false, "mcpServers" => raw.fetch("mcpServers") }
+    def deep_merge(a, b)
+      return b unless a.is_a?(Hash) && b.is_a?(Hash)
+      a.merge(b) { |_k, av, bv| deep_merge(av, bv) }
+    end
+
+    merged = { "private" => false }
+    Dir.glob(ARGV[0]).sort.each do |file|
+      data = YAML.load_file(file) || {}
+      merged = deep_merge(merged, data)
+    end
+
     File.write(ARGV[1], JSON.generate(merged))
-  ' "$SOURCE_DIR/.chezmoidata/mcp-servers.yaml" "$merged_data_file"
+  ' "$SOURCE_DIR/.chezmoidata/mcps/*.yaml" "$merged_data_file"
 
   output=$(chezmoi execute-template \
     --override-data-file "$merged_data_file" \
@@ -273,13 +472,14 @@ EOF
 
     data = JSON.parse(File.read(data_path))
     is_private = data.fetch("private", false)
-    expected_ids = data.fetch("mcpServers")
-      .reject { |s| s.dig("targets", "opencode", "enabled") == false }
-      .select do |s|
+    expected_ids = data.fetch("mcp").fetch("serversById")
+      .select { |_id, s| s.fetch("enabled", true) }
+      .reject { |_id, s| s.dig("targets", "opencode", "enabled") == false }
+      .select do |_id, s|
         conditions = s.fetch("conditions", {})
         conditions.all? { |k, v| data.key?(k) && data[k] == v }
       end
-      .map { |s| s.fetch("id") }
+      .map { |id, _s| id }
       .sort
 
     actual_ids = mcp.keys.sort

@@ -14,7 +14,7 @@ set -x
 {{ if .codespaces -}}
 cat <<EOF >"$HOME/.gitconfig.overrides"
 [user]
-	name = Chip Wolf ‮
+	name = {{ .profile.codespaces.gitName }}
 [gpg]
 	program = /.codespaces/bin/gh-gpgsign
 EOF
@@ -46,25 +46,12 @@ fi
 export HOMEBREW_CASK_OPTS="--require-sha"
 export HOMEBREW_NO_AUTO_UPDATE=1
 
-{{- if not .codespaces }}
-brew update
-brew doctor || true
-{{- end }}
-
 {{- if .codespaces }}
 CODESPACES=1 brew bundle -q --file="$CHEZMOI_SOURCE_DIR/Brewfile" || true
 {{- else if .private }}
 PRIVATE=1 brew bundle -q --file="$CHEZMOI_SOURCE_DIR/Brewfile"
 {{- else }}
 brew bundle -q --file="$CHEZMOI_SOURCE_DIR/Brewfile"
-{{- end }}
-
-{{- if not .codespaces }}
-brew upgrade --cask --greedy
-brew upgrade --greedy
-brew outdated --cask --greedy --verbose
-brew outdated --greedy --verbose
-brew cleanup
 {{- end }}
 
 # Prewarm antidote plugin cache so the first shell launch doesn't clone everything

@@ -23,12 +23,14 @@ if [ -n "${CODESPACES:-}" ] && [ -z "${DOTFILES_NO_OVERLAY:-}" ]; then
 		tar -xzf "/tmp/_crane/${CRANE_TAR}" -C /tmp/_crane crane
 		CRANE=/tmp/_crane/crane
 
-		OUR_IMAGE="ghcr.io/chipwolf/dotfiles:v1.6.0" # x-release-please-version
+		DOTFILES_IMAGE_OWNER="${DOTFILES_IMAGE_OWNER:-chipwolf}"
+		DOTFILES_ATTESTATION_REPO="${DOTFILES_ATTESTATION_REPO:-${DOTFILES_IMAGE_OWNER}/dotfiles}"
+		OUR_IMAGE="ghcr.io/${DOTFILES_IMAGE_OWNER}/dotfiles:v1.6.0" # x-release-please-version
 
 		OUR_MANIFEST=$("$CRANE" manifest "$OUR_IMAGE")
 		OUR_DIGEST=$("$CRANE" digest "$OUR_IMAGE")
 		gh attestation verify "oci://${OUR_IMAGE%:*}@${OUR_DIGEST}" \
-			--repo chipwolf/dotfiles
+			--repo "${DOTFILES_ATTESTATION_REPO}"
 
 		printf '%s' "$OUR_MANIFEST" | jq -r '.layers[].digest' | while IFS= read -r digest; do
 			printf 'Applying overlay layer %s\n' "$digest" >&2

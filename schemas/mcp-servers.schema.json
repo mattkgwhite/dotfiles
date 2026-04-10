@@ -4,11 +4,23 @@
   "title": "Canonical MCP server definitions",
   "type": "object",
   "additionalProperties": false,
-  "required": ["mcpServers"],
+  "required": ["mcp"],
   "properties": {
-    "mcpServers": {
-      "type": "array",
-      "items": { "$ref": "#/$defs/mcpServer" }
+    "mcp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["serversById"],
+      "properties": {
+        "serversById": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-z0-9][a-z0-9-]*$": {
+              "$ref": "#/$defs/mcpServer"
+            }
+          }
+        }
+      }
     }
   },
   "$defs": {
@@ -59,18 +71,13 @@
     "mcpServer": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "enabled", "targets"],
+      "required": ["enabled"],
       "properties": {
-        "id": {
-          "type": "string",
-          "pattern": "^[a-z0-9][a-z0-9-]*$"
-        },
         "enabled": { "type": "boolean" },
         "conditions": { "$ref": "#/$defs/conditions" },
         "targets": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["opencode", "cursor"],
           "properties": {
             "opencode": { "$ref": "#/$defs/targetConfig" },
             "cursor": { "$ref": "#/$defs/targetConfig" }

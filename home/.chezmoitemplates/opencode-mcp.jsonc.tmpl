@@ -1,0 +1,53 @@
+{{- /* Load MCP servers from merged chezmoidata */ -}}
+{{- $serversById := dict -}}
+{{- if and (hasKey . "mcp") (hasKey .mcp "serversById") -}}
+  {{- $serversById = .mcp.serversById -}}
+{{- end -}}
+
+{{- /* Render OpenCode MCP entries */ -}}
+{{- $first := true -}}
+{{- range $serverId := (keys $serversById | sortAlpha) -}}
+  {{- $server := index $serversById $serverId -}}
+
+  {{- $conditionsMatch := true -}}
+  {{- if hasKey $server "conditions" -}}
+    {{- range $conditionKey, $expected := $server.conditions -}}
+      {{- if and (hasKey $ $conditionKey) (eq (index $ $conditionKey) $expected) -}}
+      {{- else -}}
+        {{- $conditionsMatch = false -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- $opencodeEnabled := true -}}
+  {{- if and (hasKey $server "targets") (hasKey $server.targets "opencode") (hasKey $server.targets.opencode "enabled") -}}
+    {{- $opencodeEnabled = $server.targets.opencode.enabled -}}
+  {{- end -}}
+
+  {{- if and $server.enabled $opencodeEnabled $conditionsMatch -}}
+    {{- if $first }}{{- $first = false }}{{ else }},{{ end }}
+    "{{ $serverId }}": {
+      {{- if hasKey $server "local" }}
+        {{- $openCodeCommandName := $server.local.command -}}
+        {{- $openCodeCommandArgs := list -}}
+        {{- range $arg := $server.local.args -}}
+          {{- $resolvedArg := $arg -}}
+          {{- if hasPrefix $arg "$data." -}}
+            {{- $dataKey := trimPrefix "$data." $arg -}}
+            {{- if hasKey $ $dataKey -}}
+              {{- $resolvedArg = (index $ $dataKey) -}}
+            {{- end -}}
+          {{- end -}}
+          {{- $openCodeCommandArgs = append $openCodeCommandArgs $resolvedArg -}}
+        {{- end -}}
+        {{- $openCodeCommand := prepend $openCodeCommandArgs $openCodeCommandName -}}
+      "type": "local",
+      "command": {{ $openCodeCommand | toPrettyJson "      " }},
+      {{- else if hasKey $server "remote" }}
+      "type": "remote",
+      "url": "{{ $server.remote.url }}",
+      {{- end }}
+      "enabled": {{ $server.enabled | toPrettyJson }}
+    }
+  {{- end -}}
+{{- end }}

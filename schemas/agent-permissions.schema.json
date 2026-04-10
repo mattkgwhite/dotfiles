@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/agent-permissions.schema.json",
+  "title": "Agent permission overlays",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["agentPermissions"],
+  "properties": {
+    "agentPermissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kinds", "rules"],
+      "properties": {
+        "kinds": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-z0-9][a-z0-9_-]*$": { "$ref": "#/$defs/kindConfig" }
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/permissionRule" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "permissionValue": {
+      "type": "string",
+      "enum": ["allow", "ask", "deny"]
+    },
+    "conditions": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "ruleKind": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]*$"
+    },
+    "destinationType": {
+      "type": "string",
+      "enum": ["namespaced", "top_level"]
+    },
+    "bashMatchMode": {
+      "type": "string",
+      "enum": ["exact", "withArgs", "exactAndWithArgs"]
+    },
+    "kindConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["destinationType"],
+      "properties": {
+        "destinationType": { "$ref": "#/$defs/destinationType" },
+        "destinationKey": { "type": "string", "minLength": 1 },
+        "supportsMatchMode": { "type": "boolean" },
+        "defaultMatchMode": { "$ref": "#/$defs/bashMatchMode" },
+        "wildcardSuffix": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "destinationType": { "const": "namespaced" }
+            }
+          },
+          "then": {
+            "required": ["destinationKey"]
+          }
+        }
+      ]
+    },
+    "permissionRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "pattern", "op"],
+      "properties": {
+        "kind": { "$ref": "#/$defs/ruleKind" },
+        "pattern": { "type": "string", "minLength": 1 },
+        "op": { "$ref": "#/$defs/permissionValue" },
+        "bashMatchMode": { "$ref": "#/$defs/bashMatchMode" },
+        "conditions": { "$ref": "#/$defs/conditions" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": { "const": "bash" }
+            }
+          },
+          "then": {
+            "properties": {
+              "bashMatchMode": { "$ref": "#/$defs/bashMatchMode" }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

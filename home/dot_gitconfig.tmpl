@@ -1,7 +1,10 @@
+{{- with .profile.git }}
 [user]
-  name = Chip Wolf
-  email = hello@chipwolf.uk
-  #signingkey = 0x4C90101E11349775
+  name = {{ .name }}
+  email = {{ .email }}
+{{- if hasKey . "signingKey" }}
+  #signingkey = {{ .signingKey }}
+{{- end }}
 [color]
   ui = true
 [core]
@@ -14,7 +17,8 @@
   mr = !sh -c 'git fetch $1 merge-requests/$2/head:mr-$1-$2 && git checkout mr-$1-$2' -
   count-lines = "! git log --author=\"$1\" --pretty=tformat: --numstat | awk '{ add += $1; subs += $2; loc += $1 - $2 } END { printf \"added lines: %s, removed lines: %s, total lines: %s\\n\", add, subs, loc }' #"
 [github]
-  user = chipwolf
+  user = {{ .githubUser }}
+{{- end }}
 [gpg]
   program = gpg
 [commit]

@@ -6,10 +6,16 @@
 set -eu
 
 if command -v brew >/dev/null 2>&1; then
+  if [ -n "${CODESPACES:-}" ]; then
+    exit 0
+  fi
+
   brew update
-  brew outdated --greedy --verbose
+  brew doctor || true
   brew upgrade --cask --greedy
   brew upgrade --greedy
+  brew outdated --cask --greedy --verbose
+  brew outdated --greedy --verbose
   brew cleanup
 fi
 {{- end }}

@@ -151,12 +151,48 @@ This repo ships a pre-baked [overlay container image](https://ghcr.io/chipwolf/d
 
 ## Forking
 
-If you fork this repo, the main things to update:
+Recommended fork workflow:
 
-1. **[`home/Brewfile`](home/Brewfile)**: adjust packages to taste.
-2. **Git identity**: update [`home/dot_gitconfig`](home/dot_gitconfig) with your name, email, and signing key.
+1. Fork this repo on GitHub.
+2. Clone your fork locally.
+3. Update identity and package overlays (checklist below).
+4. Run `chezmoi execute-template --file home/Brewfile.tmpl > home/Brewfile`.
+5. Run `chezmoi apply` and validate your machine state.
 
-The install scripts ([`install.sh`](install.sh), [`install.ps1`](install.ps1)) have the repo URL interpolated automatically during the release workflow, so forks that use the same workflow get correct URLs in their release assets without editing.
+### Fork checklist
+
+Change these files first:
+
+- **Identity**: `home/.chezmoidata/profile.yaml`
+  - `profile.git.name`
+  - `profile.git.email`
+  - `profile.git.githubUser`
+  - `profile.git.signingKey` (optional)
+  - `profile.codespaces.gitName`
+- **Git config template**: `home/dot_gitconfig.tmpl` (usually no change needed, only edit if you want different structure)
+- **Homebrew packages**: `home/.chezmoidata/brew/*.yaml`
+  - Keep `00-base.yaml` for shared packages.
+  - Replace `10-chipwolf.yaml` with your own overlay file (for example `10-yourname.yaml`) and adjust package entries.
+  - Regenerate `home/Brewfile` after any overlay/template change.
+- **Agent permissions** (optional but common): `home/.chezmoidata/agent-permissions/*.yaml`
+  - Keep `00-base.yaml` for shared rules.
+  - Replace `10-chipwolf.yaml` with your own overlay file.
+- **MCP servers** (optional but common): `home/.chezmoidata/mcps/*.yaml`
+  - Keep `00-base.yaml` for shared servers.
+  - Replace `10-chipwolf.yaml` with your own overlay file.
+- **OpenCode config template**: `home/dot_config/opencode/opencode.jsonc.tmpl` (usually no change needed unless you want to change render structure)
+
+Optional removals if not relevant to your setup:
+
+- `home/private_dot_gnupg/` (if you do not use this GnuPG setup)
+- `home/dot_config/finicky.js` (if you do not use Finicky on macOS)
+- `home/dot_scripts/executable_7zw` (if you do not use the archive/encryption wrapper)
+- Any app/package entries you do not want in `home/.chezmoidata/brew/*.yaml`
+
+Install scripts note:
+
+- Keep the hardcoded upstream repo values in `install.sh` and `install.ps1` in source.
+- Release automation rewrites those values for your fork's release assets, so local source stays stable while published installers point to your fork.
 
 > [!TIP]
 > The chezmoi source state lives under [`home/`](home/) (set by [`.chezmoiroot`](.chezmoiroot)). Filenames use chezmoi's attribute prefixes: `dot_` becomes a leading `.`, `private_` restricts permissions, `executable_` adds the execute bit. [`home/dot_config/nvim/`](home/dot_config/nvim/) deploys to `~/.config/nvim/`.
@@ -209,7 +245,8 @@ gh attestation verify oci://ghcr.io/chipwolf/dotfiles:v1.6.0 --repo chipwolf/dot
 
 | Document                           | Contents                                                       |
 |------------------------------------|----------------------------------------------------------------|
-| [docs/brew-review.md](docs/brew-review.md) | Homebrew drift review flow, prompts, and safe tap handling     |
+| [docs/brew.md](docs/brew.md) | Homebrew overlays, Brewfile generation, and brew-review workflow |
+| [docs/agent-permissions.md](docs/agent-permissions.md) | Shared agent permission rule schema, overlays, and rendering model |
 | [docs/mcp-servers.md](docs/mcp-servers.md) | MCP server setup, conditions, targets, and arg interpolation   |
 | [docs/yubikey.md](docs/yubikey.md) | YubiKey SSH workflow, backup strategy, credential hygiene      |
 | [docs/secrets.md](docs/secrets.md) | Bitwarden integration, GnuPG config, secret introduction order |

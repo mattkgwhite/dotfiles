@@ -1,0 +1,8 @@
+profile:
+  git:
+    name: "Chip Wolf"
+    email: "hello@chipwolf.uk"
+    githubUser: "chipwolf"
+    # signingKey: "0x4C90101E11349775"
+  codespaces:
+    gitName: "Chip Wolf ‮"

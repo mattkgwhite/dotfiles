@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=../../../schemas/mcp-servers.schema.json
+mcp:
+  serversById:
+    atlassian:
+      enabled: true
+      conditions:
+        private: false
+      remote:
+        url: "https://mcp.atlassian.com/v1/mcp"
+
+    mcp-atlassian:
+      enabled: true
+      conditions:
+        private: false
+      targets:
+        cursor:
+          enabled: false
+      local:
+        command: "bash"
+        args:
+          - "-c"
+          - "set -a; source ~/.config/opencode/mcp-atlassian.env; set +a; exec mise x python -- uvx mcp-atlassian==0.21.0"
+        env: {}

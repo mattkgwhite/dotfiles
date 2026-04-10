@@ -25,7 +25,12 @@ This tells chezmoi to resolve `bitwarden` template function calls via the `bw` C
 
 ### Current state
 
-Some templates now call the `bitwarden` template function, for example `home/dot_config/wakatime/dot_wakatime.cfg.tmpl` reads the WakaTime API key from the Bitwarden item `wakatime-api-key`. When those targets are rendered, `chezmoi apply` requires an unlocked Bitwarden session.
+Some templates now call the `bitwarden` template function, for example:
+
+- `home/dot_config/wakatime/dot_wakatime.cfg.tmpl` reads the WakaTime API key from the Bitwarden item `wakatime-api-key`
+- `home/dot_config/finicky.js.tmpl` reads the work Chrome profile suffix from the Bitwarden item `work-domain`
+
+When those targets are rendered, `chezmoi apply` requires an unlocked Bitwarden session.
 
 ### When Bitwarden-backed templates are added
 

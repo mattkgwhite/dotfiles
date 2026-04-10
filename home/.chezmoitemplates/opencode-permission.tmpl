@@ -1,0 +1,84 @@
+{{- /* Load permission rules from merged chezmoidata */ -}}
+{{- $permission := dict -}}
+{{- if hasKey . "agentPermissions" -}}
+  {{- $permission = .agentPermissions -}}
+{{- end -}}
+{{- $kinds := default (dict) (index $permission "kinds") -}}
+{{- $rules := default (list) (index $permission "rules") -}}
+
+{{- /* Render namespaced permission maps based on kind configuration */ -}}
+{{- $firstField := true -}}
+{{- range $kindName := (keys $kinds | sortAlpha) -}}
+  {{- $kindCfg := index $kinds $kindName -}}
+  {{- if eq $kindCfg.destinationType "namespaced" -}}
+    {{- if $firstField }}{{- $firstField = false }}{{ else }},{{ end }}
+    "{{ $kindCfg.destinationKey }}": {
+    {{- $firstEntry := true -}}
+    {{- range $rule := $rules -}}
+      {{- $conditionsMatch := true -}}
+      {{- if hasKey $rule "conditions" -}}
+        {{- range $conditionKey, $expected := $rule.conditions -}}
+          {{- if and (hasKey $ $conditionKey) (eq (index $ $conditionKey) $expected) -}}
+          {{- else -}}
+            {{- $conditionsMatch = false -}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+
+      {{- if and $conditionsMatch (eq $rule.kind $kindName) -}}
+        {{- $supportsMatchMode := false -}}
+        {{- if hasKey $kindCfg "supportsMatchMode" -}}
+          {{- $supportsMatchMode = $kindCfg.supportsMatchMode -}}
+        {{- end -}}
+
+        {{- if $supportsMatchMode -}}
+          {{- $matchMode := "exact" -}}
+          {{- if hasKey $kindCfg "defaultMatchMode" -}}
+            {{- $matchMode = $kindCfg.defaultMatchMode -}}
+          {{- end -}}
+          {{- if hasKey $rule "bashMatchMode" -}}
+            {{- $matchMode = $rule.bashMatchMode -}}
+          {{- end -}}
+          {{- $wildcardSuffix := " *" -}}
+          {{- if hasKey $kindCfg "wildcardSuffix" -}}
+            {{- $wildcardSuffix = $kindCfg.wildcardSuffix -}}
+          {{- end -}}
+
+          {{- if or (eq $matchMode "exact") (eq $matchMode "exactAndWithArgs") -}}
+            {{- if $firstEntry }}{{- $firstEntry = false }}{{ else }},{{ end }}
+      "{{ $rule.pattern }}": "{{ $rule.op }}"
+          {{- end -}}
+          {{- if or (eq $matchMode "withArgs") (eq $matchMode "exactAndWithArgs") -}}
+            {{- if $firstEntry }}{{- $firstEntry = false }}{{ else }},{{ end }}
+      "{{ $rule.pattern }}{{ $wildcardSuffix }}": "{{ $rule.op }}"
+          {{- end -}}
+        {{- else -}}
+          {{- if $firstEntry }}{{- $firstEntry = false }}{{ else }},{{ end }}
+      "{{ $rule.pattern }}": "{{ $rule.op }}"
+        {{- end -}}
+      {{- end -}}
+    {{- end }}
+    }
+  {{- end -}}
+{{- end }}
+
+{{- /* Render top-level permission keys based on kind configuration */ -}}
+{{- range $rule := $rules -}}
+  {{- $conditionsMatch := true -}}
+  {{- if hasKey $rule "conditions" -}}
+    {{- range $conditionKey, $expected := $rule.conditions -}}
+      {{- if and (hasKey $ $conditionKey) (eq (index $ $conditionKey) $expected) -}}
+      {{- else -}}
+        {{- $conditionsMatch = false -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $kindCfg := dict -}}
+  {{- if hasKey $kinds $rule.kind -}}
+    {{- $kindCfg = index $kinds $rule.kind -}}
+  {{- end -}}
+  {{- if and $conditionsMatch (eq (default "" (index $kindCfg "destinationType")) "top_level") -}}
+    {{- if $firstField }}{{- $firstField = false }}{{ else }},{{ end }}
+    "{{ $rule.pattern }}": "{{ $rule.op }}"
+  {{- end -}}
+{{- end }}

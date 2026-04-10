@@ -1,0 +1,334 @@
+# yaml-language-server: $schema=../../../schemas/agent-permissions.schema.json
+agentPermissions:
+  kinds:
+    bash:
+      destinationType: namespaced
+      destinationKey: bash
+      supportsMatchMode: true
+      defaultMatchMode: exact
+      wildcardSuffix: " *"
+    external_directory:
+      destinationType: namespaced
+      destinationKey: external_directory
+    permission_key:
+      destinationType: top_level
+  rules:
+    - kind: bash
+      pattern: "*"
+      op: ask
+      bashMatchMode: exact
+
+    - kind: bash
+      pattern: "chezmoi apply"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "echo"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "printf"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "pwd"
+      op: allow
+      bashMatchMode: exact
+    - kind: bash
+      pattern: "which"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "type"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "command -v"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "uname"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "env"
+      op: allow
+      bashMatchMode: exact
+    - kind: bash
+      pattern: "printenv"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "locale"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "id"
+      op: allow
+      bashMatchMode: exact
+    - kind: bash
+      pattern: "whoami"
+      op: allow
+      bashMatchMode: exact
+    - kind: bash
+      pattern: "groups"
+      op: allow
+      bashMatchMode: exact
+    - kind: bash
+      pattern: "date"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "ls"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "find"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "stat"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "file"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "du"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "du -s"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "du -h"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "wc"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "head"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "tail"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "gh run view"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "cat"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "grep"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "egrep"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "fgrep"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "rg"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "sort"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "uniq"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "cut"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "awk"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "jq"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "column"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "nl"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "base64"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "xxd"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "strings"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "md5sum"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "sha1sum"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "sha256sum"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "shasum"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "cksum"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "realpath"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "readlink"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "ps"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "pgrep"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "df"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "uptime"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "lsof"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "git status"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "git diff"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "git show"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "git log"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "git branch"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "git remote -v"
+      op: allow
+      bashMatchMode: exact
+    - kind: bash
+      pattern: "git remote show"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "git rev-parse"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "git describe"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "git ls-files"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "git grep"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "git blame"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "ping"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "nslookup"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "dig"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "host"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "netstat"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "ifconfig"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "kubectl config get-contexts"
+      op: allow
+      bashMatchMode: exact
+    - kind: bash
+      pattern: "kubectl config current-context"
+      op: allow
+      bashMatchMode: exact
+    - kind: bash
+      pattern: "kubectl get"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "docker ps"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "docker images"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+
+    - kind: external_directory
+      pattern: "~/.local/share/chezmoi/**"
+      op: allow
+    - kind: external_directory
+      pattern: "/tmp/**"
+      op: allow
+    - kind: external_directory
+      pattern: "{{ .chezmoi.homeDir }}/AppData/Local/Temp/**"
+      op: allow

@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chipwolf.github.io/dotfiles/schemas/brew-overlays.schema.json",
+  "title": "Brew overlays",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "brew": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "overlays": {
+          "type": "object",
+          "patternProperties": {
+            "^[A-Za-z0-9._-]+$": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "packages": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/package"
+                  }
+                }
+              },
+              "required": [
+                "packages"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "tap",
+            "brew",
+            "cask",
+            "mas"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "masId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        }
+      },
+      "required": [
+        "type",
+        "name"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "mas"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "masId"
+            ]
+          }
+        }
+      ]
+    },
+    "condition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "os"
+            },
+            "op": {
+              "type": "string",
+              "const": "is"
+            },
+            "value": {
+              "type": "string",
+              "enum": [
+                "mac",
+                "linux"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "op",
+            "value"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "env"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "op": {
+              "type": "string",
+              "enum": [
+                "set",
+                "unset",
+                "equals",
+                "notEquals"
+              ]
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "name",
+            "op"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "op": {
+                    "enum": [
+                      "equals",
+                      "notEquals"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "value"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "tty"
+            },
+            "op": {
+              "type": "string",
+              "const": "is"
+            },
+            "value": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "kind",
+            "op",
+            "value"
+          ]
+        }
+      ]
+    }
+  }
+}

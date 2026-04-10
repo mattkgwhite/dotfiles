@@ -1,6 +1,6 @@
 ---
 name: update-mcp-servers
-description: Update canonical MCP server definitions for this chezmoi repo and template rendering checks. Use when editing mcp-servers.yaml, Cursor MCP template output, or OpenCode MCP config generation.
+description: Update canonical MCP server definitions for this chezmoi repo and template rendering checks. Use when editing home/.chezmoidata/mcps/*.yaml, Cursor MCP template output, or OpenCode MCP config generation.
 ---
 
 # Update MCP Servers
@@ -9,17 +9,17 @@ Use this skill when changing MCP server configuration in this repo.
 
 ## Source of truth
 
-- Canonical server data: `home/.chezmoidata/mcp-servers.yaml`
+- Canonical layered data: `home/.chezmoidata/mcps/*.yaml`
 - Cursor render template: `home/dot_cursor/mcp.json.tmpl`
 - OpenCode render template: `home/dot_config/opencode/opencode.jsonc.tmpl`
 
-Treat `mcp-servers.yaml` as the single source of truth.
+Treat `home/.chezmoidata/mcps/*.yaml` as the single source of truth.
 
 ## Canonical schema
 
-Each entry in `mcpServers` should follow this shape:
+Each entry in `mcp.serversById.<id>` should follow this shape:
 
-- `id`, `enabled`
+- `enabled`
 - optional `conditions` object, each key/value is matched against global chezmoi data
 - optional `targets.opencode.enabled` (defaults to `true`)
 - optional `targets.cursor.enabled` (defaults to `true`)
@@ -44,6 +44,7 @@ Remote shape:
 2. Keep transport configuration at server level, use `targets` only for enablement.
 3. Do not re-introduce duplicate fields like parallel `cursorLocal` and `local`.
 4. Keep command execution via `mise` where applicable.
+5. Use layered map overrides in separate files under `home/.chezmoidata/mcps/` when personal/fork-specific behavior is needed.
 
 ## Validation workflow
 

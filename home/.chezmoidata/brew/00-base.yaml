@@ -1,0 +1,178 @@
+# yaml-language-server: $schema=../../../schemas/brew-overlays.schema.json
+brew:
+  overlays:
+    base:
+      packages:
+        - type: brew
+          name: antidote # zsh plugin manager
+        - type: brew
+          name: bash
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: bat # better cat
+        - type: brew
+          name: chezmoi
+        - type: brew
+          name: colima
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: colordiff
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: docker
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: docker-compose
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: eza # better ls
+        - type: brew
+          name: fd # nvim mason dep
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: fzf # fuzzy finder
+        - type: brew
+          name: gh
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: git
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: htop
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: kubernetes-cli
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: mas # mac app store
+          conditions:
+            - { kind: os, op: is, value: mac }
+        - type: brew
+          name: mise # mise-en-place
+        - type: brew
+          name: nmap
+        - type: brew
+          name: opencode
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: parallel
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: ripgrep
+        - type: brew
+          name: sevenzip
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: timg # terminal image/video viewer (kitty graphics)
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: tree
+        - type: brew
+          name: uv # python manager
+        - type: brew
+          name: viu # terminal image viewer (kitty graphics)
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: wakatime-cli
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: watch
+        - type: brew
+          name: wget
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: brew
+          name: zsh
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
+        - type: cask
+          name: 1password # work
+          conditions:
+            - { kind: os, op: is, value: mac }
+        - type: cask
+          name: 1password-cli # work
+          conditions:
+            - { kind: os, op: is, value: mac }
+        - type: cask
+          name: alfred # better spotlight
+          conditions:
+            - { kind: os, op: is, value: mac }
+        - type: cask
+          name: amethyst # tiling wm
+          conditions:
+            - { kind: os, op: is, value: mac }
+        - type: cask
+          name: cursor
+          conditions:
+            - { kind: os, op: is, value: mac }
+            - { kind: env, name: PRIVATE, op: set }
+        - type: cask
+          name: font-fira-code-nerd-font
+          conditions:
+            - { kind: os, op: is, value: mac }
+        - type: cask
+          name: font-symbols-only-nerd-font
+          conditions:
+            - { kind: os, op: is, value: mac }
+        - type: cask
+          name: ghostty
+          conditions:
+            - { kind: os, op: is, value: mac }
+        - type: cask
+          name: jordanbaird-ice # menu bar
+          conditions:
+            - { kind: os, op: is, value: mac }
+        - type: cask
+          name: lulu # firewall
+          conditions:
+            - { kind: os, op: is, value: mac }
+            - { kind: env, name: PRIVATE, op: set }
+        - type: cask
+          name: obsidian
+          conditions:
+            - { kind: os, op: is, value: mac }
+        - type: cask
+          name: shadow
+          conditions:
+            - { kind: os, op: is, value: mac }
+            - { kind: env, name: PRIVATE, op: set }
+        - type: cask
+          name: visual-studio-code
+          conditions:
+            - { kind: os, op: is, value: mac }
+        - type: cask
+          name: wakatime
+          conditions:
+            - { kind: os, op: is, value: mac }
+        - type: cask
+          name: xscreensaver
+          conditions:
+            - { kind: os, op: is, value: mac }
+        - type: mas
+          name: Fantastical
+          masId: 975937182
+          conditions:
+            - { kind: os, op: is, value: mac }
+            - { kind: tty, op: is, value: true }
+        - type: mas
+          name: Irvue
+          masId: 1039633667
+          conditions:
+            - { kind: os, op: is, value: mac }
+            - { kind: tty, op: is, value: true }
