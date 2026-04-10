@@ -35,6 +35,15 @@
       depNameTemplate: "{{package}}",
       datasourceTemplate: "pypi",
     },
+    {
+      customType: "regex",
+      managerFilePatterns: ["/home\\/dot_config\\/opencode\\/opencode\\.jsonc\\.tmpl$/"],
+      matchStrings: [
+        "\"(?<package>(?:@[^\"/]+\\/)?[^\"@\\s]+)@(?<currentValue>[^\"@\\s]+)\"",
+      ],
+      depNameTemplate: "{{package}}",
+      datasourceTemplate: "npm",
+    },
   ],
   packageRules: [
     {

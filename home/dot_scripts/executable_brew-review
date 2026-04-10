@@ -165,32 +165,13 @@ while IFS= read -r key; do
 	fi
 done <<<"$installed_keys"
 
-# Find missing: in Brewfile active lines but not installed
-missing=()
-while IFS= read -r key; do
-	[ -z "$key" ] && continue
-	if ! echo "$installed_keys" | grep -qF "$key"; then
-		missing+=("$key")
-	fi
-done <<<"$declared_keys"
-
-if [ ${#extras[@]} -eq 0 ] && [ ${#missing[@]} -eq 0 ]; then
+if [ ${#extras[@]} -eq 0 ]; then
 	exit 0
 fi
 
 echo ""
 echo "==> Homebrew drift review"
 echo ""
-
-# Report missing (no prompt — bootstrap will install them)
-if [ ${#missing[@]} -gt 0 ]; then
-	echo "The following packages are declared in Brewfile but not installed:"
-	for key in "${missing[@]}"; do
-		echo "  - $key"
-	done
-	echo "  Run 'chezmoi apply' or 'brew bundle --file \"$BREWFILE\"' to install."
-	echo ""
-fi
 
 # Prompt for extras
 if [ ${#extras[@]} -gt 0 ]; then

@@ -4,3 +4,4 @@
 # Lines beginning with # are ignored.
 brew "k9s"
 brew "prowler"
+brew "act"
