@@ -7,7 +7,7 @@ setup() {
   # Minimal config so chezmoi execute-template can resolve .chezmoi.* and data vars
   export CHEZMOI_CONFIG="$BATS_TEST_TMPDIR/chezmoi.toml"
   cat >"$CHEZMOI_CONFIG" <<EOF
-sourceDir = "$REPO_ROOT"
+sourceDir = "$SOURCE_DIR"
 
 [data]
   codespaces = false

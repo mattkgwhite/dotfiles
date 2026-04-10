@@ -3,6 +3,15 @@
 
 setup() {
   REPO_ROOT="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"
+  SOURCE_DIR="$REPO_ROOT/home"
+  export CHEZMOI_CONFIG="$BATS_TEST_TMPDIR/chezmoi.toml"
+  cat >"$CHEZMOI_CONFIG" <<EOF
+sourceDir = "$SOURCE_DIR"
+
+[data]
+  codespaces = false
+  private = false
+EOF
   BREWFILE_TMPL="$REPO_ROOT/home/Brewfile.tmpl"
   BREWFILE_RENDERED="$BATS_TEST_TMPDIR/Brewfile.rendered"
 }
