@@ -25,18 +25,21 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - name: Interpolate repo URL in install scripts
+      - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4
+        with:
+          install: true
+
+      - name: Render install scripts from templates
         env:
-          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          DOTFILES_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
           IMAGE_NAME: ${{ inputs.image_registry }}/${{ inputs.image_name }}
-          REPOSITORY: ${{ github.repository }}
+          DOTFILES_ATTESTATION_REPO: ${{ github.repository }}
+          DOTFILES_RELEASE_TAG: ${{ inputs.tag_name }}
         run: |
           IMAGE_NAME_LC="${IMAGE_NAME,,}"
-          sed -i "s|repo_url=\"https://github.com/chipwolf/dotfiles\"|repo_url=\"${REPO_URL}\"|" install.sh
-          sed -i "s|ghcr.io/chipwolf/dotfiles|${IMAGE_NAME_LC}|g" install.sh
-          sed -i "s|--repo chipwolf/dotfiles|--repo ${REPOSITORY}|g" install.sh
-          sed -i "s|\\\$repoUrl = \"https://github.com/chipwolf/dotfiles\"|\$repoUrl = \"${REPO_URL}\"|" install.ps1
-          sed -i "s|https://github.com/chipwolf/dotfiles/releases/download/|${REPO_URL}/releases/download/|g" install.ps1
+          DOTFILES_IMAGE_NAME="${IMAGE_NAME_LC}" mise x -- chezmoi execute-template --file install.sh.tmpl > install.sh
+          DOTFILES_IMAGE_NAME="${IMAGE_NAME_LC}" mise x -- chezmoi execute-template --file install.ps1.tmpl > install.ps1
+          chmod +x install.sh
 
       - name: Upload install scripts to release
         env:

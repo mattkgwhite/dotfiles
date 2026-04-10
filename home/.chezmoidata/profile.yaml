@@ -3,6 +3,7 @@ profile:
     name: "Chip Wolf"
     email: "hello@chipwolf.uk"
     githubUser: "chipwolf"
+    githubRepo: "dotfiles"
     # signingKey: "0x4C90101E11349775"
   codespaces:
     gitName: "Chip Wolf ‮"

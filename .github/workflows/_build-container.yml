@@ -33,6 +33,20 @@ jobs:
         env:
           IMAGE_NAME: ${{ inputs.image_registry }}/${{ inputs.image_name }}
 
+      - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4
+        with:
+          install: true
+
+      - name: Render install.sh from template
+        env:
+          DOTFILES_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          DOTFILES_IMAGE_NAME: ${{ steps.image.outputs.name }}
+          DOTFILES_ATTESTATION_REPO: ${{ github.repository }}
+          DOTFILES_RELEASE_TAG: ${{ inputs.tag_name }}
+        run: |
+          mise x -- chezmoi execute-template --file install.sh.tmpl > install.sh
+          chmod +x install.sh
+
       - name: Log in to GHCR
         uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
         with:

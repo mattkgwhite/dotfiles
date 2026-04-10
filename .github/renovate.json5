@@ -10,7 +10,7 @@
   customManagers: [
     {
       customType: "regex",
-      managerFilePatterns: ["/install\\.sh$/"],
+      managerFilePatterns: ["/install\\.sh\\.tmpl$/"],
       matchStrings: [
         "CRANE_VERSION=\"(?<currentValue>v[^\"]+)\"",
       ],

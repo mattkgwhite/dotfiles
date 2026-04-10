@@ -114,7 +114,7 @@ chezmoi uses two boolean flags to adapt behavior per machine. Both are set autom
 
 | Flag         | When true                       | What it gates                                                                                                 |
 |--------------|---------------------------------|---------------------------------------------------------------------------------------------------------------|
-| `codespaces` | `CODESPACES` env var is set     | Skips GUI apps and redundant packages in the Brewfile. Uses the overlay fast path in [`install.sh`](install.sh). |
+| `codespaces` | `CODESPACES` env var is set     | Skips GUI apps and redundant packages in the Brewfile. Uses the overlay fast path in [`install.sh.tmpl`](install.sh.tmpl). |
 | `private`    | Windows, or `~/.private` exists | Enables personal-machine config: excludes work-specific MCP servers and Atlassian integrations from OpenCode. |
 
 > [!IMPORTANT]
@@ -166,6 +166,7 @@ Change these files first:
   - `profile.git.name`
   - `profile.git.email`
   - `profile.git.githubUser`
+  - `profile.git.githubRepo` (for WSL bootstrap clone target)
   - `profile.git.signingKey` (optional)
   - `profile.codespaces.gitName`
 - **Git config template**: `home/dot_gitconfig.tmpl` (usually no change needed, only edit if you want different structure)
@@ -190,8 +191,8 @@ Optional removals if not relevant to your setup:
 
 Install scripts note:
 
-- Keep the hardcoded upstream repo values in `install.sh` and `install.ps1` in source.
-- Release automation rewrites those values for your fork's release assets, so local source stays stable while published installers point to your fork.
+- `install.sh.tmpl` and `install.ps1.tmpl` are the installer source of truth.
+- Release automation renders release-ready `install.sh` and `install.ps1` from those templates using the current repository and tag values.
 
 > [!TIP]
 > The chezmoi source state lives under [`home/`](home/) (set by [`.chezmoiroot`](.chezmoiroot)). Filenames use chezmoi's attribute prefixes: `dot_` becomes a leading `.`, `private_` restricts permissions, `executable_` adds the execute bit. [`home/dot_config/nvim/`](home/dot_config/nvim/) deploys to `~/.config/nvim/`.
@@ -218,7 +219,7 @@ All release artifacts are built with [SLSA Build L3](https://slsa.dev/spec/v1.0/
 
 This covers:
 
-- **Install scripts** ([`install.sh`](install.sh), [`install.ps1`](install.ps1)): published as [GitHub Release](https://github.com/chipwolf/dotfiles/releases/tag/v1.6.0) assets. <!-- x-release-please-version -->
+- **Install scripts** ([`install.sh.tmpl`](install.sh.tmpl), [`install.ps1.tmpl`](install.ps1.tmpl)): published as [GitHub Release](https://github.com/chipwolf/dotfiles/releases/tag/v1.6.0) assets after CI template rendering. <!-- x-release-please-version -->
 - **Codespaces overlay image** ([ghcr.io/chipwolf/dotfiles](https://ghcr.io/chipwolf/dotfiles)): published to GHCR.
 
 > [!NOTE]

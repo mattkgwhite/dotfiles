@@ -26,6 +26,9 @@
   "Wakatime.CLIWakatime"
   "Wakatime.DesktopWakatime"
 -}}
+{{- $dotfilesRepoUser := .profile.git.githubUser -}}
+{{- $dotfilesRepoName := .profile.git.githubRepo -}}
+{{- $dotfilesRepoUrl := printf "https://github.com/%s/%s" $dotfilesRepoUser $dotfilesRepoName -}}
 {{ if eq .chezmoi.os "windows" -}}
 # Chocolatey package list hash (triggers re-run when this list changes):
 # {{ join " " $chocoPackages | sha256sum }}
@@ -97,8 +100,8 @@ write_files:
     default=$wslUser
 
 runcmd:
-  - sudo -u $wslUser git clone https://github.com/chipwolf/dotfiles /home/$wslUser/.local/share/chezmoi
-  - sudo -u $wslUser /home/$wslUser/.local/share/chezmoi/install.sh
+  - sudo -u $wslUser git clone {{ $dotfilesRepoUrl }} /home/$wslUser/.local/share/chezmoi
+  - sudo -u $wslUser bash -lc 'if ! command -v chezmoi >/dev/null 2>&1; then sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"; fi; PATH="$HOME/.local/bin:$PATH"; "$HOME/.local/bin/chezmoi" init --apply --source="$HOME/.local/share/chezmoi"'
 "@
             [System.IO.File]::WriteAllText("$cloudInitDir\Ubuntu.user-data", $cloudConfig)
 
@@ -126,10 +129,13 @@ runcmd:
             Write-Host "Updating dotfiles in WSL..."
             wsl -d Ubuntu -- bash -lc '
               if [ ! -d ~/.local/share/chezmoi ]; then
-                git clone https://github.com/chipwolf/dotfiles ~/.local/share/chezmoi
+                git clone {{ $dotfilesRepoUrl }} ~/.local/share/chezmoi
               fi
               cd ~/.local/share/chezmoi && git pull
-              ~/.local/share/chezmoi/install.sh
+              if ! command -v chezmoi >/dev/null 2>&1; then
+                sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+              fi
+              PATH="$HOME/.local/bin:$PATH" ~/.local/bin/chezmoi init --apply --source="$HOME/.local/share/chezmoi"
             '
         }
     }

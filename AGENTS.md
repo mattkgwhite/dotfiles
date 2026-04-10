@@ -34,7 +34,7 @@ See [Concepts](https://www.chezmoi.io/reference/concepts/).
 The file [.chezmoiroot](.chezmoiroot) at the repo root contains `home`. So the **source state** is read from the `home/` directory. All managed targets and special files (e.g. config template, scripts) are under `home/`.
 
 - [.chezmoiroot](https://www.chezmoi.io/reference/special-files/chezmoiroot/) is read first; it sets the path used for the rest of the source state.
-- The working tree (git repo) is the parent of that path; `install.sh`, `.macos`, `.gitignore`, and `README.md` live at repo root and are **not** part of the source state.
+- The working tree (git repo) is the parent of that path; `install.sh.tmpl`, `install.ps1.tmpl`, `.macos`, `.gitignore`, and `README.md` live at repo root and are **not** part of the source state.
 
 ### Naming: source state attributes
 
@@ -124,9 +124,9 @@ Deleting a file from the chezmoi source does **not** remove it from the target (
 - **Other config** – `home/dot_config/` includes tmux, mise, finicky; `home/private_dot_gnupg/` for GnuPG (private permissions).
 - **Executable** – `home/dot_scripts/executable_brew-review` (→ `~/.scripts/brew-review`) is the Homebrew drift review script. `home/dot_scripts/executable_7zw` (→ `~/.scripts/7zw`) is a 7-zip wrapper. Both live in `dot_scripts/` — not `dot_zfunctions/` (see Brew section below).
 - **Bootstrap** – `home/.chezmoiscripts/run_once_before_bootstrap.sh.tmpl` runs once before other updates (install deps, brew bundle, oh-my-zsh, mise, etc.). It is OS-aware (darwin/linux) and sets Codespaces overrides when `codespaces` is true.
-- **Root-level (not in source state)** – `install.sh` runs `chezmoi init --apply --source=...` to bootstrap; `.macos` holds macOS defaults; `.gitignore` excludes local/private artifacts (e.g. `*.local.*`, vim swap/undo). Do not add ignored patterns to the source state.
+- **Root-level (not in source state)** – `install.sh.tmpl` and `install.ps1.tmpl` are installer templates for release assets; `.macos` holds macOS defaults; `.gitignore` excludes local/private artifacts (e.g. `*.local.*`, vim swap/undo). Do not add ignored patterns to the source state.
 - **README "What you get" table** – The tool table in `README.md` is sorted by category: shell/prompt, terminal emulators, multiplexer, editor, dev tools, version control, security, package/runtime management, then platform-specific utilities. When adding or removing a managed tool, update this table and preserve the sort order. Platform columns (macOS, Linux, Windows, Codespaces) must reflect what `.chezmoiignore` actually deploys.
-- **Install script repo URL** – `install.sh` and `install.ps1` hardcode `repo_url` pointing at `chipwolf/dotfiles`. The release workflow (`release.yml`) interpolates this with `github.server_url/github.repository` before uploading to the release, so forks get correct URLs automatically. Do not remove the hardcoded values from the source files; they are needed for local clone execution.
+- **Install script templates** – `install.sh.tmpl` and `install.ps1.tmpl` are the source of truth for release installers. The release workflow renders `install.sh` and `install.ps1` from templates with repository/image/tag values before uploading release assets.
 - **Template readability** – Keep chezmoi template source files readable: use clear indentation, split complex logic into understandable blocks, and avoid flattening everything to the left margin with aggressive whitespace trimming unless required for output correctness.
 
 ---
@@ -137,13 +137,13 @@ Deleting a file from the chezmoi source does **not** remove it from the target (
 - **OS-conditional ignores** in `home/.chezmoiignore` use `{{ if eq .chezmoi.os "windows" }}` and `{{ if ne .chezmoi.os "windows" }}` blocks to control which targets are deployed per platform.
 - **Bash chezmoiscripts** (`run_onchange_after_bootstrap.sh.tmpl`, `run_onchange_after_brew_review.sh.tmpl`, `run_onchange_after_tmux_symlinks.sh.tmpl`) are wrapped in `{{ if ne .chezmoi.os "windows" }}` guards so they render to empty on Windows (chezmoi skips empty scripts).
 - **Windows bootstrap** — `home/.chezmoiscripts/run_onchange_after_bootstrap_windows.ps1.tmpl` installs packages via Chocolatey (`choco install -y`), runs `mise install`, and syncs Neovim plugins. Runs only on Windows.
-- **`install.ps1`** at the repo root is the Windows equivalent of `install.sh`: installs Chocolatey, chezmoi, and git, then runs `chezmoi init --apply`.
+- **`install.ps1.tmpl`** at the repo root is the Windows installer template equivalent of `install.sh.tmpl`: installs Chocolatey, chezmoi, and git, then runs `chezmoi init --apply`.
 - **WezTerm** — `home/dot_config/wezterm/wezterm.lua` (→ `~/.config/wezterm/wezterm.lua`). Windows terminal emulator with kitty graphics protocol support. Ignored on non-Windows via `.chezmoiignore`.
 - **OpenCode** — `home/dot_config/opencode/opencode.jsonc.tmpl` renders MCP and permission data from `home/.chezmoidata/mcps/*.yaml` and `home/.chezmoidata/agent-permissions/*.yaml`. Atlassian entries are gated by `conditions` in those overlays (for example `private: false`), so they are excluded on personal machines. Since Windows is always personal, this also covers Windows.
 - **Package manager** — Windows uses Chocolatey (`choco`), not winget or scoop.
 - **When adding new configs**, decide if the target is cross-platform, Unix-only, or Windows-only, and update `home/.chezmoiignore` accordingly.
 - **When adding new chezmoiscripts**, bash scripts (`.sh.tmpl`) must be guarded with `{{ if ne .chezmoi.os "windows" }}` and PowerShell scripts (`.ps1.tmpl`) with `{{ if eq .chezmoi.os "windows" }}` so they render to empty on the wrong OS.
-- **WSL** — The Windows bootstrap script provisions WSL Ubuntu non-interactively via cloud-init. It writes a cloud-config to `~/.cloud-init/Ubuntu.user-data` (using the Windows username), installs Ubuntu with `--no-launch`, then launches and waits for cloud-init to create the user, clone the dotfiles repo, and run `install.sh`. Inside WSL, `chezmoi.os` is `"linux"` so the full Unix config stack (zsh, brew, tmux, etc.) applies without modification.
+- **WSL** — The Windows bootstrap script provisions WSL Ubuntu non-interactively via cloud-init. It writes a cloud-config to `~/.cloud-init/Ubuntu.user-data` (using the Windows username), installs Ubuntu with `--no-launch`, then launches and waits for cloud-init to create the user, clone the dotfiles repo, install chezmoi, and run `chezmoi init --apply --source=...`. Inside WSL, `chezmoi.os` is `"linux"` so the full Unix config stack (zsh, brew, tmux, etc.) applies without modification.
 
 ---
 

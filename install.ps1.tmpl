@@ -1,11 +1,15 @@
-h# install.ps1 — Bootstrap chezmoi dotfiles on Windows.
+{{- $repoURL := env "DOTFILES_REPO_URL" -}}
+{{- $releaseTag := env "DOTFILES_RELEASE_TAG" -}}
+# install.ps1 — Bootstrap chezmoi dotfiles on Windows.
 # Forks: update $repoUrl below to point at your fork.
+#
+# Render source: install.ps1.tmpl
 
 [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '', Justification = 'Install script uses Write-Host for coloured terminal output')]
 param()
 
-$repoUrl = "https://github.com/chipwolf/dotfiles"
-$rawBase = "https://github.com/chipwolf/dotfiles/releases/download/v1.6.0" # x-release-please-version
+$repoUrl = "{{ $repoURL }}"
+$rawBase = "{{ $repoURL }}/releases/download/{{ $releaseTag }}" # x-release-please-version
 
 $ErrorActionPreference = "Stop"
 

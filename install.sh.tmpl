@@ -1,11 +1,17 @@
+{{- $repoURL := env "DOTFILES_REPO_URL" -}}
+{{- $imageName := env "DOTFILES_IMAGE_NAME" -}}
+{{- $attestationRepo := env "DOTFILES_ATTESTATION_REPO" -}}
+{{- $releaseTag := env "DOTFILES_RELEASE_TAG" -}}
 #!/bin/sh
 # Forks: update repo_url below to point at your fork.
+#
+# Render source: install.sh.tmpl
 
 # -e: exit on error
 # -u: exit on unset variables
 set -eu
 
-repo_url="https://github.com/chipwolf/dotfiles"
+repo_url="{{ $repoURL }}"
 
 # --- Codespaces fast path ---
 # The GHCR image is a delta-only image (scratch + our overlay layers).
@@ -23,9 +29,9 @@ if [ -n "${CODESPACES:-}" ] && [ -z "${DOTFILES_NO_OVERLAY:-}" ]; then
 		tar -xzf "/tmp/_crane/${CRANE_TAR}" -C /tmp/_crane crane
 		CRANE=/tmp/_crane/crane
 
-		DOTFILES_IMAGE_OWNER="${DOTFILES_IMAGE_OWNER:-chipwolf}"
-		DOTFILES_ATTESTATION_REPO="${DOTFILES_ATTESTATION_REPO:-${DOTFILES_IMAGE_OWNER}/dotfiles}"
-		OUR_IMAGE="ghcr.io/${DOTFILES_IMAGE_OWNER}/dotfiles:v1.6.0" # x-release-please-version
+		DOTFILES_IMAGE_NAME="{{ $imageName }}"
+		DOTFILES_ATTESTATION_REPO="{{ $attestationRepo }}"
+		OUR_IMAGE="${DOTFILES_IMAGE_NAME}:{{ $releaseTag }}" # x-release-please-version
 
 		OUR_MANIFEST=$("$CRANE" manifest "$OUR_IMAGE")
 		OUR_DIGEST=$("$CRANE" digest "$OUR_IMAGE")
