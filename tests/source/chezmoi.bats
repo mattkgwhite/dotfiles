@@ -4,20 +4,11 @@
 setup() {
   REPO_ROOT="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"
   SOURCE_DIR="$REPO_ROOT/home"
-  # Minimal config so chezmoi execute-template can resolve .chezmoi.* and data vars
-  export CHEZMOI_CONFIG="$BATS_TEST_TMPDIR/chezmoi.toml"
-  cat >"$CHEZMOI_CONFIG" <<EOF
-sourceDir = "$SOURCE_DIR"
-
-[data]
-  codespaces = false
-  private = false
-EOF
 }
 
 render_template() {
   local template_path="$1"
-  chezmoi execute-template --init \
+  chezmoi --source "$REPO_ROOT" execute-template --init \
     --promptBool "codespaces=false" \
     --promptBool "private=false" \
     --file "$template_path"
@@ -26,7 +17,11 @@ render_template() {
 render_template_with_override_data() {
   local template_path="$1"
   local data_file="$2"
-  chezmoi execute-template --override-data-file "$data_file" --file "$template_path"
+  chezmoi --source "$REPO_ROOT" execute-template --init \
+    --promptBool "codespaces=false" \
+    --promptBool "private=false" \
+    --override-data-file "$data_file" \
+    --file "$template_path"
 }
 
 # --- .chezmoi.toml.tmpl renders without error ---
@@ -127,13 +122,13 @@ EOF
 }
 EOF
 
-  output_false=$(render_template_with_override_data "$SOURCE_DIR/dot_config/opencode/opencode.jsonc.tmpl" "$data_file_false")
+  output_false=$(render_template_with_override_data "$SOURCE_DIR/.chezmoitemplates/opencode-permission.tmpl" "$data_file_false")
   echo "$output_false" | grep -Fq '"atlassian_*": "ask"'
   echo "$output_false" | grep -Fq '"always_*": "allow"'
   echo "$output_false" | grep -Fq '"docker ps": "allow"'
   echo "$output_false" | grep -Fq '"docker ps *": "allow"'
 
-  output_true=$(render_template_with_override_data "$SOURCE_DIR/dot_config/opencode/opencode.jsonc.tmpl" "$data_file_true")
+  output_true=$(render_template_with_override_data "$SOURCE_DIR/.chezmoitemplates/opencode-permission.tmpl" "$data_file_true")
   ! echo "$output_true" | grep -Fq '"atlassian_*": "ask"'
   echo "$output_true" | grep -Fq '"always_*": "allow"'
 }
@@ -291,7 +286,7 @@ EOF
 }
 EOF
 
-  output=$(render_template_with_override_data "$SOURCE_DIR/dot_config/opencode/opencode.jsonc.tmpl" "$data_file")
+  output=$(render_template_with_override_data "$SOURCE_DIR/.chezmoitemplates/opencode-mcp.jsonc.tmpl" "$data_file")
   echo "$output" | grep -q '"shape-op-local-base"'
   echo "$output" | grep -q '"pkg-op-local-base@latest"'
   echo "$output" | grep -q '"shape-op-remote-base"'
@@ -314,7 +309,7 @@ EOF
 }
 EOF
 
-  output=$(render_template_with_override_data "$SOURCE_DIR/dot_config/opencode/opencode.jsonc.tmpl" "$data_file")
+  output=$(render_template_with_override_data "$SOURCE_DIR/.chezmoitemplates/opencode-mcp.jsonc.tmpl" "$data_file")
   echo "$output" | grep -q '"shape-op-no-targets"'
 }
 
@@ -340,7 +335,7 @@ EOF
 }
 EOF
 
-  output=$(render_template_with_override_data "$SOURCE_DIR/dot_config/opencode/opencode.jsonc.tmpl" "$data_file")
+  output=$(render_template_with_override_data "$SOURCE_DIR/.chezmoitemplates/opencode-mcp.jsonc.tmpl" "$data_file")
   ! echo "$output" | grep -q '"shape-op-disabled"'
   ! echo "$output" | grep -q '"shape-op-disabled-explicit"'
 }
@@ -363,7 +358,10 @@ EOF
     File.write(ARGV[1], JSON.generate(merged))
   ' "$SOURCE_DIR/.chezmoidata/mcps/*.yaml" "$merged_data_file"
 
-  output=$(chezmoi execute-template \
+  output=$(chezmoi --source "$REPO_ROOT" execute-template \
+    --init \
+    --promptBool "codespaces=false" \
+    --promptBool "private=false" \
     --override-data-file "$merged_data_file" \
     --file "$SOURCE_DIR/dot_cursor/mcp.json.tmpl")
   printf '%s' "$output" >"$rendered_file"
@@ -421,54 +419,19 @@ EOF
     File.write(ARGV[1], JSON.generate(merged))
   ' "$SOURCE_DIR/.chezmoidata/mcps/*.yaml" "$merged_data_file"
 
-  output=$(chezmoi execute-template \
+  output=$(chezmoi --source "$REPO_ROOT" execute-template \
+    --init \
+    --promptBool "codespaces=false" \
+    --promptBool "private=false" \
     --override-data-file "$merged_data_file" \
-    --file "$SOURCE_DIR/dot_config/opencode/opencode.jsonc.tmpl")
+    --file "$SOURCE_DIR/.chezmoitemplates/opencode-mcp.jsonc.tmpl")
   printf '%s' "$output" >"$rendered_file"
 
   ruby -rjson -e '
     rendered_path = ARGV[0]
     data_path = ARGV[1]
-    text = File.read(rendered_path)
-
-    marker = "\"mcp\":"
-    marker_idx = text.index(marker)
-    raise "missing mcp block" if marker_idx.nil?
-    start_idx = text.index("{", marker_idx)
-    raise "missing mcp object start" if start_idx.nil?
-
-    depth = 0
-    in_string = false
-    escape = false
-    end_idx = nil
-
-    (start_idx...text.length).each do |i|
-      ch = text[i]
-      if in_string
-        if escape
-          escape = false
-        elsif ch == "\\\\"
-          escape = true
-        elsif ch == "\""
-          in_string = false
-        end
-      else
-        if ch == "\""
-          in_string = true
-        elsif ch == "{"
-          depth += 1
-        elsif ch == "}"
-          depth -= 1
-          if depth == 0
-            end_idx = i
-            break
-          end
-        end
-      end
-    end
-
-    raise "unterminated mcp object" if end_idx.nil?
-    mcp = JSON.parse(text[start_idx..end_idx])
+    text = File.read(rendered_path).strip
+    mcp = JSON.parse("{#{text}}")
 
     data = JSON.parse(File.read(data_path))
     is_private = data.fetch("private", false)
@@ -507,7 +470,7 @@ EOF
     # Use --init so .chezmoi.* variables and include are available.
     # Rendering may fail on missing data (e.g. bitwarden), but syntax
     # errors produce a distinct "parse" error. We only fail on parse errors.
-    err=$(chezmoi execute-template --init \
+    err=$(chezmoi --source "$REPO_ROOT" execute-template --init \
       --promptBool "codespaces=false" \
       --promptBool "private=false" \
       --file "$tmpl" 2>&1) || {
