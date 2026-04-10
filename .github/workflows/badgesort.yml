@@ -3,6 +3,9 @@ name: BadgeSort
 on:
   push:
     branches: [main]
+    paths:
+      - "**/*.md"
+      - ".github/workflows/badgesort.yml"
   workflow_dispatch:
 
 permissions:
