@@ -332,4 +332,3 @@ agentPermissions:
     - kind: external_directory
       pattern: "{{ .chezmoi.homeDir }}/AppData/Local/Temp/**"
       op: allow
-
