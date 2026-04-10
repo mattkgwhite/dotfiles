@@ -133,6 +133,74 @@ EOF
   echo "$output_true" | grep -Fq '"always_*": "allow"'
 }
 
+@test "OpenCode config template renders embedded permission and MCP partials" {
+  local data_file="$BATS_TEST_TMPDIR/opencode-config-render.json"
+  cat >"$data_file" <<'EOF'
+{
+  "private": false,
+  "agentPermissions": {
+    "kinds": {
+      "bash": {
+        "destinationType": "namespaced",
+        "destinationKey": "bash",
+        "supportsMatchMode": true,
+        "defaultMatchMode": "exact",
+        "wildcardSuffix": " *"
+      },
+      "permission_key": {
+        "destinationType": "top_level"
+      }
+    },
+    "rules": [
+      { "kind": "bash", "pattern": "echo", "op": "allow", "bashMatchMode": "exactAndWithArgs" },
+      { "kind": "permission_key", "pattern": "always_*", "op": "allow" }
+    ]
+  },
+  "mcp": {
+    "serversById": {
+      "shape-op-remote-base": {
+        "enabled": true,
+        "targets": { "opencode": {} },
+        "remote": { "url": "https://example.com/op-base" }
+      }
+    }
+  }
+}
+EOF
+
+  output=$(render_template_with_override_data "$SOURCE_DIR/dot_config/opencode/opencode.jsonc.tmpl" "$data_file")
+  echo "$output" | grep -Fq '"permission": {'
+  echo "$output" | grep -Fq '"bash": {'
+  echo "$output" | grep -Fq '"echo": "allow"'
+  echo "$output" | grep -Fq '"echo *": "allow"'
+  echo "$output" | grep -Fq '"always_*": "allow"'
+  echo "$output" | grep -Fq '"mcp": {'
+  echo "$output" | grep -Fq '"shape-op-remote-base": {'
+  echo "$output" | grep -Fq '"url": "https://example.com/op-base"'
+}
+
+@test "OpenCode permission template with merged chezmoidata keeps base and overlay rules" {
+  local merged_data_file="$BATS_TEST_TMPDIR/agent-permissions-realdata.json"
+  ruby -ryaml -rjson -e '
+    def deep_merge(a, b)
+      return b unless a.is_a?(Hash) && b.is_a?(Hash)
+      a.merge(b) { |_k, av, bv| deep_merge(av, bv) }
+    end
+
+    merged = { "private" => false }
+    Dir.glob(ARGV[0]).sort.each do |file|
+      data = YAML.load_file(file) || {}
+      merged = deep_merge(merged, data)
+    end
+
+    File.write(ARGV[1], JSON.generate(merged))
+  ' "$SOURCE_DIR/.chezmoidata/agent-permissions/*.yaml" "$merged_data_file"
+
+  output=$(render_template_with_override_data "$SOURCE_DIR/.chezmoitemplates/opencode-permission.tmpl" "$merged_data_file")
+  echo "$output" | grep -Fq '"ls *": "allow"'
+  echo "$output" | grep -Fq '"atlassian_*": "ask"'
+}
+
 # --- MCP template rendering ---
 
 @test "Cursor MCP template renders canonical local/remote shapes correctly" {
