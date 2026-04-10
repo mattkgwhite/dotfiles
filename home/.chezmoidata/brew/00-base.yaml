@@ -62,7 +62,7 @@ brew:
         - type: brew
           name: nmap
         - type: brew
-          name: opencode
+          name: anomalyco/tap/opencode
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
         - type: brew
@@ -176,3 +176,7 @@ brew:
           conditions:
             - { kind: os, op: is, value: mac }
             - { kind: tty, op: is, value: true }
+        - type: tap
+          name: anomalyco/tap
+          conditions:
+            - { kind: env, name: CODESPACES, op: unset }
