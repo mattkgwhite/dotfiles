@@ -12,8 +12,7 @@ agentPermissions:
       destinationKey: external_directory
     permission_key:
       destinationType: top_level
-  ruleSets:
-    base:
+  rules:
     - kind: bash
       pattern: "*"
       op: ask
