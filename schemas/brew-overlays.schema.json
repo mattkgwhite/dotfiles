@@ -23,9 +23,7 @@
                   }
                 }
               },
-              "required": [
-                "packages"
-              ]
+              "required": ["packages"]
             }
           }
         }
@@ -39,12 +37,7 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": [
-            "tap",
-            "brew",
-            "cask",
-            "mas"
-          ]
+          "enum": ["tap", "brew", "cask", "mas"]
         },
         "name": {
           "type": "string",
@@ -61,10 +54,7 @@
           }
         }
       },
-      "required": [
-        "type",
-        "name"
-      ],
+      "required": ["type", "name"],
       "allOf": [
         {
           "if": {
@@ -75,9 +65,7 @@
             }
           },
           "then": {
-            "required": [
-              "masId"
-            ]
+            "required": ["masId"]
           }
         }
       ]
@@ -98,17 +86,10 @@
             },
             "value": {
               "type": "string",
-              "enum": [
-                "mac",
-                "linux"
-              ]
+              "enum": ["mac", "linux"]
             }
           },
-          "required": [
-            "kind",
-            "op",
-            "value"
-          ]
+          "required": ["kind", "op", "value"]
         },
         {
           "type": "object",
@@ -124,38 +105,24 @@
             },
             "op": {
               "type": "string",
-              "enum": [
-                "set",
-                "unset",
-                "equals",
-                "notEquals"
-              ]
+              "enum": ["set", "unset", "equals", "notEquals"]
             },
             "value": {
               "type": "string"
             }
           },
-          "required": [
-            "kind",
-            "name",
-            "op"
-          ],
+          "required": ["kind", "name", "op"],
           "allOf": [
             {
               "if": {
                 "properties": {
                   "op": {
-                    "enum": [
-                      "equals",
-                      "notEquals"
-                    ]
+                    "enum": ["equals", "notEquals"]
                   }
                 }
               },
               "then": {
-                "required": [
-                  "value"
-                ]
+                "required": ["value"]
               }
             }
           ]
@@ -176,11 +143,7 @@
               "type": "boolean"
             }
           },
-          "required": [
-            "kind",
-            "op",
-            "value"
-          ]
+          "required": ["kind", "op", "value"]
         }
       ]
     }

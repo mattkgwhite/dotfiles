@@ -183,13 +183,11 @@ agentPermissions:
       op: allow
       bashMatchMode: withArgs
     - kind: bash
-      # DevSkim: ignore DS0000
-      pattern: "md5sum"
+      pattern: "md5sum" # DevSkim: ignore DS126858
       op: allow
       bashMatchMode: withArgs
     - kind: bash
-      # DevSkim: ignore DS0000
-      pattern: "sha1sum"
+      pattern: "sha1sum" # DevSkim: ignore DS126858
       op: allow
       bashMatchMode: withArgs
     - kind: bash

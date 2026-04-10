@@ -86,10 +86,7 @@
         "local": { "$ref": "#/$defs/localConfig" },
         "remote": { "$ref": "#/$defs/remoteConfig" }
       },
-      "oneOf": [
-        { "required": ["local"] },
-        { "required": ["remote"] }
-      ]
+      "oneOf": [{ "required": ["local"] }, { "required": ["remote"] }]
     }
   }
 }

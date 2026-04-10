@@ -112,10 +112,10 @@ chezmoi is configured to use Bitwarden CLI (`bw`) as its secret manager. Some te
 
 chezmoi uses two boolean flags to adapt behavior per machine. Both are set automatically in [`home/.chezmoi.toml.tmpl`](home/.chezmoi.toml.tmpl).
 
-| Flag         | When true                       | What it gates                                                                                                 |
-|--------------|---------------------------------|---------------------------------------------------------------------------------------------------------------|
+| Flag         | When true                       | What it gates                                                                                                              |
+|--------------|---------------------------------|----------------------------------------------------------------------------------------------------------------------------|
 | `codespaces` | `CODESPACES` env var is set     | Skips GUI apps and redundant packages in the Brewfile. Uses the overlay fast path in [`install.sh.tmpl`](install.sh.tmpl). |
-| `private`    | Windows, or `~/.private` exists | Enables personal-machine config: excludes work-specific MCP servers and Atlassian integrations from OpenCode. |
+| `private`    | Windows, or `~/.private` exists | Enables personal-machine config: excludes work-specific MCP servers and Atlassian integrations from OpenCode.              |
 
 > [!IMPORTANT]
 > To mark a macOS or Linux machine as private, run `touch ~/.private` before `chezmoi apply`.
@@ -243,10 +243,10 @@ gh attestation verify oci://ghcr.io/chipwolf/dotfiles:v1.6.0 --repo chipwolf/dot
 
 ## Further reading
 
-| Document                           | Contents                                                       |
-|------------------------------------|----------------------------------------------------------------|
-| [docs/brew.md](docs/brew.md) | Homebrew overlays, template rendering, and brew-review workflow |
+| Document                                               | Contents                                                           |
+|--------------------------------------------------------|--------------------------------------------------------------------|
+| [docs/brew.md](docs/brew.md)                           | Homebrew overlays, template rendering, and brew-review workflow    |
 | [docs/agent-permissions.md](docs/agent-permissions.md) | Shared agent permission rule schema, overlays, and rendering model |
-| [docs/mcp-servers.md](docs/mcp-servers.md) | MCP server setup, conditions, targets, and arg interpolation   |
-| [docs/yubikey.md](docs/yubikey.md) | YubiKey SSH workflow, backup strategy, credential hygiene      |
-| [docs/secrets.md](docs/secrets.md) | Bitwarden integration, GnuPG config, secret introduction order |
+| [docs/mcp-servers.md](docs/mcp-servers.md)             | MCP server setup, conditions, targets, and arg interpolation       |
+| [docs/yubikey.md](docs/yubikey.md)                     | YubiKey SSH workflow, backup strategy, credential hygiene          |
+| [docs/secrets.md](docs/secrets.md)                     | Bitwarden integration, GnuPG config, secret introduction order     |

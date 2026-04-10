@@ -21,15 +21,15 @@ These constraints are unconditional. Apply them without being asked.
 
 Load skills on-demand via the `skill` tool. Use subagents for delegated async work.
 
-| Name               | Type     | When to use                                                          |
-|--------------------|----------|----------------------------------------------------------------------|
-| `memory`           | skill    | Before writing to any AGENTS.md file                                 |
-| `dotfiles`         | skill    | Before any change to chezmoi-managed files                           |
-| `python-toolchain` | skill    | Before any Python, pip, uv, or mise work                             |
-| `git-commit-push`  | skill    | For commit and push requests, including auth and non-fast-forward remediation |
-| `create-opencode-skill` | skill | For creating or updating OpenCode skills with valid format and memory integration |
-| `retrospective`    | skill    | After completing any non-trivial task                                |
-| `@daily-note`      | subagent | Logging achievements to today's Obsidian daily note (ask user first) |
+| Name                    | Type     | When to use                                                                       |
+|-------------------------|----------|-----------------------------------------------------------------------------------|
+| `memory`                | skill    | Before writing to any AGENTS.md file                                              |
+| `dotfiles`              | skill    | Before any change to chezmoi-managed files                                        |
+| `python-toolchain`      | skill    | Before any Python, pip, uv, or mise work                                          |
+| `git-commit-push`       | skill    | For commit and push requests, including auth and non-fast-forward remediation     |
+| `create-opencode-skill` | skill    | For creating or updating OpenCode skills with valid format and memory integration |
+| `retrospective`         | skill    | After completing any non-trivial task                                             |
+| `@daily-note`           | subagent | Logging achievements to today's Obsidian daily note (ask user first)              |
 
 When delegating to subagents at session close, run them in sequence: one at a time, wait for each to complete.
 
