@@ -9,7 +9,11 @@
     "agentPermissions": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kinds", "rules"],
+      "anyOf": [
+        { "required": ["kinds"] },
+        { "required": ["rules"] },
+        { "required": ["ruleSets"] }
+      ],
       "properties": {
         "kinds": {
           "type": "object",
@@ -22,6 +26,17 @@
         "rules": {
           "type": "array",
           "items": { "$ref": "#/$defs/permissionRule" }
+        },
+        "ruleSets": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[a-z0-9][a-z0-9_-]*$": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/permissionRule" }
+            }
+          }
         }
       }
     }

@@ -4,7 +4,14 @@
   {{- $permission = .agentPermissions -}}
 {{- end -}}
 {{- $kinds := default (dict) (index $permission "kinds") -}}
-{{- $rules := default (list) (index $permission "rules") -}}
+{{- $rules := list -}}
+{{- if hasKey $permission "rules" -}}
+  {{- $rules = concat $rules (default (list) (index $permission "rules")) -}}
+{{- end -}}
+{{- $ruleSets := default (dict) (index $permission "ruleSets") -}}
+{{- range $setName := (keys $ruleSets | sortAlpha) -}}
+  {{- $rules = concat $rules (default (list) (index $ruleSets $setName)) -}}
+{{- end -}}
 
 {{- /* Render namespaced permission maps based on kind configuration */ -}}
 {{- $firstField := true -}}
