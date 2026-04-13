@@ -1,82 +1,95 @@
 {{- $repoURL := env "DOTFILES_REPO_URL" -}}
-{{- $releaseTag := env "DOTFILES_RELEASE_TAG" -}}
 # install.ps1 — Bootstrap chezmoi dotfiles on Windows.
 
 [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '', Justification = 'Install script uses Write-Host for coloured terminal output')]
 param()
 
 $repoUrl = "{{ $repoURL }}"
-$rawBase = "{{ $repoURL }}/releases/download/{{ $releaseTag }}" # x-release-please-version
 
 $ErrorActionPreference = "Stop"
 
-# Self-elevate if not already running as administrator
+# --- Elevated block: install system packages via Chocolatey ---
+# Only choco installs need admin. Everything else (bw login, chezmoi init)
+# runs non-elevated in the caller's original window afterwards.
+
+$elevatedScript = {
+    $ErrorActionPreference = "Stop"
+    try {
+        if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
+            Write-Host "Installing Chocolatey..." -ForegroundColor Cyan
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+            $chocoBootstrapPath = Join-Path $env:TEMP "chocolatey-install.ps1"
+            Invoke-WebRequest -Uri "https://community.chocolatey.org/install.ps1" -OutFile $chocoBootstrapPath
+            $chocoResult = Start-Process powershell -ArgumentList @(
+                "-NoProfile",
+                "-ExecutionPolicy", "Bypass",
+                "-File", $chocoBootstrapPath
+            ) -Wait -PassThru
+            Remove-Item $chocoBootstrapPath -ErrorAction SilentlyContinue
+            if ($chocoResult.ExitCode -ne 0) {
+                throw "Chocolatey installation failed with exit code $($chocoResult.ExitCode)."
+            }
+            $env:PATH = "$env:ALLUSERSPROFILE\chocolatey\bin;$env:PATH"
+        }
+
+        $packages = @()
+        if (-not (Get-Command chezmoi -ErrorAction SilentlyContinue)) { $packages += "chezmoi" }
+        if (-not (Get-Command mise -ErrorAction SilentlyContinue)) { $packages += "mise" }
+        if (-not (Get-Command bw -ErrorAction SilentlyContinue)) { $packages += "bitwarden-cli" }
+
+        # Ensure git is available (check common install locations before installing)
+        if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+            $gitPaths = @("$env:ProgramFiles\Git\cmd", "${env:ProgramFiles(x86)}\Git\cmd", "$env:LOCALAPPDATA\Programs\Git\cmd")
+            $found = $gitPaths | Where-Object { Test-Path "$_\git.exe" } | Select-Object -First 1
+            if ($found) {
+                Write-Host "Found git at $found, adding to PATH..." -ForegroundColor Cyan
+                $env:PATH = "$found;$env:PATH"
+            } else {
+                $packages += "git"
+            }
+        }
+
+        if ($packages.Count -gt 0) {
+            Write-Host "Installing $($packages -join ', ')..." -ForegroundColor Cyan
+            choco install @packages -y --no-progress
+        }
+
+        Write-Host "Package installation complete." -ForegroundColor Green
+    } catch {
+        Write-Host "`nError during package installation:" -ForegroundColor Red
+        Write-Host $_.Exception.Message -ForegroundColor Red
+        Write-Host "`nPress any key to close this window..." -ForegroundColor Yellow
+        $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+        exit 1
+    }
+}
+
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-if (-not $isAdmin) {
-    Write-Host "Elevating to administrator..." -ForegroundColor Cyan
-    $scriptPath = $MyInvocation.MyCommand.Path
-    if ($scriptPath) {
-        # Running from a file — re-launch the file elevated
-        Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptPath`"" -Wait
-    } else {
-        # Running via iex/pipe — re-download and re-launch elevated via a temp file
-        $tmp = Join-Path $env:TEMP ([System.IO.Path]::GetRandomFileName() + ".ps1")
-        (New-Object System.Net.WebClient).DownloadFile("$rawBase/install.ps1", $tmp)
-        Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$tmp`"" -Wait
-        Remove-Item $tmp -ErrorAction SilentlyContinue
+if ($isAdmin) {
+    & $elevatedScript
+} else {
+    $scriptFile = Join-Path $env:TEMP "chezmoi-install-elevated.ps1"
+    $elevatedScript.ToString() | Out-File $scriptFile -Encoding ascii
+    Write-Host "Elevating for package installation..." -ForegroundColor Cyan
+    $proc = Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptFile`"" -Wait -PassThru
+    Remove-Item $scriptFile -ErrorAction SilentlyContinue
+    if ($proc.ExitCode -ne 0) {
+        throw "Elevated package installation failed (exit code $($proc.ExitCode)). Re-run the script to retry."
     }
-    exit
 }
 
-# Install Chocolatey if not present
-if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
-    Write-Host "Installing Chocolatey..." -ForegroundColor Cyan
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-    $chocoBootstrapPath = Join-Path $env:TEMP "chocolatey-install.ps1"
-    Invoke-WebRequest -Uri "https://community.chocolatey.org/install.ps1" -OutFile $chocoBootstrapPath
-    # Run Chocolatey's bootstrap in an isolated PowerShell process with per-process policy bypass.
-    # This avoids mutating execution policy from inside this installer script.
-    $chocoResult = Start-Process powershell -ArgumentList @(
-        "-NoProfile",
-        "-ExecutionPolicy", "Bypass",
-        "-File", $chocoBootstrapPath
-    ) -Wait -PassThru
-    Remove-Item $chocoBootstrapPath -ErrorAction SilentlyContinue
-    if ($chocoResult.ExitCode -ne 0) {
-        throw "Chocolatey installation failed with exit code $($chocoResult.ExitCode)."
-    }
-    $env:PATH = "$env:ALLUSERSPROFILE\chocolatey\bin;$env:PATH"
-}
+# --- Non-elevated: bw login, chezmoi init, git config ---
+# Runs in the caller's original window so interactive prompts are visible
+# and files are owned by the current user.
 
-# Install chezmoi if not present
-if (-not (Get-Command chezmoi -ErrorAction SilentlyContinue)) {
-    Write-Host "Installing chezmoi..." -ForegroundColor Cyan
-    choco install chezmoi -y --no-progress
-    $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")
-}
+# Refresh PATH so newly installed tools are available
+$env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")
 
-# Ensure git is on PATH (chezmoi init needs it)
+# Ensure git is on PATH (may have been found but not installed by choco)
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     $gitPaths = @("$env:ProgramFiles\Git\cmd", "${env:ProgramFiles(x86)}\Git\cmd", "$env:LOCALAPPDATA\Programs\Git\cmd")
     $found = $gitPaths | Where-Object { Test-Path "$_\git.exe" } | Select-Object -First 1
-    if ($found) {
-        Write-Host "Found git at $found, adding to PATH..." -ForegroundColor Cyan
-        $env:PATH = "$found;$env:PATH"
-    } else {
-        Write-Host "Installing git..." -ForegroundColor Cyan
-        choco install git -y --no-progress
-        $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")
-    }
-}
-
-# Install remaining prerequisites that chezmoi init needs
-$prereqs = @()
-if (-not (Get-Command mise -ErrorAction SilentlyContinue)) { $prereqs += "mise" }
-if (-not (Get-Command bw -ErrorAction SilentlyContinue)) { $prereqs += "bitwarden-cli" }
-if ($prereqs.Count -gt 0) {
-    Write-Host "Installing $($prereqs -join ', ')..." -ForegroundColor Cyan
-    choco install @prereqs -y --no-progress
-    $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")
+    if ($found) { $env:PATH = "$found;$env:PATH" }
 }
 
 # Log in to Bitwarden if unauthenticated (chezmoi manages the session)
