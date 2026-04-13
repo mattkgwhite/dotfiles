@@ -31,6 +31,6 @@ jobs:
           CI: "1"
           HOMEBREW_CI: "1"
         run: |
-          chezmoi -S "$GITHUB_WORKSPACE" execute-template --init --file "$GITHUB_WORKSPACE/home/.chezmoiscripts/run_onchange_after_bootstrap.sh.tmpl" > bootstrap.ci.sh
+          chezmoi -S "$GITHUB_WORKSPACE/home" execute-template --init --file "$GITHUB_WORKSPACE/home/.chezmoiscripts/run_onchange_after_bootstrap.sh.tmpl" > bootstrap.ci.sh
           grep -E 'DOTFILES_BREWFILE_RENDERED' bootstrap.ci.sh
           grep -E '^brew "neovim"' bootstrap.ci.sh
