@@ -80,9 +80,11 @@ Invoke-ElevatedWithLog `
 # Capture the pre-refresh chezmoi path (e.g. from mise shims) because
 # rebuilding PATH from Machine/User entries can drop ephemeral runner PATH entries.
 $initialChezmoiPath = (Get-Command chezmoi -ErrorAction SilentlyContinue).Source
+$originalPath = $env:PATH
 
 # Refresh PATH so newly installed tools are available
-$env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")
+$machineUserPath = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")
+$env:PATH = "$machineUserPath;$originalPath"
 
 $chezmoiPath = (Get-Command chezmoi -ErrorAction SilentlyContinue).Source
 if ([string]::IsNullOrWhiteSpace($chezmoiPath)) {
