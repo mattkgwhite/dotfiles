@@ -97,7 +97,6 @@ jobs:
 
   e2e-windows:
     name: E2E install (Windows)
-    needs: e2e-linux
     runs-on: windows-2025
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -127,13 +126,12 @@ jobs:
       - name: Verify Windows E2E results
         shell: pwsh
         run: |
-          if (-not (Test-Path "$env:USERPROFILE\.gitconfig")) { throw ".gitconfig was not created" }
           if (-not (Test-Path "$env:USERPROFILE\.config\nvim\init.lua")) { throw "Neovim config was not created" }
+          if (-not (Test-Path "$env:USERPROFILE\.config\wezterm\wezterm.lua")) { throw "WezTerm config was not created" }
           if (-not (Get-Command chezmoi -ErrorAction SilentlyContinue)) { throw "chezmoi not found on PATH" }
 
   e2e-macos:
     name: E2E install (macOS)
-    needs: e2e-windows
     runs-on: macos-15
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
