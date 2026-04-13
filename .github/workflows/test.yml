@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   source-tests:
+    if: github.event_name == 'pull_request' || !contains(github.actor, '[bot]')
     strategy:
       fail-fast: false
       matrix:
