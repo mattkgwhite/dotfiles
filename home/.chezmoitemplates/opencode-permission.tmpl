@@ -10,7 +10,18 @@
 {{- end -}}
 {{- $ruleSets := default (dict) (index $permission "ruleSets") -}}
 {{- range $setName := (keys $ruleSets | sortAlpha) -}}
-  {{- $rules = concat $rules (default (list) (index $ruleSets $setName)) -}}
+  {{- $ruleSet := index $ruleSets $setName -}}
+  {{- $setEnabled := true -}}
+  {{- if hasKey $ruleSet "conditions" -}}
+    {{- range $ck, $cv := $ruleSet.conditions -}}
+      {{- if and (hasKey $ $ck) (ne (index $ $ck) $cv) -}}
+        {{- $setEnabled = false -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if $setEnabled -}}
+    {{- $rules = concat $rules (default (list) (index $ruleSet "rules")) -}}
+  {{- end -}}
 {{- end -}}
 
 {{- /* Render namespaced permission maps based on kind configuration */ -}}

@@ -2,6 +2,9 @@
 agentPermissions:
   ruleSets:
     chipwolf:
+      conditions:
+        ci: false
+      rules:
       - kind: permission_key
         pattern: "atlassian_*"
         op: ask

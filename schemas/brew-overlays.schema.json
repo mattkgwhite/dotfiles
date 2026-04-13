@@ -16,6 +16,12 @@
               "type": "object",
               "additionalProperties": false,
               "properties": {
+                "conditions": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/condition"
+                  }
+                },
                 "packages": {
                   "type": "array",
                   "items": {

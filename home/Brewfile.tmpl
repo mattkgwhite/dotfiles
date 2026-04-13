@@ -19,6 +19,17 @@
 {{- if hasKey $.brew "overlays" -}}
 {{- range $overlayName := (keys $.brew.overlays | sortAlpha) -}}
     {{- $overlay := index $.brew.overlays $overlayName -}}
+    {{- $overlayEnabled := true -}}
+    {{- if and (hasKey $overlay "conditions") $overlay.conditions -}}
+      {{- range $cond := $overlay.conditions -}}
+        {{- if eq $cond.kind "env" -}}
+          {{- $envVal := env $cond.name -}}
+          {{- if and (eq $cond.op "unset") (ne $envVal "") -}}{{- $overlayEnabled = false -}}{{- end -}}
+          {{- if and (eq $cond.op "set") (eq $envVal "") -}}{{- $overlayEnabled = false -}}{{- end -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+    {{- if not $overlayEnabled -}}{{- continue -}}{{- end -}}
     {{- range $pkg := $overlay.packages -}}
       {{- $conditionsIf := list -}}
       {{- $conditionsUnless := list -}}

@@ -1,8 +1,10 @@
 {{- $codespaces:= env "CODESPACES" | not | not -}}
+{{- $ci := env "CI" | not | not -}}
 {{- $private := or (eq .chezmoi.os "windows") (stat (joinPath .chezmoi.homeDir ".private") | not | not) -}}
 {{- $obsidianVaultPath := joinPath .chezmoi.homeDir "Documents" "Obsidian" "Vault" -}}
 [data]
     codespaces = {{ $codespaces }}
+    ci = {{ $ci }}
     private = {{ $private }}
     obsidianVaultPath = {{ $obsidianVaultPath | quote }}
 

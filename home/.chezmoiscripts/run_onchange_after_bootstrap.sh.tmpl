@@ -52,6 +52,8 @@ chezmoi execute-template --file "$CHEZMOI_SOURCE_DIR/Brewfile.tmpl" >"$BREWFILE_
 
 {{- if .codespaces }}
 CODESPACES=1 brew bundle -q --file="$BREWFILE_RENDERED" || true
+{{- else if .ci }}
+CI=1 brew bundle -q --file="$BREWFILE_RENDERED"
 {{- else if .private }}
 PRIVATE=1 brew bundle -q --file="$BREWFILE_RENDERED"
 {{- else }}

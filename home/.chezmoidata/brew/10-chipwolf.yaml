@@ -2,6 +2,8 @@
 brew:
   overlays:
     chipwolf:
+      conditions:
+        - { kind: env, name: CI, op: unset }
       packages:
         - type: brew
           name: asitop # apple silicon top
