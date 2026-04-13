@@ -77,8 +77,20 @@ Invoke-ElevatedWithLog `
 # Runs in the caller's original window so interactive prompts are visible
 # and files are owned by the current user.
 
+# Capture the pre-refresh chezmoi path (e.g. from mise shims) because
+# rebuilding PATH from Machine/User entries can drop ephemeral runner PATH entries.
+$initialChezmoiPath = (Get-Command chezmoi -ErrorAction SilentlyContinue).Source
+
 # Refresh PATH so newly installed tools are available
 $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")
+
+$chezmoiPath = (Get-Command chezmoi -ErrorAction SilentlyContinue).Source
+if ([string]::IsNullOrWhiteSpace($chezmoiPath)) {
+    $chezmoiPath = $initialChezmoiPath
+}
+if ([string]::IsNullOrWhiteSpace($chezmoiPath)) {
+    throw "chezmoi is not on PATH after package installation."
+}
 
 # Ensure git is on PATH (may have been found but not installed by choco)
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
@@ -121,10 +133,10 @@ $defaultSourceDir = "$env:USERPROFILE\.local\share\chezmoi"
 if ($PSScriptRoot -and (Test-Path "$PSScriptRoot\.chezmoiroot")) {
     $sourceDir = $PSScriptRoot
     Write-Host "Applying chezmoi dotfiles from $sourceDir..." -ForegroundColor Cyan
-    chezmoi init --apply --source="$sourceDir"
+    & $chezmoiPath init --apply --source="$sourceDir"
 } else {
     Write-Host "Applying chezmoi dotfiles from GitHub..." -ForegroundColor Cyan
-    chezmoi init --apply $repoUrl
+    & $chezmoiPath init --apply $repoUrl
     $sourceDir = $defaultSourceDir
 }
 if ($LASTEXITCODE -ne 0) {
