@@ -9,7 +9,7 @@ set -x
 {{- end }}
 
 # Brewfile inputs hash (triggers re-run when template or overlay data changes):
-# tmpl={{ include "Brewfile.tmpl" | sha256sum }} overlays={{ .brew.overlays | toJson | sha256sum }}
+# overlays={{ .brew.overlays | toJson | sha256sum }}
 
 {{ if .codespaces -}}
 cat <<EOF >"$HOME/.gitconfig.overrides"

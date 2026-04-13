@@ -126,8 +126,9 @@ jobs:
       - name: Verify Windows E2E results
         shell: pwsh
         run: |
-          if (-not (Test-Path "$env:USERPROFILE\.config\nvim\init.lua")) { throw "Neovim config was not created" }
-          if (-not (Test-Path "$env:USERPROFILE\.config\wezterm\wezterm.lua")) { throw "WezTerm config was not created" }
+          $targetHome = if ([string]::IsNullOrWhiteSpace($env:HOME)) { $env:USERPROFILE } else { $env:HOME }
+          if (-not (Test-Path (Join-Path $targetHome ".config\nvim\init.lua"))) { throw "Neovim config was not created" }
+          if (-not (Test-Path (Join-Path $targetHome ".config\wezterm\wezterm.lua"))) { throw "WezTerm config was not created" }
           if (-not (Get-Command chezmoi -ErrorAction SilentlyContinue)) { throw "chezmoi not found on PATH" }
 
   e2e-macos:
