@@ -4,6 +4,7 @@
 setup() {
   REPO_ROOT="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"
   BREWFILE_TMPL="$REPO_ROOT/home/Brewfile.tmpl"
+  BOOTSTRAP_TMPL="$REPO_ROOT/home/.chezmoiscripts/run_onchange_after_bootstrap.sh.tmpl"
   BREWFILE_RENDERED="$BATS_TEST_TMPDIR/Brewfile.rendered"
 }
 
@@ -16,6 +17,11 @@ render_brewfile_to_tmp() {
   run render_brewfile_template
   [ "$status" -eq 0 ]
   printf "%s\n" "$output" >"$BREWFILE_RENDERED"
+}
+
+render_bootstrap_template_ci() {
+  env CI=1 HOMEBREW_CI=1 chezmoi --source "$REPO_ROOT" execute-template \
+    --file "$BOOTSTRAP_TMPL"
 }
 
 @test "Brewfile template renders valid Ruby syntax" {
@@ -53,4 +59,24 @@ render_brewfile_to_tmp() {
   render_brewfile_to_tmp
   echo "$output" | grep -Fq 'brew "cbonsai" if (ENV["HOMEBREW_PRIVATE"]) && !(ENV["HOMEBREW_CODESPACES"])'
   echo "$output" | grep -Fq 'brew "tmux" if (OS.mac?) && !(ENV["HOMEBREW_CODESPACES"])'
+}
+
+@test "bootstrap template CI fallback still embeds neovim brew entry" {
+  if [ "${OS:-}" = "Windows_NT" ]; then
+    skip "unix bootstrap script is empty on Windows hosts"
+  fi
+  run render_bootstrap_template_ci
+  [ "$status" -eq 0 ]
+  echo "$output" | grep -Fq 'brew "neovim"'
+  echo "$output" | grep -Fq 'Rendered Brewfile is missing neovim entry.'
+}
+
+@test "bootstrap template supports pre-rendered Brewfile override" {
+  if [ "${OS:-}" = "Windows_NT" ]; then
+    skip "unix bootstrap script is empty on Windows hosts"
+  fi
+  run render_bootstrap_template_ci
+  [ "$status" -eq 0 ]
+  echo "$output" | grep -Fq 'if [ -n "${DOTFILES_BREWFILE_RENDERED:-}" ]'
+  echo "$output" | grep -Fq 'cp "$DOTFILES_BREWFILE_RENDERED" "$BREWFILE_RENDERED"'
 }

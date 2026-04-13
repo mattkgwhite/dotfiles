@@ -83,6 +83,7 @@ jobs:
           DOTFILES_RELEASE_TAG: "e2e-test"
         run: |
           chezmoi execute-template --file install.sh.tmpl > install.sh
+          chezmoi -S "$GITHUB_WORKSPACE/home" execute-template --file "$GITHUB_WORKSPACE/home/Brewfile.tmpl" > Brewfile.e2e
           chmod +x install.sh
 
       - name: Run install.sh
@@ -90,6 +91,7 @@ jobs:
           CI: "1"
           HOMEBREW_CI: "1"
           DOTFILES_CHEZMOI_EXCLUDE: externals
+          DOTFILES_BREWFILE_RENDERED: ${{ github.workspace }}/Brewfile.e2e
         run: ./install.sh
 
       - name: Verify E2E results
@@ -149,6 +151,7 @@ jobs:
           DOTFILES_RELEASE_TAG: "e2e-test"
         run: |
           chezmoi -S "$GITHUB_WORKSPACE" execute-template --file install.sh.tmpl > install.sh
+          chezmoi -S "$GITHUB_WORKSPACE/home" execute-template --file "$GITHUB_WORKSPACE/home/Brewfile.tmpl" > Brewfile.e2e
           chmod +x install.sh
 
       - name: Run install.sh
@@ -157,6 +160,7 @@ jobs:
           HOMEBREW_CI: "1"
           DOTFILES_SKIP_BITWARDEN: "1"
           DOTFILES_CHEZMOI_EXCLUDE: externals
+          DOTFILES_BREWFILE_RENDERED: ${{ github.workspace }}/Brewfile.e2e
         run: ./install.sh
 
       - name: Verify macOS E2E results

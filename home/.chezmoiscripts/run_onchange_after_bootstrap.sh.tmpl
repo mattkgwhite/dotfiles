@@ -50,9 +50,13 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 
 BREWFILE_RENDERED="$(mktemp)"
 trap 'rm -f "$BREWFILE_RENDERED"' EXIT INT TERM
-cat >"$BREWFILE_RENDERED" <<'EOF'
+if [ -n "${DOTFILES_BREWFILE_RENDERED:-}" ] && [ -f "${DOTFILES_BREWFILE_RENDERED}" ]; then
+  cp "$DOTFILES_BREWFILE_RENDERED" "$BREWFILE_RENDERED"
+else
+  cat >"$BREWFILE_RENDERED" <<'EOF'
 {{ includeTemplate "Brewfile.tmpl" . }}
 EOF
+fi
 if ! rg '^brew "neovim"' "$BREWFILE_RENDERED" >/dev/null 2>&1; then
   echo "Rendered Brewfile is missing neovim entry." >&2
   exit 1
