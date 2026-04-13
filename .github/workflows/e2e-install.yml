@@ -71,6 +71,11 @@ jobs:
           echo '{"type":1,"name":"work-domain","login":{"username":"test.example.com","password":""}}' \
             | bw encode | bw create item --session "$BW_SESSION" >/dev/null
 
+      - name: Link checkout as default chezmoi source
+        run: |
+          mkdir -p ~/.local/share
+          ln -s "$GITHUB_WORKSPACE" ~/.local/share/chezmoi
+
       - name: Render install.sh from template
         env:
           DOTFILES_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
