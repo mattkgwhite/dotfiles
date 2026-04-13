@@ -86,5 +86,8 @@ jobs:
           DOTFILES_CHEZMOI_EXCLUDE: scripts,externals
         run: ./install.sh
 
+      - name: Run scripts phase (same environment)
+        run: chezmoi apply --exclude=externals
+
       - name: Verify E2E results
         run: bats tests/e2e/install.bats
