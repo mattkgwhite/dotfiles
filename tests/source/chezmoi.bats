@@ -3,6 +3,12 @@
 
 setup() {
   REPO_ROOT="$(cd "$BATS_TEST_DIRNAME/../.." && pwd)"
+  # Native Windows tools (Ruby, chezmoi) don't understand MSYS paths (/c/...);
+  # convert to mixed-style (C:/...) when running under Git Bash.
+  if command -v cygpath >/dev/null 2>&1; then
+    REPO_ROOT="$(cygpath -m "$REPO_ROOT")"
+    BATS_TEST_TMPDIR="$(cygpath -m "$BATS_TEST_TMPDIR")"
+  fi
   SOURCE_DIR="$REPO_ROOT/home"
 }
 
@@ -188,13 +194,13 @@ EOF
     end
 
     merged = { "private" => false }
-    Dir.glob(ARGV[0]).sort.each do |file|
+    Dir.glob(File.join(ARGV[0], "*.yaml")).sort.each do |file|
       data = YAML.load_file(file) || {}
       merged = deep_merge(merged, data)
     end
 
     File.write(ARGV[1], JSON.generate(merged))
-  ' "$SOURCE_DIR/.chezmoidata/agent-permissions/*.yaml" "$merged_data_file"
+  ' "$SOURCE_DIR/.chezmoidata/agent-permissions" "$merged_data_file"
 
   output=$(render_template_with_override_data "$SOURCE_DIR/.chezmoitemplates/opencode-permission.tmpl" "$merged_data_file")
   echo "$output" | grep -Fq '"ls *": "allow"'
@@ -418,13 +424,13 @@ EOF
     end
 
     merged = { "private" => false }
-    Dir.glob(ARGV[0]).sort.each do |file|
+    Dir.glob(File.join(ARGV[0], "*.yaml")).sort.each do |file|
       data = YAML.load_file(file) || {}
       merged = deep_merge(merged, data)
     end
 
     File.write(ARGV[1], JSON.generate(merged))
-  ' "$SOURCE_DIR/.chezmoidata/mcps/*.yaml" "$merged_data_file"
+  ' "$SOURCE_DIR/.chezmoidata/mcps" "$merged_data_file"
 
   output=$(chezmoi --source "$REPO_ROOT" execute-template \
     --init \
@@ -479,13 +485,13 @@ EOF
     end
 
     merged = { "private" => false }
-    Dir.glob(ARGV[0]).sort.each do |file|
+    Dir.glob(File.join(ARGV[0], "*.yaml")).sort.each do |file|
       data = YAML.load_file(file) || {}
       merged = deep_merge(merged, data)
     end
 
     File.write(ARGV[1], JSON.generate(merged))
-  ' "$SOURCE_DIR/.chezmoidata/mcps/*.yaml" "$merged_data_file"
+  ' "$SOURCE_DIR/.chezmoidata/mcps" "$merged_data_file"
 
   output=$(chezmoi --source "$REPO_ROOT" execute-template \
     --init \
