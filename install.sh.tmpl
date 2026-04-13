@@ -169,6 +169,10 @@ else
 	set -- init --apply "${repo_url}"
 fi
 
+if [ -n "${DOTFILES_CHEZMOI_EXCLUDE:-}" ]; then
+	set -- "$@" "--exclude=${DOTFILES_CHEZMOI_EXCLUDE}"
+fi
+
 echo "Running 'chezmoi $*'" >&2
 # exec: replace current process with chezmoi
 exec "$chezmoi" "$@"
