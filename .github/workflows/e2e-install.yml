@@ -52,11 +52,7 @@ jobs:
         run: pip install cryptography
 
       - name: Install Bitwarden CLI
-        run: |
-          if ! command -v bw >/dev/null 2>&1; then
-            npm install -g @bitwarden/cli
-          fi
-          bw --version
+        run: mise use -g bitwarden-cli
 
       - name: Register test user on Vaultwarden
         run: |
