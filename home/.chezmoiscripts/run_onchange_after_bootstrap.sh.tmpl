@@ -50,7 +50,7 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 
 BREWFILE_RENDERED="$(mktemp)"
 trap 'rm -f "$BREWFILE_RENDERED"' EXIT INT TERM
-chezmoi execute-template --file "$CHEZMOI_SOURCE_DIR/Brewfile.tmpl" >"$BREWFILE_RENDERED"
+chezmoi --source "$CHEZMOI_SOURCE_DIR" execute-template --file "$CHEZMOI_SOURCE_DIR/Brewfile.tmpl" >"$BREWFILE_RENDERED"
 if ! rg '^brew "neovim"' "$BREWFILE_RENDERED" >/dev/null 2>&1; then
   echo "Rendered Brewfile is missing neovim entry." >&2
   exit 1

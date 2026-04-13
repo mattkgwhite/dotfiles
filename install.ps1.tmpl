@@ -132,13 +132,23 @@ if ($skipBitwarden) {
 # If the script is running from a local clone, use that as the source.
 # Otherwise (e.g. irm | iex), let chezmoi clone from GitHub into the default location.
 $defaultSourceDir = "$env:USERPROFILE\.local\share\chezmoi"
+$excludeArg = $null
+if (-not [string]::IsNullOrWhiteSpace($env:DOTFILES_CHEZMOI_EXCLUDE)) {
+    $excludeArg = "--exclude=$($env:DOTFILES_CHEZMOI_EXCLUDE)"
+}
 if ($PSScriptRoot -and (Test-Path "$PSScriptRoot\.chezmoiroot")) {
     $sourceDir = $PSScriptRoot
     Write-Host "Applying chezmoi dotfiles from $sourceDir..." -ForegroundColor Cyan
-    & $chezmoiPath init --apply --source="$sourceDir"
+    $initArgs = @("init", "--apply")
+    if ($excludeArg) { $initArgs += $excludeArg }
+    $initArgs += "--source=$sourceDir"
+    & $chezmoiPath @initArgs
 } else {
     Write-Host "Applying chezmoi dotfiles from GitHub..." -ForegroundColor Cyan
-    & $chezmoiPath init --apply $repoUrl
+    $initArgs = @("init", "--apply")
+    if ($excludeArg) { $initArgs += $excludeArg }
+    $initArgs += $repoUrl
+    & $chezmoiPath @initArgs
     $sourceDir = $defaultSourceDir
 }
 if ($LASTEXITCODE -ne 0) {

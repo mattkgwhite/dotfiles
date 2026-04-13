@@ -53,7 +53,7 @@ setup() {
   local non_elevated
   non_elevated=$(grep -n '# --- Non-elevated' "$REPO_ROOT/install.ps1.tmpl" | head -1 | cut -d: -f1)
   local chezmoi_init
-  chezmoi_init=$(grep -vn '^\s*#' "$REPO_ROOT/install.ps1.tmpl" | grep 'init --apply' | head -1 | cut -d: -f1)
+  chezmoi_init=$(grep -n 'initArgs = @("init", "--apply")' "$REPO_ROOT/install.ps1.tmpl" | head -1 | cut -d: -f1)
   [ "$chezmoi_init" -gt "$non_elevated" ]
 }
 
@@ -71,7 +71,7 @@ setup() {
 @test "install.ps1: checks LASTEXITCODE after chezmoi init" {
   # LASTEXITCODE check must appear after chezmoi init --apply
   local chezmoi_init
-  chezmoi_init=$(grep -n 'init --apply' "$REPO_ROOT/install.ps1.tmpl" | tail -1 | cut -d: -f1)
+  chezmoi_init=$(grep -n '& \$chezmoiPath @initArgs' "$REPO_ROOT/install.ps1.tmpl" | tail -1 | cut -d: -f1)
   local exit_check
   exit_check=$(grep -n 'LASTEXITCODE' "$REPO_ROOT/install.ps1.tmpl" | tail -1 | cut -d: -f1)
   [ "$exit_check" -gt "$chezmoi_init" ]
