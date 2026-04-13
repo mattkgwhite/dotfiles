@@ -124,6 +124,10 @@ setup() {
   grep -q 'bw login' "$REPO_ROOT/install.sh.tmpl"
 }
 
+@test "install.sh: unlocks bw when vault is locked" {
+  grep -q 'bw unlock --passwordenv BW_PASSWORD --raw' "$REPO_ROOT/install.sh.tmpl"
+}
+
 @test "install.sh: skips bw setup when non-interactive unless forced" {
   grep -q '\[ ! -t 0 \] || \[ ! -t 1 \]' "$REPO_ROOT/install.sh.tmpl"
   grep -q 'DOTFILES_FORCE_BITWARDEN' "$REPO_ROOT/install.sh.tmpl"
