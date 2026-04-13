@@ -32,6 +32,11 @@ jobs:
           SIGNUPS_ALLOWED: "true"
           DOMAIN: "http://localhost:8222"
           LOG_LEVEL: "warn"
+        options: >-
+          --health-cmd "curl -sf http://localhost:80/alive || exit 1"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 15
     env:
       BW_SERVER: "http://localhost:8222"
       BW_EMAIL: "ci-test@dotfiles.local"
@@ -45,18 +50,6 @@ jobs:
 
       - name: Install dependencies
         run: pip install cryptography
-
-      - name: Wait for Vaultwarden
-        run: |
-          for i in $(seq 1 30); do
-            if curl -sf "$BW_SERVER/alive" >/dev/null 2>&1; then
-              echo "Vaultwarden is ready."
-              exit 0
-            fi
-            sleep 1
-          done
-          echo "Vaultwarden did not start in time."
-          exit 1
 
       - name: Install Bitwarden CLI
         run: |
