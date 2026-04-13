@@ -165,6 +165,9 @@ if (Get-Command mise -ErrorAction SilentlyContinue) {
     Write-Host "Running mise install..."
     mise trust
     mise install
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "mise install failed (exit code $LASTEXITCODE). Run 'mise install' manually after setup." -ForegroundColor Yellow
+    }
 }
 
 # Sync Neovim plugins
