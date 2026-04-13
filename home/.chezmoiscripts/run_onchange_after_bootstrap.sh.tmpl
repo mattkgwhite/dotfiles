@@ -50,12 +50,21 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 
 BREWFILE_RENDERED="$(mktemp)"
 trap 'rm -f "$BREWFILE_RENDERED"' EXIT INT TERM
-SOURCE_DIR="${CHEZMOI_SOURCE_DIR:-}"
-if [ -z "$SOURCE_DIR" ] || [ ! -f "$SOURCE_DIR/Brewfile.tmpl" ]; then
-  SOURCE_DIR="$(chezmoi source-path)"
-fi
-if [ ! -f "$SOURCE_DIR/Brewfile.tmpl" ]; then
-  echo "Cannot locate Brewfile.tmpl in chezmoi source (SOURCE_DIR=$SOURCE_DIR)." >&2
+SOURCE_HINT="${CHEZMOI_SOURCE_DIR:-}"
+SOURCE_PATH="$(chezmoi source-path)"
+SOURCE_DIR=""
+for candidate in "$SOURCE_HINT" "$SOURCE_PATH" "$SOURCE_PATH/home"; do
+  if [ -z "$candidate" ] || [ ! -f "$candidate/Brewfile.tmpl" ]; then
+    continue
+  fi
+  if chezmoi --source "$candidate" data | rg '"brew"' >/dev/null 2>&1; then
+    SOURCE_DIR="$candidate"
+    break
+  fi
+done
+
+if [ -z "$SOURCE_DIR" ]; then
+  echo "Cannot resolve chezmoi source for Brewfile rendering (hint=$SOURCE_HINT source-path=$SOURCE_PATH)." >&2
   exit 1
 fi
 
@@ -65,10 +74,14 @@ if ! rg '^brew "neovim"' "$BREWFILE_RENDERED" >/dev/null 2>&1; then
   exit 1
 fi
 
+if [ -n "${CI:-}" ]; then
+  export HOMEBREW_CI="${HOMEBREW_CI:-1}"
+fi
+
 if [ -n "${CODESPACES:-}" ]; then
   CODESPACES=1 brew bundle -q --file="$BREWFILE_RENDERED" || true
-elif [ -n "${CI:-}" ]; then
-  CI=1 brew bundle -q --no-upgrade --file="$BREWFILE_RENDERED"
+elif [ -n "${CI:-}" ] || [ -n "${HOMEBREW_CI:-}" ]; then
+  CI=1 HOMEBREW_CI=1 brew bundle -q --no-upgrade --file="$BREWFILE_RENDERED"
 elif [ -n "${PRIVATE:-}" ]; then
   PRIVATE=1 brew bundle -q --file="$BREWFILE_RENDERED"
 else
