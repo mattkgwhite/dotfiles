@@ -1,7 +1,6 @@
 {{ if eq .chezmoi.os "windows" -}}
 $ErrorActionPreference = "Stop"
-
-$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+{{ includeTemplate ".chezmoitemplates/windows-elevation.ps1.tmpl" . }}
 
 $elevatedScript = {
     $ErrorActionPreference = "Stop"
@@ -17,13 +16,9 @@ $elevatedScript = {
     }
 }
 
-if ($isAdmin) {
-    & $elevatedScript
-} else {
-    $scriptFile = "$env:TEMP\chezmoi-package-updates-elevated.ps1"
-    $elevatedScript.ToString() | Out-File $scriptFile -Encoding ascii
-    Write-Host "Elevating for package updates..."
-    Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptFile`"" -Wait
-    Remove-Item $scriptFile -ErrorAction SilentlyContinue
-}
+Invoke-ElevatedWithLog `
+    -Name "package-updates" `
+    -ScriptBlock $elevatedScript `
+    -StatusMessage "Elevating for package updates..." `
+    -IgnoreExitCode
 {{- end }}

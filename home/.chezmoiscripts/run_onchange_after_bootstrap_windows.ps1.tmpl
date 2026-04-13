@@ -37,10 +37,9 @@
 # {{ join " " $wingetPackages | sha256sum }}
 
 $ErrorActionPreference = "Stop"
+{{ includeTemplate ".chezmoitemplates/windows-elevation.ps1.tmpl" . }}
 
 # --- Elevated block: Chocolatey packages + WSL provisioning ---
-$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
 $elevatedScript = {
     $ErrorActionPreference = "Stop"
 
@@ -102,7 +101,7 @@ write_files:
 
 runcmd:
   - sudo -u $wslUser git clone {{ $dotfilesRepoUrl }} /home/$wslUser/.local/share/chezmoi
-  - sudo -u $wslUser bash -lc 'if ! command -v chezmoi >/dev/null 2>&1; then sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"; fi; PATH="$HOME/.local/bin:$PATH"; "$HOME/.local/bin/chezmoi" init --apply --source="$HOME/.local/share/chezmoi"'
+  - sudo -u $wslUser bash -lc 'if ! command -v chezmoi >/dev/null 2>&1; then sh -c "`$(curl -fsLS get.chezmoi.io)" -- -b "`$HOME/.local/bin"; fi; PATH="`$HOME/.local/bin:`$PATH"; DOTFILES_SKIP_BITWARDEN=1 "`$HOME/.local/bin/chezmoi" init --apply --source="`$HOME/.local/share/chezmoi" --exclude=externals -R never'
 "@
             [System.IO.File]::WriteAllText("$cloudInitDir\Ubuntu.user-data", $cloudConfig)
 
@@ -127,6 +126,24 @@ runcmd:
                 Write-Host "WSL provisioning complete." -ForegroundColor Green
             }
         } else {
+            $wslUser = $env:USERNAME.ToLower()
+            $wslUserExists = (wsl -d Ubuntu -- bash -lc "id -u $wslUser >/dev/null 2>&1 && echo yes || echo no" 2>$null) -match "yes"
+            if (-not $wslUserExists) {
+                Write-Host "WSL user '$wslUser' is missing in Ubuntu. Existing distro detected; skipping automatic user recreation." -ForegroundColor Yellow
+                Write-Host "To reprovision Ubuntu from scratch, run these commands in an elevated PowerShell session:" -ForegroundColor Yellow
+                Write-Host "  wsl --unregister Ubuntu" -ForegroundColor Yellow
+                Write-Host "  chezmoi apply" -ForegroundColor Yellow
+            }
+
+            # Ensure Ubuntu starts as the expected Windows-derived user.
+            wsl -d Ubuntu -- bash -lc @"
+if ! grep -q '^\[user\]' /etc/wsl.conf 2>/dev/null; then
+  printf '\n[user]\ndefault=$wslUser\n' | sudo tee -a /etc/wsl.conf >/dev/null
+elif ! grep -q '^default=$wslUser$' /etc/wsl.conf 2>/dev/null; then
+  sudo sed -i '/^\[user\]/,/^\[/ s/^default=.*/default=$wslUser/' /etc/wsl.conf
+fi
+"@
+
             Write-Host "Updating dotfiles in WSL..."
             wsl -d Ubuntu -- bash -lc '
               if [ ! -d ~/.local/share/chezmoi ]; then
@@ -136,21 +153,17 @@ runcmd:
               if ! command -v chezmoi >/dev/null 2>&1; then
                 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
               fi
-              PATH="$HOME/.local/bin:$PATH" ~/.local/bin/chezmoi init --apply --source="$HOME/.local/share/chezmoi"
+              PATH="$HOME/.local/bin:$PATH" DOTFILES_SKIP_BITWARDEN=1 ~/.local/bin/chezmoi init --apply --source="$HOME/.local/share/chezmoi" --exclude=externals -R never
             '
         }
     }
 }
 
-if ($isAdmin) {
-    & $elevatedScript
-} else {
-    $scriptFile = "$env:TEMP\chezmoi-bootstrap-elevated.ps1"
-    $elevatedScript.ToString() | Out-File $scriptFile -Encoding ascii
-    Write-Host "Elevating for package installation and WSL provisioning..."
-    Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptFile`"" -Wait
-    Remove-Item $scriptFile -ErrorAction SilentlyContinue
-}
+Invoke-ElevatedWithLog `
+    -Name "bootstrap" `
+    -ScriptBlock $elevatedScript `
+    -StatusMessage "Elevating for package installation and WSL provisioning..." `
+    -IgnoreExitCode
 
 # Refresh PATH so newly installed tools are available
 $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")

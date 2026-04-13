@@ -1,0 +1,72 @@
+{{- $dotfilesRepoUser := .profile.git.githubUser -}}
+{{- $dotfilesRepoName := .profile.git.githubRepo -}}
+{{- $dotfilesRepoUrl := printf "https://github.com/%s/%s" $dotfilesRepoUser $dotfilesRepoName -}}
+{{ if eq .chezmoi.os "windows" -}}
+$ErrorActionPreference = "Stop"
+{{ includeTemplate ".chezmoitemplates/windows-elevation.ps1.tmpl" . }}
+
+$elevatedScript = {
+    $ErrorActionPreference = "Stop"
+
+    if (-not (Get-Command wsl -ErrorAction SilentlyContinue)) {
+        Write-Host "Installing WSL..."
+        wsl --install --no-distribution
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "WSL install command failed (exit code $LASTEXITCODE). Reboot Windows, then run 'chezmoi apply' again." -ForegroundColor Yellow
+            return
+        }
+        Write-Host "WSL installed. A reboot may be required before WSL is available."
+    }
+
+    if (-not (Get-Command wsl -ErrorAction SilentlyContinue)) {
+        Write-Host "WSL is not available yet. Reboot Windows, then run 'chezmoi apply' again." -ForegroundColor Yellow
+        return
+    }
+
+    $distros = wsl --list --quiet 2>$null
+    if ($distros -contains "Ubuntu") {
+        Write-Host "WSL Ubuntu already installed; skipping provisioning."
+        return
+    }
+
+    $wslUser = $env:USERNAME.ToLower()
+    $cloudInitDir = "$env:USERPROFILE\.cloud-init"
+    if (-not (Test-Path $cloudInitDir)) { New-Item -ItemType Directory -Path $cloudInitDir | Out-Null }
+    $cloudConfig = @"
+#cloud-config
+users:
+- name: $wslUser
+  groups: [adm,dialout,cdrom,floppy,sudo,audio,dip,video,plugdev,netdev]
+  sudo: ALL=(ALL) NOPASSWD:ALL
+  shell: /bin/bash
+
+write_files:
+- path: /etc/wsl.conf
+  append: true
+  content: |
+    [user]
+    default=$wslUser
+
+runcmd:
+  - sudo -u $wslUser git clone {{ $dotfilesRepoUrl }} /home/$wslUser/.local/share/chezmoi
+  - sudo -u $wslUser bash -lc 'if ! command -v chezmoi >/dev/null 2>&1; then sh -c "`$(curl -fsLS get.chezmoi.io)" -- -b "`$HOME/.local/bin"; fi; PATH="`$HOME/.local/bin:`$PATH"; DOTFILES_SKIP_BITWARDEN=1 "`$HOME/.local/bin/chezmoi" init --apply --source="`$HOME/.local/share/chezmoi" --exclude=externals -R never'
+"@
+    [System.IO.File]::WriteAllText("$cloudInitDir\Ubuntu.user-data", $cloudConfig)
+
+    Write-Host "Installing Ubuntu WSL distribution..."
+    wsl --install Ubuntu --no-launch
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Ubuntu installation failed (exit code $LASTEXITCODE). Reboot Windows, then run 'chezmoi apply' again." -ForegroundColor Yellow
+        return
+    }
+
+    Write-Host "Launching Ubuntu for cloud-init provisioning..."
+    wsl -d Ubuntu -- true
+}
+
+Invoke-ElevatedWithLog `
+    -Name "wsl-ensure" `
+    -ScriptBlock $elevatedScript `
+    -StatusMessage "Elevating for WSL provisioning..." `
+    -FailureMessage "Elevated WSL provisioning failed"
+{{- end }}

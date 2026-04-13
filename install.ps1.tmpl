@@ -7,6 +7,7 @@ param()
 $repoUrl = "{{ $repoURL }}"
 
 $ErrorActionPreference = "Stop"
+{{ includeTemplate ".chezmoitemplates/windows-elevation.ps1.tmpl" . }}
 
 # --- Elevated block: install system packages via Chocolatey ---
 # Only choco installs need admin. Everything else (bw login, chezmoi init)
@@ -18,7 +19,7 @@ $elevatedScript = {
         if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
             Write-Host "Installing Chocolatey..." -ForegroundColor Cyan
             [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-            $chocoBootstrapPath = Join-Path $env:TEMP "chocolatey-install.ps1"
+            $chocoBootstrapPath = Join-Path $env:TEMP "chocolatey-install-$([Guid]::NewGuid().ToString("N")).ps1"
             Invoke-WebRequest -Uri "https://community.chocolatey.org/install.ps1" -OutFile $chocoBootstrapPath
             $chocoResult = Start-Process powershell -ArgumentList @(
                 "-NoProfile",
@@ -66,19 +67,11 @@ $elevatedScript = {
     }
 }
 
-$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-if ($isAdmin) {
-    & $elevatedScript
-} else {
-    $scriptFile = Join-Path $env:TEMP "chezmoi-install-elevated.ps1"
-    $elevatedScript.ToString() | Out-File $scriptFile -Encoding ascii
-    Write-Host "Elevating for package installation..." -ForegroundColor Cyan
-    $proc = Start-Process powershell -Verb RunAs -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptFile`"" -Wait -PassThru
-    Remove-Item $scriptFile -ErrorAction SilentlyContinue
-    if ($proc.ExitCode -ne 0) {
-        throw "Elevated package installation failed (exit code $($proc.ExitCode)). Re-run the script to retry."
-    }
-}
+Invoke-ElevatedWithLog `
+    -Name "install" `
+    -ScriptBlock $elevatedScript `
+    -StatusMessage "Elevating for package installation..." `
+    -FailureMessage "Elevated package installation failed. Re-run the script to retry"
 
 # --- Non-elevated: bw login, chezmoi init, git config ---
 # Runs in the caller's original window so interactive prompts are visible
@@ -94,17 +87,32 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     if ($found) { $env:PATH = "$found;$env:PATH" }
 }
 
-# Log in to Bitwarden if unauthenticated (chezmoi manages the session)
-$bwStatus = (bw status 2>$null | ConvertFrom-Json).status
-if ($bwStatus -eq "unauthenticated") {
-    Write-Host "Bitwarden vault is not logged in. Please log in:" -ForegroundColor Yellow
-    bw login
-    if ($LASTEXITCODE -ne 0) { throw "Bitwarden login failed." }
+$forceBitwarden = -not [string]::IsNullOrWhiteSpace($env:DOTFILES_FORCE_BITWARDEN)
+$skipBitwarden = $env:DOTFILES_SKIP_BITWARDEN -eq "1"
+$interactiveSession = $false
+try {
+    $interactiveSession = ($Host.Name -eq "ConsoleHost") -and (-not [Console]::IsInputRedirected) -and (-not [Console]::IsOutputRedirected)
+} catch {
+    $interactiveSession = $false
 }
 
-Write-Host "Syncing Bitwarden vault..." -ForegroundColor Cyan
-bw sync
-if ($LASTEXITCODE -ne 0) { throw "Bitwarden sync failed." }
+if ($skipBitwarden) {
+    Write-Host "Skipping Bitwarden setup: DOTFILES_SKIP_BITWARDEN=1." -ForegroundColor Yellow
+} elseif ($forceBitwarden -or $interactiveSession) {
+    # Log in to Bitwarden if unauthenticated (chezmoi manages the session)
+    $bwStatus = (bw status 2>$null | ConvertFrom-Json).status
+    if ($bwStatus -eq "unauthenticated") {
+        Write-Host "Bitwarden vault is not logged in. Please log in:" -ForegroundColor Yellow
+        bw login
+        if ($LASTEXITCODE -ne 0) { throw "Bitwarden login failed." }
+    }
+
+    Write-Host "Syncing Bitwarden vault..." -ForegroundColor Cyan
+    bw sync
+    if ($LASTEXITCODE -ne 0) { throw "Bitwarden sync failed." }
+} else {
+    Write-Host "Skipping Bitwarden setup: non-interactive session detected. Set DOTFILES_FORCE_BITWARDEN=1 to force." -ForegroundColor Yellow
+}
 
 # Initialise and apply chezmoi dotfiles.
 # If the script is running from a local clone, use that as the source.

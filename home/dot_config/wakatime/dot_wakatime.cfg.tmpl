@@ -1,4 +1,5 @@
 [settings]
-{{- if not .codespaces }}
+{{- $skipBitwarden := eq (env "DOTFILES_SKIP_BITWARDEN") "1" -}}
+{{- if and (not .codespaces) (not $skipBitwarden) }}
 api_key = {{ (bitwarden "item" "wakatime-api-key").login.password | quote }}
 {{- end }}

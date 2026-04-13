@@ -135,26 +135,32 @@ fi
 
 # Ensure Bitwarden CLI is available before chezmoi init (templates call bitwarden for secrets)
 if [ -z "${CODESPACES:-}" ]; then
-	if ! command -v bw >/dev/null 2>&1; then
-		if command -v brew >/dev/null 2>&1; then
-			echo "Installing Bitwarden CLI via Homebrew" >&2
-			brew install bitwarden-cli
-		else
-			echo "Bitwarden CLI (bw) is required but not installed and Homebrew is not available." >&2
-			echo "Install it manually: https://bitwarden.com/help/cli/" >&2
-			exit 1
+	if [ -z "${DOTFILES_FORCE_BITWARDEN:-}" ] && { [ ! -t 0 ] || [ ! -t 1 ]; }; then
+		echo "Skipping Bitwarden setup: non-interactive session detected. Set DOTFILES_FORCE_BITWARDEN=1 to force." >&2
+	elif [ "${DOTFILES_SKIP_BITWARDEN:-}" = "1" ]; then
+		echo "Skipping Bitwarden setup: DOTFILES_SKIP_BITWARDEN=1." >&2
+	else
+		if ! command -v bw >/dev/null 2>&1; then
+			if command -v brew >/dev/null 2>&1; then
+				echo "Installing Bitwarden CLI via Homebrew" >&2
+				brew install bitwarden-cli
+			else
+				echo "Bitwarden CLI (bw) is required but not installed and Homebrew is not available." >&2
+				echo "Install it manually: https://bitwarden.com/help/cli/" >&2
+				exit 1
+			fi
 		fi
-	fi
 
-	# Log in to Bitwarden if unauthenticated (chezmoi manages the session)
-	bw_status="$(bw status 2>/dev/null | sed -n 's/.*"status":"\([^"]*\)".*/\1/p')"
-	if [ "$bw_status" = "unauthenticated" ]; then
-		echo "Bitwarden vault is not logged in. Please log in:" >&2
-		bw login </dev/tty
-	fi
+		# Log in to Bitwarden if unauthenticated (chezmoi manages the session)
+		bw_status="$(bw status 2>/dev/null | sed -n 's/.*"status":"\([^"]*\)".*/\1/p')"
+		if [ "$bw_status" = "unauthenticated" ]; then
+			echo "Bitwarden vault is not logged in. Please log in:" >&2
+			bw login </dev/tty
+		fi
 
-	echo "Syncing Bitwarden vault..." >&2
-	bw sync
+		echo "Syncing Bitwarden vault..." >&2
+		bw sync
+	fi
 fi
 
 # POSIX way to get script's dir: https://stackoverflow.com/a/29834779/12156188

@@ -89,6 +89,12 @@ setup() {
   grep -q 'bw status' "$REPO_ROOT/install.ps1.tmpl"
 }
 
+@test "install.ps1: skips bw setup when non-interactive unless forced" {
+  grep -q 'ConsoleHost' "$REPO_ROOT/install.ps1.tmpl"
+  grep -q 'DOTFILES_FORCE_BITWARDEN' "$REPO_ROOT/install.ps1.tmpl"
+  grep -q 'Skipping Bitwarden setup: non-interactive session detected' "$REPO_ROOT/install.ps1.tmpl"
+}
+
 @test "install.ps1: prompts bw login when unauthenticated" {
   grep -q 'unauthenticated' "$REPO_ROOT/install.ps1.tmpl"
   grep -q 'bw login' "$REPO_ROOT/install.ps1.tmpl"
@@ -116,6 +122,12 @@ setup() {
 @test "install.sh: checks bw status and prompts login" {
   grep -q 'bw status' "$REPO_ROOT/install.sh.tmpl"
   grep -q 'bw login' "$REPO_ROOT/install.sh.tmpl"
+}
+
+@test "install.sh: skips bw setup when non-interactive unless forced" {
+  grep -q '\[ ! -t 0 \] || \[ ! -t 1 \]' "$REPO_ROOT/install.sh.tmpl"
+  grep -q 'DOTFILES_FORCE_BITWARDEN' "$REPO_ROOT/install.sh.tmpl"
+  grep -q 'Skipping Bitwarden setup: non-interactive session detected' "$REPO_ROOT/install.sh.tmpl"
 }
 
 @test "install.sh: syncs bw vault after login" {

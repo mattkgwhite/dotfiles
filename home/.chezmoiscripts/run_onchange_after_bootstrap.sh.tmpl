@@ -50,15 +50,15 @@ BREWFILE_RENDERED="$(mktemp)"
 trap 'rm -f "$BREWFILE_RENDERED"' EXIT INT TERM
 chezmoi execute-template --file "$CHEZMOI_SOURCE_DIR/Brewfile.tmpl" >"$BREWFILE_RENDERED"
 
-{{- if .codespaces }}
-CODESPACES=1 brew bundle -q --file="$BREWFILE_RENDERED" || true
-{{- else if .ci }}
-CI=1 brew bundle -q --file="$BREWFILE_RENDERED"
-{{- else if .private }}
-PRIVATE=1 brew bundle -q --file="$BREWFILE_RENDERED"
-{{- else }}
-brew bundle -q --file="$BREWFILE_RENDERED"
-{{- end }}
+if [ -n "${CODESPACES:-}" ]; then
+  CODESPACES=1 brew bundle -q --file="$BREWFILE_RENDERED" || true
+elif [ -n "${CI:-}" ]; then
+  CI=1 brew bundle -q --file="$BREWFILE_RENDERED"
+elif [ -n "${PRIVATE:-}" ]; then
+  PRIVATE=1 brew bundle -q --file="$BREWFILE_RENDERED"
+else
+  brew bundle -q --file="$BREWFILE_RENDERED"
+fi
 
 # Prewarm antidote plugin cache so the first shell launch doesn't clone everything
 zsh -c '

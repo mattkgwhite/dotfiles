@@ -128,6 +128,7 @@ Deleting a file from the chezmoi source does **not** remove it from the target (
 - **README "What you get" table** – The tool table in `README.md` is sorted by category: shell/prompt, terminal emulators, multiplexer, editor, dev tools, version control, security, package/runtime management, then platform-specific utilities. When adding or removing a managed tool, update this table and preserve the sort order. Platform columns (macOS, Linux, Windows, Codespaces) must reflect what `.chezmoiignore` actually deploys.
 - **Install script templates** – `install.sh.tmpl` and `install.ps1.tmpl` are the source of truth for release installers. The release workflow renders `install.sh` and `install.ps1` from templates with repository/image/tag values before uploading release assets.
 - **Template readability** – Keep chezmoi template source files readable: use clear indentation, split complex logic into understandable blocks, and avoid flattening everything to the left margin with aggressive whitespace trimming unless required for output correctness.
+- **Bitwarden in automation** – Set `DOTFILES_SKIP_BITWARDEN=1` when running `chezmoi apply` in non-interactive/agent contexts. Templates that use the `bitwarden` function must honor this variable to avoid `bw` prompts/failures during automated runs.
 
 ---
 

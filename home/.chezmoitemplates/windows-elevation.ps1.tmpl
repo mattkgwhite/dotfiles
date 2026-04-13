@@ -1,0 +1,66 @@
+function Invoke-ElevatedWithLog {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+        [Parameter(Mandatory = $true)]
+        [scriptblock]$ScriptBlock,
+        [Parameter(Mandatory = $true)]
+        [string]$StatusMessage,
+        [string]$FailureMessage = "",
+        [switch]$IgnoreExitCode
+    )
+
+    $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    if ($isAdmin) {
+        & $ScriptBlock
+        return
+    }
+
+    $runId = [Guid]::NewGuid().ToString("N")
+    $safeName = $Name -replace '[^A-Za-z0-9_-]', '-'
+    $payloadFile = Join-Path $env:TEMP "chezmoi-$safeName-elevated-payload-$runId.ps1"
+    $wrapperFile = Join-Path $env:TEMP "chezmoi-$safeName-elevated-wrapper-$runId.ps1"
+    $transcriptFile = Join-Path $env:TEMP "chezmoi-$safeName-elevated-$runId.log"
+
+    try {
+        $ScriptBlock.ToString() | Out-File $payloadFile -Encoding ascii
+@"
+`$ErrorActionPreference = "Stop"
+`$transcriptStarted = `$false
+try {
+    Start-Transcript -Path "$transcriptFile" -Force | Out-Null
+    `$transcriptStarted = `$true
+} catch {
+    # Continue even if transcript cannot start.
+}
+
+try {
+    & "$payloadFile"
+} finally {
+    if (`$transcriptStarted) {
+        try {
+            Stop-Transcript | Out-Null
+        } catch {
+            # Ignore transcript stop errors.
+        }
+    }
+}
+"@ | Out-File $wrapperFile -Encoding ascii
+        Write-Host $StatusMessage
+        $proc = Start-Process powershell -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$wrapperFile`"" -Wait -PassThru
+        if (Test-Path $transcriptFile) {
+            Get-Content $transcriptFile | ForEach-Object { Write-Host $_ }
+        }
+
+        if ((-not $IgnoreExitCode) -and $proc.ExitCode -ne 0) {
+            if ([string]::IsNullOrWhiteSpace($FailureMessage)) {
+                throw "Elevated command failed (exit code $($proc.ExitCode))."
+            }
+            throw "$FailureMessage (exit code $($proc.ExitCode))."
+        }
+    } finally {
+        Remove-Item $wrapperFile -ErrorAction SilentlyContinue
+        Remove-Item $payloadFile -ErrorAction SilentlyContinue
+        Remove-Item $transcriptFile -ErrorAction SilentlyContinue
+    }
+}
