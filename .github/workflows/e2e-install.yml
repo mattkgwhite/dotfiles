@@ -49,9 +49,6 @@ jobs:
         with:
           install: true
 
-      - name: Install dependencies
-        run: pip install cryptography
-
       - name: Register test user on Vaultwarden
         run: |
           python3 tests/e2e/seed-vaultwarden.py \
