@@ -94,6 +94,7 @@ jobs:
         env:
           CI: "1"
           HOMEBREW_CI: "1"
+          DOTFILES_SKIP_BITWARDEN: "1"
           DOTFILES_CHEZMOI_EXCLUDE: externals
           DOTFILES_BREWFILE_RENDERED: ${{ github.workspace }}/Brewfile.e2e
         run: ./install.sh
