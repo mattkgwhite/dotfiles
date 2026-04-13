@@ -8,7 +8,7 @@ setup() {
 }
 
 render_brewfile_template() {
-  chezmoi --source "$REPO_ROOT" execute-template \
+  env CI= chezmoi --source "$REPO_ROOT" execute-template \
     --file "$BREWFILE_TMPL"
 }
 

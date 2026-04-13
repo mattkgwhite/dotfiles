@@ -16,6 +16,7 @@ render_template() {
   local template_path="$1"
   chezmoi --source "$REPO_ROOT" execute-template --init \
     --promptBool "codespaces=false" \
+    --promptBool "ci=false" \
     --promptBool "private=false" \
     --file "$template_path"
 }
@@ -25,6 +26,7 @@ render_template_with_override_data() {
   local data_file="$2"
   chezmoi --source "$REPO_ROOT" execute-template --init \
     --promptBool "codespaces=false" \
+    --promptBool "ci=false" \
     --promptBool "private=false" \
     --override-data-file "$data_file" \
     --file "$template_path"
