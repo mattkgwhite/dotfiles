@@ -9,6 +9,7 @@ brew:
           name: bash
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: bat # better cat
         - type: brew
@@ -17,42 +18,51 @@ brew:
           name: colima
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: colordiff
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: docker
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: docker-compose
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: eza # better ls
         - type: brew
           name: fd # nvim mason dep
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: fzf # fuzzy finder
         - type: brew
           name: gh
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: git
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: htop
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: kubernetes-cli
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: mas # mac app store
           conditions:
@@ -61,24 +71,30 @@ brew:
           name: mise # mise-en-place
         - type: brew
           name: nmap
+          conditions:
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: anomalyco/tap/opencode
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: parallel
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: ripgrep
         - type: brew
           name: sevenzip
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: timg # terminal image/video viewer (kitty graphics)
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: tree
         - type: brew
@@ -87,16 +103,21 @@ brew:
           name: viu # terminal image viewer (kitty graphics)
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: wakatime-cli
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: watch
+          conditions:
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: wget
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
         - type: brew
           name: zsh
           conditions:
@@ -180,3 +201,4 @@ brew:
           name: anomalyco/tap
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: CI, op: unset }
