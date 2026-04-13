@@ -83,7 +83,7 @@ jobs:
           DOTFILES_RELEASE_TAG: "e2e-test"
         run: |
           chezmoi execute-template --file install.sh.tmpl > install.sh
-          chezmoi -S "$GITHUB_WORKSPACE/home" execute-template --init --override-data '{"codespaces":false}' --file "$GITHUB_WORKSPACE/home/Brewfile.tmpl" > Brewfile.e2e
+          chezmoi -S "$GITHUB_WORKSPACE/home" execute-template --file "$GITHUB_WORKSPACE/home/Brewfile.tmpl" > Brewfile.e2e
           grep -E '^brew "neovim"' Brewfile.e2e
           chmod +x install.sh
 
@@ -152,7 +152,7 @@ jobs:
           DOTFILES_RELEASE_TAG: "e2e-test"
         run: |
           chezmoi -S "$GITHUB_WORKSPACE" execute-template --file install.sh.tmpl > install.sh
-          chezmoi -S "$GITHUB_WORKSPACE/home" execute-template --init --override-data '{"codespaces":false}' --file "$GITHUB_WORKSPACE/home/Brewfile.tmpl" > Brewfile.e2e
+          chezmoi -S "$GITHUB_WORKSPACE/home" execute-template --file "$GITHUB_WORKSPACE/home/Brewfile.tmpl" > Brewfile.e2e
           grep -E '^brew "neovim"' Brewfile.e2e
           chmod +x install.sh
 
