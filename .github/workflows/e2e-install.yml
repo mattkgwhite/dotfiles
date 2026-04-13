@@ -64,6 +64,8 @@ jobs:
 
       - name: Seed Bitwarden vault with test items
         run: |
+          BW_SESSION="$(bw unlock --passwordenv BW_PASSWORD --raw)"
+
           echo '{"type":1,"name":"wakatime-api-key","login":{"username":"","password":"test-wakatime-key-12345"}}' \
             | bw encode | bw create item --session "$BW_SESSION" >/dev/null
 
