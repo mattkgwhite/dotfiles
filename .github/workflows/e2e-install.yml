@@ -1,0 +1,120 @@
+---
+name: E2E install
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "install.sh.tmpl"
+      - "install.ps1.tmpl"
+      - "home/.chezmoi.toml.tmpl"
+      - "home/.chezmoiscripts/**"
+      - "home/.chezmoidata/**"
+      - "home/.chezmoitemplates/**"
+      - "home/dot_config/wakatime/**"
+      - "tests/e2e/**"
+      - ".github/workflows/e2e-install.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e-linux:
+    name: E2E install (Linux)
+    runs-on: ubuntu-24.04
+    services:
+      vaultwarden:
+        image: vaultwarden/server:latest
+        ports:
+          - 8222:80
+        env:
+          SIGNUPS_ALLOWED: "true"
+          DOMAIN: "http://localhost:8222"
+          LOG_LEVEL: "warn"
+    env:
+      BW_SERVER: "http://localhost:8222"
+      BW_EMAIL: "ci-test@dotfiles.local"
+      BW_PASSWORD: "CiTestPassword123!"
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4
+        with:
+          install: true
+
+      - name: Install dependencies
+        run: pip install cryptography
+
+      - name: Wait for Vaultwarden
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf "$BW_SERVER/alive" >/dev/null 2>&1; then
+              echo "Vaultwarden is ready."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Vaultwarden did not start in time."
+          exit 1
+
+      - name: Install Bitwarden CLI
+        run: |
+          if ! command -v bw >/dev/null 2>&1; then
+            npm install -g @bitwarden/cli
+          fi
+          bw --version
+
+      - name: Register test user on Vaultwarden
+        run: |
+          python3 tests/e2e/seed-vaultwarden.py \
+            "$BW_SERVER" "$BW_EMAIL" "$BW_PASSWORD" '[]'
+
+      - name: Configure and login to Bitwarden
+        run: |
+          bw config server "$BW_SERVER"
+          export BW_SESSION=$(bw login "$BW_EMAIL" "$BW_PASSWORD" --raw)
+          echo "BW_SESSION=$BW_SESSION" >> "$GITHUB_ENV"
+
+      - name: Seed Bitwarden vault with test items
+        run: |
+          echo '{"type":1,"name":"wakatime-api-key","login":{"username":"","password":"test-wakatime-key-12345"}}' \
+            | bw encode | bw create item --session "$BW_SESSION" >/dev/null
+
+          echo '{"type":1,"name":"work-domain","login":{"username":"test.example.com","password":""}}' \
+            | bw encode | bw create item --session "$BW_SESSION" >/dev/null
+
+          echo "Vault items seeded."
+
+      - name: Run chezmoi init and apply
+        run: |
+          chezmoi init --source="$GITHUB_WORKSPACE"
+          chezmoi apply --exclude=scripts,externals
+
+      - name: Verify Bitwarden secrets were resolved
+        run: |
+          wakatime_cfg="$HOME/.config/wakatime/.wakatime.cfg"
+          if [ ! -f "$wakatime_cfg" ]; then
+            echo "FAIL: $wakatime_cfg not created"
+            exit 1
+          fi
+          if ! grep -q "test-wakatime-key-12345" "$wakatime_cfg"; then
+            echo "FAIL: wakatime config does not contain expected API key"
+            echo "Contents:"
+            cat "$wakatime_cfg"
+            exit 1
+          fi
+          echo "PASS: Bitwarden secrets resolved correctly."
+
+      - name: Verify key config files exist
+        run: |
+          for f in \
+            "$HOME/.gitconfig" \
+            "$HOME/.config/nvim/init.lua" \
+          ; do
+            if [ ! -f "$f" ]; then
+              echo "FAIL: $f not created"
+              exit 1
+            fi
+          done
+          echo "PASS: Key config files exist."
