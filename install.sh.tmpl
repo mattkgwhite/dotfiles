@@ -3,9 +3,6 @@
 {{- $attestationRepo := env "DOTFILES_ATTESTATION_REPO" -}}
 {{- $releaseTag := env "DOTFILES_RELEASE_TAG" -}}
 #!/bin/sh
-# Forks: update repo_url below to point at your fork.
-#
-# Render source: install.sh.tmpl
 
 # -e: exit on error
 # -u: exit on unset variables
@@ -133,6 +130,27 @@ if ! chezmoi="$(command -v chezmoi)"; then
 			unset bin_dir
 		fi
 		unset install_via_script
+	fi
+fi
+
+# Ensure Bitwarden CLI is available before chezmoi init (templates call bitwarden for secrets)
+if [ -z "${CODESPACES:-}" ]; then
+	if ! command -v bw >/dev/null 2>&1; then
+		if command -v brew >/dev/null 2>&1; then
+			echo "Installing Bitwarden CLI via Homebrew" >&2
+			brew install bitwarden-cli
+		else
+			echo "Bitwarden CLI (bw) is required but not installed and Homebrew is not available." >&2
+			echo "Install it manually: https://bitwarden.com/help/cli/" >&2
+			exit 1
+		fi
+	fi
+
+	# Log in to Bitwarden if unauthenticated (chezmoi manages the session)
+	bw_status="$(bw status 2>/dev/null | sed -n 's/.*"status":"\([^"]*\)".*/\1/p')"
+	if [ "$bw_status" = "unauthenticated" ]; then
+		echo "Bitwarden vault is not logged in. Please log in:" >&2
+		bw login </dev/tty
 	fi
 fi
 

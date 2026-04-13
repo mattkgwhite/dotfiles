@@ -1,9 +1,6 @@
 {{- $repoURL := env "DOTFILES_REPO_URL" -}}
 {{- $releaseTag := env "DOTFILES_RELEASE_TAG" -}}
 # install.ps1 — Bootstrap chezmoi dotfiles on Windows.
-# Forks: update $repoUrl below to point at your fork.
-#
-# Render source: install.ps1.tmpl
 
 [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '', Justification = 'Install script uses Write-Host for coloured terminal output')]
 param()
@@ -72,11 +69,22 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
     }
 }
 
-# Ensure mise is available before chezmoi init (git credential helper uses `mise x -- gh`)
-if (-not (Get-Command mise -ErrorAction SilentlyContinue)) {
-    Write-Host "Installing mise..." -ForegroundColor Cyan
-    choco install mise -y --no-progress
+# Install remaining prerequisites that chezmoi init needs
+$prereqs = @()
+if (-not (Get-Command mise -ErrorAction SilentlyContinue)) { $prereqs += "mise" }
+if (-not (Get-Command bw -ErrorAction SilentlyContinue)) { $prereqs += "bitwarden-cli" }
+if ($prereqs.Count -gt 0) {
+    Write-Host "Installing $($prereqs -join ', ')..." -ForegroundColor Cyan
+    choco install @prereqs -y --no-progress
     $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")
+}
+
+# Log in to Bitwarden if unauthenticated (chezmoi manages the session)
+$bwStatus = (bw status 2>$null | ConvertFrom-Json).status
+if ($bwStatus -eq "unauthenticated") {
+    Write-Host "Bitwarden vault is not logged in. Please log in:" -ForegroundColor Yellow
+    bw login
+    if ($LASTEXITCODE -ne 0) { throw "Bitwarden login failed." }
 }
 
 # Initialise and apply chezmoi dotfiles.
