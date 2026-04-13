@@ -24,7 +24,7 @@ jobs:
           HOMEBREW_CI: "1"
         run: |
           chezmoi -S "$GITHUB_WORKSPACE/home" execute-template --file "$GITHUB_WORKSPACE/home/Brewfile.tmpl" > Brewfile.ci
-          rg '^brew "neovim"' Brewfile.ci
+          grep -E '^brew "neovim"' Brewfile.ci
 
       - name: Render bootstrap script and assert embedded neovim entry
         env:
@@ -32,5 +32,5 @@ jobs:
           HOMEBREW_CI: "1"
         run: |
           chezmoi -S "$GITHUB_WORKSPACE" execute-template --file "$GITHUB_WORKSPACE/home/.chezmoiscripts/run_onchange_after_bootstrap.sh.tmpl" > bootstrap.ci.sh
-          rg 'DOTFILES_BREWFILE_RENDERED' bootstrap.ci.sh
-          rg '^brew "neovim"' bootstrap.ci.sh
+          grep -E 'DOTFILES_BREWFILE_RENDERED' bootstrap.ci.sh
+          grep -E '^brew "neovim"' bootstrap.ci.sh
