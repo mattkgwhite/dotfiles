@@ -94,3 +94,74 @@ jobs:
 
       - name: Verify E2E results
         run: bats tests/e2e/install.bats
+
+  e2e-windows:
+    name: E2E install (Windows)
+    needs: e2e-linux
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4
+        with:
+          install: true
+
+      - name: Render install.ps1 from template
+        env:
+          DOTFILES_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          DOTFILES_IMAGE_NAME: "unused"
+          DOTFILES_ATTESTATION_REPO: ${{ github.repository }}
+          DOTFILES_RELEASE_TAG: "e2e-test"
+        shell: pwsh
+        run: |
+          chezmoi -S "$env:GITHUB_WORKSPACE" execute-template --file install.ps1.tmpl | Out-File install.ps1 -Encoding ascii
+
+      - name: Run install.ps1
+        env:
+          DOTFILES_SKIP_BITWARDEN: "1"
+          DOTFILES_CHEZMOI_EXCLUDE: externals
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
+
+      - name: Verify Windows E2E results
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "$env:USERPROFILE\.gitconfig")) { throw ".gitconfig was not created" }
+          if (-not (Test-Path "$env:USERPROFILE\.config\nvim\init.lua")) { throw "Neovim config was not created" }
+          if (-not (Get-Command chezmoi -ErrorAction SilentlyContinue)) { throw "chezmoi not found on PATH" }
+
+  e2e-macos:
+    name: E2E install (macOS)
+    needs: e2e-windows
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4
+        with:
+          install: true
+
+      - name: Render install.sh from template
+        env:
+          DOTFILES_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          DOTFILES_IMAGE_NAME: "unused"
+          DOTFILES_ATTESTATION_REPO: ${{ github.repository }}
+          DOTFILES_RELEASE_TAG: "e2e-test"
+        run: |
+          chezmoi -S "$GITHUB_WORKSPACE" execute-template --file install.sh.tmpl > install.sh
+          chmod +x install.sh
+
+      - name: Run install.sh
+        env:
+          CI: "1"
+          HOMEBREW_CI: "1"
+          DOTFILES_SKIP_BITWARDEN: "1"
+          DOTFILES_CHEZMOI_EXCLUDE: externals
+        run: ./install.sh
+
+      - name: Verify macOS E2E results
+        run: |
+          test -f "$HOME/.gitconfig"
+          test -f "$HOME/.config/nvim/init.lua"
+          command -v tmux
