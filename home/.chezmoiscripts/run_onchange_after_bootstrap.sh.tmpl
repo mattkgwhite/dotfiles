@@ -33,9 +33,14 @@ if ! command -v brew 2>&1 >/dev/null; then
   NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-if ! command -v brew 2>&1 >/dev/null; then
-  export PATH="$PATH:$HOME/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/bin:/opt/homebrew/bin"
+# Ensure this process sees Homebrew-installed binaries (nvim, zsh, etc.).
+if command -v brew 2>&1 >/dev/null; then
   eval "$(brew shellenv)"
+else
+  export PATH="$PATH:$HOME/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/bin:/opt/homebrew/bin"
+  if command -v brew 2>&1 >/dev/null; then
+    eval "$(brew shellenv)"
+  fi
 fi
 
 NVIM_PRE_INSTALLED=""
