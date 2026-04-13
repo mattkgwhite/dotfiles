@@ -6,7 +6,7 @@
 set -eu
 
 if command -v brew >/dev/null 2>&1; then
-  if [ -n "${CODESPACES:-}" ]; then
+  if [ -n "${CODESPACES:-}" ] || [ -n "${CI:-}" ] || [ -n "${HOMEBREW_CI:-}" ]; then
     exit 0
   fi
 

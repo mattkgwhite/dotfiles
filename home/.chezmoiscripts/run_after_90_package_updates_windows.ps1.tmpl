@@ -2,6 +2,11 @@
 $ErrorActionPreference = "Stop"
 {{ includeTemplate ".chezmoitemplates/windows-elevation.ps1.tmpl" . }}
 
+if (-not [string]::IsNullOrWhiteSpace($env:CI)) {
+    Write-Host "Skipping package upgrades in CI." -ForegroundColor Yellow
+    return
+}
+
 $elevatedScript = {
     $ErrorActionPreference = "Stop"
 
