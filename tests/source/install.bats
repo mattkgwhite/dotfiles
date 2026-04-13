@@ -89,6 +89,11 @@ setup() {
   grep -q 'bw status' "$REPO_ROOT/install.ps1.tmpl"
 }
 
+@test "windows elevation helper bypasses UAC in CI" {
+  grep -q '\$isCi = -not \[string\]::IsNullOrWhiteSpace(\$env:CI)' "$REPO_ROOT/home/.chezmoitemplates/windows-elevation.ps1.tmpl"
+  grep -q "CI detected: running '\$Name' without UAC elevation." "$REPO_ROOT/home/.chezmoitemplates/windows-elevation.ps1.tmpl"
+}
+
 @test "install.ps1: skips bw setup when non-interactive unless forced" {
   grep -q 'ConsoleHost' "$REPO_ROOT/install.ps1.tmpl"
   grep -q 'DOTFILES_FORCE_BITWARDEN' "$REPO_ROOT/install.ps1.tmpl"

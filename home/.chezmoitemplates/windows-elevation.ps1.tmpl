@@ -11,7 +11,11 @@ function Invoke-ElevatedWithLog {
     )
 
     $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-    if ($isAdmin) {
+    $isCi = -not [string]::IsNullOrWhiteSpace($env:CI)
+    if ($isAdmin -or $isCi) {
+        if ($isCi -and -not $isAdmin) {
+            Write-Host "CI detected: running '$Name' without UAC elevation."
+        }
         & $ScriptBlock
         return
     }
