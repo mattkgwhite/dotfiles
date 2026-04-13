@@ -1,3 +1,4 @@
 .config/kitty
 .config/opencode/commands/retrospective.md
+.config/zsh/.zfunctions/is-iterm2
 .local/beads

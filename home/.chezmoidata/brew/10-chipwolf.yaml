@@ -52,10 +52,6 @@ brew:
           conditions:
             - { kind: os, op: is, value: mac }
         - type: cask
-          name: iterm2 # better terminal
-          conditions:
-            - { kind: os, op: is, value: mac }
-        - type: cask
           name: lookaway # screen breaks
           conditions:
             - { kind: os, op: is, value: mac }
