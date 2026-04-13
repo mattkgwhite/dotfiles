@@ -21,6 +21,7 @@ render_brewfile_to_tmp() {
 
 render_bootstrap_template_ci() {
   env CI=1 HOMEBREW_CI=1 chezmoi --source "$REPO_ROOT/home" execute-template --init \
+    --override-data '{"codespaces":false}' \
     --file "$BOOTSTRAP_TMPL"
 }
 
