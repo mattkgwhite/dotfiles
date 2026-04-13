@@ -3,7 +3,7 @@ uv = "0.11.6"
 "pipx:pre-commit" = "4.5.1"
 chezmoi = "2.70.1"
 bats = { version = "1.13.0", os = ["linux", "macos"] }
-bitwarden = { version = "2026.3.0", os = ["linux"] }
+bitwarden = { version = "2025.10.0", os = ["linux"] }
 
 [tasks.pre-commit-install]
 run = "pre-commit install"
