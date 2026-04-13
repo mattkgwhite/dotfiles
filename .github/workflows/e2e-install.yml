@@ -126,9 +126,9 @@ jobs:
       - name: Verify Windows E2E results
         shell: pwsh
         run: |
-          $managed = chezmoi managed --path-style unix
-          if (-not ($managed | Select-String -SimpleMatch "/.config/nvim/init.lua")) { throw "Neovim target is not managed by chezmoi" }
-          if (-not ($managed | Select-String -SimpleMatch "/.config/wezterm/wezterm.lua")) { throw "WezTerm target is not managed by chezmoi" }
+          $managed = chezmoi managed
+          if (-not ($managed | Select-String -Pattern '\.config[\\/]+nvim[\\/]+init\.lua')) { throw "Neovim target is not managed by chezmoi" }
+          if (-not ($managed | Select-String -Pattern '\.config[\\/]+wezterm[\\/]+wezterm\.lua')) { throw "WezTerm target is not managed by chezmoi" }
           if (-not (Get-Command chezmoi -ErrorAction SilentlyContinue)) { throw "chezmoi not found on PATH" }
 
   e2e-macos:

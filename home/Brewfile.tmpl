@@ -14,7 +14,7 @@
 {{- $sections := dict "tap" (list) "brew" (list) "cask" (list) "mas" (list) -}}
 {{- $seen := dict -}}
 
-{{- if hasKey $.brew "overlays" -}}
+{{- if and (hasKey $ "brew") (hasKey $.brew "overlays") -}}
 {{- range $overlayName := (keys $.brew.overlays | sortAlpha) -}}
     {{- $overlay := index $.brew.overlays $overlayName -}}
     {{- $overlayEnabled := true -}}
