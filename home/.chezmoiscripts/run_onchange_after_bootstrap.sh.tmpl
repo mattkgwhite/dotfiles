@@ -61,7 +61,7 @@ if [ ! -s "$BREWFILE_RENDERED" ]; then
 {{ includeTemplate "Brewfile.tmpl" . }}
 EOF
 fi
-if ! rg '^brew "neovim"' "$BREWFILE_RENDERED" >/dev/null 2>&1; then
+if ! grep -E '^brew "neovim"' "$BREWFILE_RENDERED" >/dev/null 2>&1; then
   echo "Rendered Brewfile is missing neovim entry." >&2
   exit 1
 fi
