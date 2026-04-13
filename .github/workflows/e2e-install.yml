@@ -51,7 +51,7 @@ jobs:
 
       - name: Register test user on Vaultwarden
         run: |
-          python3 tests/e2e/seed-vaultwarden.py \
+          uv run tests/e2e/seed-vaultwarden.py \
             "$BW_SERVER" "$BW_EMAIL" "$BW_PASSWORD" '[]'
 
       - name: Configure and login to Bitwarden
