@@ -83,7 +83,7 @@ jobs:
 
       - name: Run install.sh
         env:
-          DOTFILES_CHEZMOI_EXCLUDE: externals
+          DOTFILES_CHEZMOI_EXCLUDE: scripts,externals
         run: ./install.sh
 
       - name: Verify E2E results
