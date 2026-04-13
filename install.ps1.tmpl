@@ -34,6 +34,7 @@ $elevatedScript = {
 
         $packages = @()
         if (-not (Get-Command chezmoi -ErrorAction SilentlyContinue)) { $packages += "chezmoi" }
+        if (-not (Get-Command gpg -ErrorAction SilentlyContinue)) { $packages += "gnupg" }
         if (-not (Get-Command mise -ErrorAction SilentlyContinue)) { $packages += "mise" }
         if (-not (Get-Command bw -ErrorAction SilentlyContinue)) { $packages += "bitwarden-cli" }
 
