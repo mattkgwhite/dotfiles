@@ -68,7 +68,7 @@ render_bootstrap_template_ci() {
   fi
   run render_bootstrap_template_ci
   [ "$status" -eq 0 ]
-  echo "$output" | grep -Fq 'brew "neovim"'
+  echo "$output" | grep -Fq "cat >\"\$BREWFILE_RENDERED\" <<'EOF'"
   echo "$output" | grep -Fq 'Rendered Brewfile is missing neovim entry.'
 }
 

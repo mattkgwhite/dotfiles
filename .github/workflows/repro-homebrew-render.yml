@@ -33,4 +33,4 @@ jobs:
         run: |
           chezmoi -S "$GITHUB_WORKSPACE/home" execute-template --init --override-data '{"codespaces":false}' --file "$GITHUB_WORKSPACE/home/.chezmoiscripts/run_onchange_after_bootstrap.sh.tmpl" > bootstrap.ci.sh
           grep -E 'DOTFILES_BREWFILE_RENDERED' bootstrap.ci.sh
-          grep -E '^brew "neovim"' bootstrap.ci.sh
+          grep -E 'Rendered Brewfile is missing neovim entry\.' bootstrap.ci.sh
