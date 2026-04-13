@@ -59,7 +59,7 @@ jobs:
       - name: Configure and login to Bitwarden
         run: |
           bw config server "$BW_SERVER"
-          export BW_SESSION=$(bw login "$BW_EMAIL" "$BW_PASSWORD" --raw)
+          BW_SESSION=$(bw login "$BW_EMAIL" "$BW_PASSWORD" --raw)
           echo "BW_SESSION=$BW_SESSION" >> "$GITHUB_ENV"
 
       - name: Seed Bitwarden vault with test items
@@ -70,12 +70,18 @@ jobs:
           echo '{"type":1,"name":"work-domain","login":{"username":"test.example.com","password":""}}' \
             | bw encode | bw create item --session "$BW_SESSION" >/dev/null
 
-          echo "Vault items seeded."
-
-      - name: Run chezmoi init and apply
+      - name: Render install.sh from template
+        env:
+          DOTFILES_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          DOTFILES_IMAGE_NAME: "unused"
+          DOTFILES_ATTESTATION_REPO: ${{ github.repository }}
+          DOTFILES_RELEASE_TAG: "e2e-test"
         run: |
-          chezmoi init --source="$GITHUB_WORKSPACE"
-          chezmoi apply --exclude=scripts,externals
+          chezmoi execute-template --file install.sh.tmpl > install.sh
+          chmod +x install.sh
+
+      - name: Run install.sh
+        run: ./install.sh
 
       - name: Verify E2E results
         run: bats tests/e2e/install.bats
