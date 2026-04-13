@@ -32,6 +32,7 @@ jobs:
           SIGNUPS_ALLOWED: "true"
           DOMAIN: "http://localhost:8222"
           LOG_LEVEL: "warn"
+          I_REALLY_WANT_VOLATILE_STORAGE: "true"
         options: >-
           --health-cmd "curl -sf http://localhost:80/alive || exit 1"
           --health-interval 2s
