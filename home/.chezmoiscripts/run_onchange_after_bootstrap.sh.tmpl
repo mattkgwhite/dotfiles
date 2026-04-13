@@ -8,9 +8,6 @@ set -eu
 set -x
 {{- end }}
 
-# Brewfile inputs hash (triggers re-run when template or overlay data changes):
-# overlays={{ .brew.overlays | toJson | sha256sum }}
-
 {{ if .codespaces -}}
 cat <<EOF >"$HOME/.gitconfig.overrides"
 [user]
