@@ -80,30 +80,5 @@ jobs:
           chezmoi init --source="$GITHUB_WORKSPACE"
           chezmoi apply --exclude=scripts,externals
 
-      - name: Verify Bitwarden secrets were resolved
-        run: |
-          wakatime_cfg="$HOME/.config/wakatime/.wakatime.cfg"
-          if [ ! -f "$wakatime_cfg" ]; then
-            echo "FAIL: $wakatime_cfg not created"
-            exit 1
-          fi
-          if ! grep -q "test-wakatime-key-12345" "$wakatime_cfg"; then
-            echo "FAIL: wakatime config does not contain expected API key"
-            echo "Contents:"
-            cat "$wakatime_cfg"
-            exit 1
-          fi
-          echo "PASS: Bitwarden secrets resolved correctly."
-
-      - name: Verify key config files exist
-        run: |
-          for f in \
-            "$HOME/.gitconfig" \
-            "$HOME/.config/nvim/init.lua" \
-          ; do
-            if [ ! -f "$f" ]; then
-              echo "FAIL: $f not created"
-              exit 1
-            fi
-          done
-          echo "PASS: Key config files exist."
+      - name: Verify E2E results
+        run: bats tests/e2e/install.bats
