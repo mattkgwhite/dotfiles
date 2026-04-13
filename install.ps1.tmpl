@@ -36,6 +36,7 @@ $elevatedScript = {
         if (-not (Get-Command chezmoi -ErrorAction SilentlyContinue)) { $packages += "chezmoi" }
         if (-not (Get-Command gpg -ErrorAction SilentlyContinue)) { $packages += "gnupg" }
         if (-not (Get-Command mise -ErrorAction SilentlyContinue)) { $packages += "mise" }
+        if (-not (Get-Command pwsh -ErrorAction SilentlyContinue)) { $packages += "powershell-core" }
         if (-not (Get-Command bw -ErrorAction SilentlyContinue)) { $packages += "bitwarden-cli" }
 
         # Ensure git is available (check common install locations before installing)
