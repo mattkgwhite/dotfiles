@@ -83,7 +83,7 @@ def register(server: str, email: str, password: str) -> str:
     enc_key, mac_key = stretch_key(master_key)
     encrypted_key = encrypt_symmetric_key(enc_key, mac_key)
 
-    api_request(f"{server}/api/accounts/register", {
+    payload = {
         "name": "CI Test User",
         "email": email,
         "masterPasswordHash": master_hash,
@@ -91,7 +91,27 @@ def register(server: str, email: str, password: str) -> str:
         "key": encrypted_key,
         "kdf": 0,
         "kdfIterations": 600000,
-    })
+    }
+
+    # Vaultwarden/Bitwarden deployments can expose registration under
+    # /identity/accounts/register (current) or /api/accounts/register (legacy).
+    endpoints = [
+        f"{server.rstrip('/')}/identity/accounts/register",
+        f"{server.rstrip('/')}/api/accounts/register",
+    ]
+    last_error: Exception | None = None
+    for endpoint in endpoints:
+        try:
+            api_request(endpoint, payload)
+            return master_hash
+        except urllib.error.HTTPError as e:
+            last_error = e
+            if e.code == 404:
+                continue
+            raise
+
+    if last_error:
+        raise last_error
     return master_hash
 
 
