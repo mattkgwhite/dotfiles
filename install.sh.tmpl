@@ -152,6 +152,9 @@ if [ -z "${CODESPACES:-}" ]; then
 		echo "Bitwarden vault is not logged in. Please log in:" >&2
 		bw login </dev/tty
 	fi
+
+	echo "Syncing Bitwarden vault..." >&2
+	bw sync
 fi
 
 # POSIX way to get script's dir: https://stackoverflow.com/a/29834779/12156188

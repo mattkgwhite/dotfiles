@@ -102,6 +102,10 @@ if ($bwStatus -eq "unauthenticated") {
     if ($LASTEXITCODE -ne 0) { throw "Bitwarden login failed." }
 }
 
+Write-Host "Syncing Bitwarden vault..." -ForegroundColor Cyan
+bw sync
+if ($LASTEXITCODE -ne 0) { throw "Bitwarden sync failed." }
+
 # Initialise and apply chezmoi dotfiles.
 # If the script is running from a local clone, use that as the source.
 # Otherwise (e.g. irm | iex), let chezmoi clone from GitHub into the default location.
