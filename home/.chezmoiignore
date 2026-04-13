@@ -24,5 +24,6 @@ Documents
 # macOS-only targets — not applicable on non-macOS
 .config/tmux
 .config/ghostty
+.config/finicky.js
 Library
 {{ end }}

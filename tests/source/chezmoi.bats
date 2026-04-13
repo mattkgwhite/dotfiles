@@ -55,6 +55,10 @@ render_template_with_override_data() {
   grep -q '\.config/ghostty' "$SOURCE_DIR/.chezmoiignore"
 }
 
+@test "chezmoiignore: non-darwin block lists .config/finicky.js" {
+  grep -q '\.config/finicky\.js' "$SOURCE_DIR/.chezmoiignore"
+}
+
 @test "chezmoiignore: windows block lists .config/zsh" {
   grep -q '\.config/zsh' "$SOURCE_DIR/.chezmoiignore"
 }
