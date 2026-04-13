@@ -78,6 +78,7 @@ render_bootstrap_template_ci() {
   fi
   run render_bootstrap_template_ci
   [ "$status" -eq 0 ]
-  echo "$output" | grep -Fq 'if [ -n "${DOTFILES_BREWFILE_RENDERED:-}" ]'
-  echo "$output" | grep -Fq 'cp "$DOTFILES_BREWFILE_RENDERED" "$BREWFILE_RENDERED"'
+  echo "$output" | grep -Fq 'for candidate in "${DOTFILES_BREWFILE_RENDERED:-}" "/tmp/dotfiles-brewfile.e2e"; do'
+  echo "$output" | grep -Fq 'cp "$candidate" "$BREWFILE_RENDERED"'
+  echo "$output" | grep -Fq '"/tmp/dotfiles-brewfile.e2e"'
 }

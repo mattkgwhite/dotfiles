@@ -85,6 +85,7 @@ jobs:
           chezmoi execute-template --file install.sh.tmpl > install.sh
           chezmoi -S "$GITHUB_WORKSPACE/home" execute-template --file "$GITHUB_WORKSPACE/home/Brewfile.tmpl" > Brewfile.e2e
           grep -E '^brew "neovim"' Brewfile.e2e
+          cp Brewfile.e2e /tmp/dotfiles-brewfile.e2e
           chmod +x install.sh
 
       - name: Run install.sh
@@ -154,6 +155,7 @@ jobs:
           chezmoi -S "$GITHUB_WORKSPACE" execute-template --file install.sh.tmpl > install.sh
           chezmoi -S "$GITHUB_WORKSPACE/home" execute-template --file "$GITHUB_WORKSPACE/home/Brewfile.tmpl" > Brewfile.e2e
           grep -E '^brew "neovim"' Brewfile.e2e
+          cp Brewfile.e2e /tmp/dotfiles-brewfile.e2e
           chmod +x install.sh
 
       - name: Run install.sh
