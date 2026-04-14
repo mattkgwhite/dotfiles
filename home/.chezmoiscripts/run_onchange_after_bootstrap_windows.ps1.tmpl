@@ -27,6 +27,15 @@ $ErrorActionPreference = "Stop"
 # --- Elevated block: Chocolatey packages + WSL provisioning ---
 $elevatedScript = {
     $ErrorActionPreference = "Stop"
+    function Assert-LastExitCode {
+        param(
+            [Parameter(Mandatory = $true)]
+            [string]$CommandName
+        )
+        if ($LASTEXITCODE -ne 0) {
+            throw "$CommandName failed with exit code $LASTEXITCODE."
+        }
+    }
 
     if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
         Write-Host "Installing Chocolatey..."
@@ -38,6 +47,7 @@ $elevatedScript = {
 
     Write-Host "Installing Chocolatey packages..."
     choco install {{ join " " $chocoPackages }} -y --no-progress
+    Assert-LastExitCode "choco install"
 
     $wingetPackages = "{{ join " " $wingetPackages }}".Split(" ", [System.StringSplitOptions]::RemoveEmptyEntries)
     foreach ($wingetPackage in $wingetPackages) {
@@ -49,19 +59,24 @@ $elevatedScript = {
 
         Write-Host "Installing Winget package: $wingetPackage"
         winget install --id $wingetPackage --exact --silent --accept-package-agreements --accept-source-agreements
+        Assert-LastExitCode "winget install ($wingetPackage)"
     }
 
     # --- WSL ---
     if (-not (Get-Command wsl -ErrorAction SilentlyContinue)) {
         Write-Host "Installing WSL..."
         wsl --install --no-distribution
+        Assert-LastExitCode "wsl --install --no-distribution"
         Write-Host "WSL installed. A reboot may be required before WSL is available."
     }
 
-    if (Get-Command wsl -ErrorAction SilentlyContinue) {
-        Write-Host "Updating WSL to latest pre-release..."
-        wsl --update --pre-release
+    if (-not (Get-Command wsl -ErrorAction SilentlyContinue)) {
+        throw "WSL command is not available after installation."
     }
+
+    Write-Host "Updating WSL to latest pre-release..."
+    wsl --update --pre-release
+    Assert-LastExitCode "wsl --update --pre-release"
 
     if (Get-Command wsl -ErrorAction SilentlyContinue) {
         $distros = wsl --list --quiet 2>$null
@@ -78,6 +93,7 @@ $elevatedScript = {
 
             Write-Host "Installing Ubuntu WSL distribution (cloud-init will provision user '$wslUser')..."
             wsl --install Ubuntu --no-launch
+            Assert-LastExitCode "wsl --install Ubuntu --no-launch"
 
             Write-Host "Launching Ubuntu for cloud-init provisioning..."
             $prevLine = ""
@@ -92,7 +108,7 @@ $elevatedScript = {
             } while ($status -match "running")
 
             if ($status -match "error") {
-                Write-Host "cloud-init finished with errors. Run 'wsl -d Ubuntu -- cat /var/log/cloud-init.log' for details." -ForegroundColor Yellow
+                throw "cloud-init finished with errors. Run 'wsl -d Ubuntu -- cat /var/log/cloud-init.log' for details."
             } else {
                 Write-Host "WSL provisioning complete." -ForegroundColor Green
             }
@@ -100,10 +116,7 @@ $elevatedScript = {
             $wslUser = '{{ $wslLinuxUser }}'
             $wslUserExists = (wsl -d Ubuntu -- bash -lc "id -u $wslUser >/dev/null 2>&1 && echo yes || echo no" 2>$null) -match "yes"
             if (-not $wslUserExists) {
-                Write-Host "WSL user '$wslUser' is missing in Ubuntu. Existing distro detected; skipping automatic user recreation." -ForegroundColor Yellow
-                Write-Host "To reprovision Ubuntu from scratch, run these commands in an elevated PowerShell session:" -ForegroundColor Yellow
-                Write-Host "  wsl --unregister Ubuntu" -ForegroundColor Yellow
-                Write-Host "  chezmoi apply" -ForegroundColor Yellow
+                throw "WSL user '$wslUser' is missing in Ubuntu. Reprovision with: wsl --unregister Ubuntu; chezmoi apply."
             }
 
             # Existing Ubuntu only (fresh installs get [user]/default from cloud-init). Align default login with profile.windows.wslUser.
@@ -114,6 +127,7 @@ elif ! grep -q '^default=$wslUser$' /etc/wsl.conf 2>/dev/null; then
   sudo sed -i '/^\[user\]/,/^\[/ s/^default=.*/default=$wslUser/' /etc/wsl.conf
 fi
 "@
+            Assert-LastExitCode "Update /etc/wsl.conf user default"
             if ($wslUserExists) {
                 Write-Host "WSL default user may still be root until you run 'wsl --shutdown' once; using --user $wslUser for dotfiles update." -ForegroundColor DarkGray
             }
@@ -124,11 +138,12 @@ fi
 {{ includeTemplate ".chezmoitemplates/wsl-update-dotfiles-bash.sh.tmpl" (dict "wslChezmoiSource" $wslChezmoiSource) }}
 '@
             if ($wslUserExists) {
-                $wslUpdateBash | wsl -d Ubuntu --user $wslUser -- bash -s
+                $wslUpdateBash | wsl -d Ubuntu --user $wslUser -- bash -lc "tr -d '\r' | bash -s"
             } else {
                 Write-Host "Running WSL update as default user (root); dotfiles copy will live under /root until user '$wslUser' exists and you re-apply." -ForegroundColor Yellow
-                $wslUpdateBash | wsl -d Ubuntu -- bash -s
+                $wslUpdateBash | wsl -d Ubuntu -- bash -lc "tr -d '\r' | bash -s"
             }
+            Assert-LastExitCode "WSL dotfiles update"
         }
     }
 }
@@ -136,8 +151,7 @@ fi
 Invoke-ElevatedWithLog `
     -Name "bootstrap" `
     -ScriptBlock $elevatedScript `
-    -StatusMessage "Elevating for package installation and WSL provisioning..." `
-    -IgnoreExitCode
+    -StatusMessage "Elevating for package installation and WSL provisioning..."
 
 # Refresh PATH so newly installed tools are available
 $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH", "User")
@@ -153,7 +167,7 @@ if (Get-Command mise -ErrorAction SilentlyContinue) {
     mise trust
     mise install
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "mise install failed (exit code $LASTEXITCODE). Run 'mise install' manually after setup." -ForegroundColor Yellow
+        throw "mise install failed (exit code $LASTEXITCODE)."
     }
 }
 
@@ -161,5 +175,8 @@ if (Get-Command mise -ErrorAction SilentlyContinue) {
 if (Get-Command nvim -ErrorAction SilentlyContinue) {
     Write-Host "Syncing Neovim plugins..."
     nvim --headless "+Lazy! sync" +qa
+    if ($LASTEXITCODE -ne 0) {
+        throw "Neovim plugin sync failed (exit code $LASTEXITCODE)."
+    }
 }
 {{- end }}

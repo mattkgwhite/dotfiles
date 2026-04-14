@@ -20,7 +20,7 @@ brew:
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
             - { kind: env, name: CI, op: unset }
-            - { kind: env, name: WSL, op: unset }
+            - { kind: env, name: WSL_DISTRO_NAME, op: unset }
         - type: brew
           name: colordiff
           conditions:
@@ -99,12 +99,13 @@ brew:
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
             - { kind: env, name: CI, op: unset }
-            - { kind: env, name: WSL, op: unset }
+            - { kind: env, name: WSL_DISTRO_NAME, op: unset }
         - type: brew
           name: tmux
           conditions:
             - { kind: os, op: is, value: mac }
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: WSL_DISTRO_NAME, op: unset }
         - type: brew
           name: tree
         - type: brew
@@ -114,7 +115,7 @@ brew:
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
             - { kind: env, name: CI, op: unset }
-            - { kind: env, name: WSL, op: unset }
+            - { kind: env, name: WSL_DISTRO_NAME, op: unset }
         - type: brew
           name: wakatime-cli
           conditions:

@@ -12,15 +12,13 @@ $elevatedScript = {
         Write-Host "Installing WSL..."
         wsl --install --no-distribution
         if ($LASTEXITCODE -ne 0) {
-            Write-Host "WSL install command failed (exit code $LASTEXITCODE). Reboot Windows, then run 'chezmoi apply' again." -ForegroundColor Yellow
-            return
+            throw "WSL install command failed (exit code $LASTEXITCODE). Reboot Windows, then run 'chezmoi apply' again."
         }
         Write-Host "WSL installed. A reboot may be required before WSL is available."
     }
 
     if (-not (Get-Command wsl -ErrorAction SilentlyContinue)) {
-        Write-Host "WSL is not available yet. Reboot Windows, then run 'chezmoi apply' again." -ForegroundColor Yellow
-        return
+        throw "WSL is not available yet. Reboot Windows, then run 'chezmoi apply' again."
     }
 
     $distros = wsl --list --quiet 2>$null
@@ -42,8 +40,7 @@ $elevatedScript = {
     Write-Host "Installing Ubuntu WSL distribution..."
     wsl --install Ubuntu --no-launch
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "Ubuntu installation failed (exit code $LASTEXITCODE). Reboot Windows, then run 'chezmoi apply' again." -ForegroundColor Yellow
-        return
+        throw "Ubuntu installation failed (exit code $LASTEXITCODE). Reboot Windows, then run 'chezmoi apply' again."
     }
 
     Write-Host "Launching Ubuntu for cloud-init provisioning..."
@@ -59,13 +56,12 @@ $elevatedScript = {
             $prevLine = $tail
         }
         if ((Get-Date) -ge $deadline -and $status -match "running") {
-            Write-Host "cloud-init still running after 10 minutes. Let it finish, then rerun 'chezmoi apply'." -ForegroundColor Yellow
-            return
+            throw "cloud-init still running after 10 minutes. Let it finish, then rerun 'chezmoi apply'."
         }
     } while ($status -match "running")
 
     if ($status -match "error") {
-        Write-Host "cloud-init finished with errors. Run 'wsl -d Ubuntu -- cat /var/log/cloud-init.log' for details." -ForegroundColor Yellow
+        throw "cloud-init finished with errors. Run 'wsl -d Ubuntu -- cat /var/log/cloud-init.log' for details."
     } else {
         Write-Host "WSL provisioning complete." -ForegroundColor Green
     }

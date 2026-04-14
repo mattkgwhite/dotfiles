@@ -1,0 +1,83 @@
+{{- if eq .chezmoi.os "windows" -}}
+$ErrorActionPreference = "Stop"
+
+$rdctl = "C:\Program Files\Rancher Desktop\resources\resources\win32\bin\rdctl.exe"
+$docker = "C:\Program Files\Rancher Desktop\resources\resources\win32\bin\docker.exe"
+
+if (-not (Test-Path $rdctl)) {
+    Write-Host "Rancher Desktop not installed; skipping Docker/container configuration."
+    return
+}
+
+# Start Rancher Desktop with moby engine, no Kubernetes, no modal dialogs.
+# rdctl start is a no-op if already running with the same settings.
+Write-Host "Ensuring Rancher Desktop is running with moby engine..."
+& $rdctl start --container-engine.name moby --kubernetes.enabled=false --no-modal-dialogs
+if ($LASTEXITCODE -ne 0) {
+    throw "rdctl start failed (exit code $LASTEXITCODE)."
+}
+
+# Wait for the backend to be fully ready (WSL distro running + Docker pipe available)
+$maxWaitSec = 120
+$elapsed = 0
+while (-not (Test-Path '\\.\pipe\docker_engine')) {
+    if ($elapsed -ge $maxWaitSec) {
+        throw "Docker daemon pipe not available after ${maxWaitSec}s. Check Rancher Desktop logs at `$env:LOCALAPPDATA\rancher-desktop\logs."
+    }
+    Start-Sleep -Seconds 5
+    $elapsed += 5
+    Write-Host "  Waiting for Docker daemon... (${elapsed}s)"
+}
+
+# Verify Docker is responsive (docker info emits stderr warnings like "No swap limit support"
+# which become terminating errors under $ErrorActionPreference = "Stop")
+$ErrorActionPreference = "Continue"
+$null = & $docker info 2>&1
+$dockerExitCode = $LASTEXITCODE
+$ErrorActionPreference = "Stop"
+if ($dockerExitCode -ne 0) {
+    throw "Docker daemon pipe exists but 'docker info' failed (exit code $dockerExitCode)."
+}
+Write-Host "Docker daemon is ready."
+
+# Configure WSL integration for Ubuntu via the Rancher Desktop API.
+# rdctl set has no WSL integration flags, so we use the HTTP API directly.
+# The API requires a version field matching the current settings schema version.
+$currentSettings = & $rdctl api /v1/settings 2>&1
+if ($LASTEXITCODE -ne 0) {
+    throw "Failed to query Rancher Desktop settings (exit code $LASTEXITCODE)."
+}
+$settingsObj = $currentSettings | ConvertFrom-Json
+$version = $settingsObj.version
+
+# wsl.exe outputs UTF-16LE with null bytes; strip them for reliable comparison
+$wslDistros = @(wsl --list --quiet 2>$null | ForEach-Object { $_ -replace "`0", "" } | Where-Object { $_.Trim() -ne "" })
+if ($wslDistros -contains "Ubuntu") {
+    $needsUpdate = $true
+    if ($settingsObj.WSL -and $settingsObj.WSL.integrations -and $settingsObj.WSL.integrations.Ubuntu -eq $true) {
+        $needsUpdate = $false
+    }
+
+    if ($needsUpdate) {
+        Write-Host "Enabling Rancher Desktop WSL integration for Ubuntu..."
+        $body = "{`"version`":$version,`"WSL`":{`"integrations`":{`"Ubuntu`":true}}}"
+        $tempFile = Join-Path $env:TEMP "rd-wsl-integration.json"
+        [System.IO.File]::WriteAllText($tempFile, $body)
+        try {
+            & $rdctl api -X PUT --input $tempFile /v1/settings
+            if ($LASTEXITCODE -ne 0) {
+                throw "Failed to enable WSL integration for Ubuntu (exit code $LASTEXITCODE)."
+            }
+            Write-Host "WSL integration for Ubuntu enabled."
+        } finally {
+            Remove-Item $tempFile -ErrorAction SilentlyContinue
+        }
+    } else {
+        Write-Host "WSL integration for Ubuntu already enabled."
+    }
+} else {
+    Write-Host "Ubuntu WSL distribution not found; skipping WSL integration. Run 'chezmoi apply' again after Ubuntu is provisioned."
+}
+
+Write-Host "Rancher Desktop Docker configuration complete." -ForegroundColor Green
+{{- end }}

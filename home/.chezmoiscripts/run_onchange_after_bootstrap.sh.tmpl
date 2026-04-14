@@ -50,7 +50,7 @@ export HOMEBREW_NO_AUTO_UPDATE=1
 
 BREWFILE_RENDERED="$(mktemp)"
 trap 'rm -f "$BREWFILE_RENDERED"' EXIT INT TERM
-for candidate in "${DOTFILES_BREWFILE_RENDERED:-}" "/tmp/dotfiles-brewfile.e2e"; do
+for candidate in "${DOTFILES_BREWFILE_RENDERED:-}"; do
   if [ -n "$candidate" ] && [ -f "$candidate" ]; then
     cp "$candidate" "$BREWFILE_RENDERED"
     break
@@ -81,7 +81,7 @@ if [ -n "${CODESPACES:-}" ]; then
 elif [ -n "${CI:-}" ] || [ -n "${HOMEBREW_CI:-}" ]; then
   CI=1 HOMEBREW_CI=1 brew bundle -q --no-upgrade --file="$BREWFILE_RENDERED"
 elif [ "$is_wsl" -eq 1 ]; then
-  WSL=1 brew bundle -q --file="$BREWFILE_RENDERED"
+  WSL_DISTRO_NAME="${WSL_DISTRO_NAME:-Ubuntu}" brew bundle -q --file="$BREWFILE_RENDERED"
 elif [ -n "${PRIVATE:-}" ]; then
   PRIVATE=1 brew bundle -q --file="$BREWFILE_RENDERED"
 else

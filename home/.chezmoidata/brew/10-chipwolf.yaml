@@ -32,7 +32,7 @@ brew:
           name: btop
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
-            - { kind: env, name: WSL, op: unset }
+            - { kind: env, name: WSL_DISTRO_NAME, op: unset }
         - type: brew
           name: cbonsai
           conditions:

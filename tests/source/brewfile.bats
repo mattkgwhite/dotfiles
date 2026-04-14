@@ -59,7 +59,7 @@ render_bootstrap_template_ci() {
 @test "Brewfile render preserves mixed condition expression formatting" {
   render_brewfile_to_tmp
   echo "$output" | grep -Fq 'brew "cbonsai" if (ENV["HOMEBREW_PRIVATE"]) && !(ENV["HOMEBREW_CODESPACES"])'
-  echo "$output" | grep -Fq 'brew "tmux" if (OS.mac?) && !(ENV["HOMEBREW_CODESPACES"])'
+  echo "$output" | grep -Fq 'brew "tmux" if (OS.mac?) && !(ENV["HOMEBREW_CODESPACES"] || ENV["HOMEBREW_WSL_DISTRO_NAME"])'
 }
 
 @test "bootstrap template CI fallback still embeds neovim brew entry" {

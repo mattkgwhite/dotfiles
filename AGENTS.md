@@ -75,6 +75,7 @@ Other special files/dirs (e.g. `.chezmoiignore`, `.chezmoiremove`, `.chezmoidata
 - **`before_`** – Run before updating files; **`after_`** – run after updating files.
 
 Scripts should be **idempotent**. Scripts in `home/.chezmoiscripts/` do not create a target directory. Scripts with `.tmpl` are templated first; if the result is empty/whitespace, the script is not run.
+Scripts should be **fail-fast**. Do not swallow errors in chezmoiscripts (`-IgnoreExitCode`, warning-and-continue returns, or `|| true`) for core bootstrap/provisioning/package steps; propagate non-zero exits so `chezmoi apply` stops immediately.
 
 See [Use scripts to perform actions](https://www.chezmoi.io/user-guide/use-scripts-to-perform-actions/) and [Target types – Scripts](https://www.chezmoi.io/reference/target-types/#scripts).
 
@@ -178,6 +179,19 @@ After applying changes to the Finicky config (`~/.config/finicky.js`), reload it
 3. Close the foreground window manually (AppleScript window close is not available without assistive access)
 
 Finicky's built-in auto-reload does NOT work when the config is managed by chezmoi. Chezmoi replaces the file with a new inode on every write; Finicky's fsnotify watcher (kqueue on macOS) tracks by inode and loses the watch when this happens. A restart is always required.
+
+---
+
+## Rancher Desktop / Docker (Windows)
+
+- Rancher Desktop provides the Docker daemon on Windows via a WSL2 backend (`rancher-desktop` distro).
+- Container engine must be **`moby`** (not containerd) for the `docker` CLI to work.
+- Docker CLI and `rdctl` live at `C:\Program Files\Rancher Desktop\resources\resources\win32\bin\`.
+- Settings file: `%LOCALAPPDATA%\rancher-desktop\settings.json` (schema version in `version` field).
+- `rdctl set` covers engine and Kubernetes flags; WSL integration (`WSL.integrations.<distro>`) must use `rdctl api -X PUT --input <file> /v1/settings` with a `version` field.
+- `home/.chezmoiscripts/run_after_96_rancher_desktop_windows.ps1.tmpl` starts RD, waits for the Docker daemon pipe (`\\.\pipe\docker_engine`), and enables WSL integration for Ubuntu.
+- The script runs after WSL ensure (95) so Ubuntu is available for integration.
+- If the backend crashes (WSL distros show Stopped while UI shows online), fix with: `rdctl shutdown --wait && wsl --shutdown && rdctl start --container-engine.name moby`.
 
 ---
 
