@@ -8,3 +8,6 @@ profile:
     # signingKey: "0x4C90101E11349775"
   codespaces:
     gitName: "Chip Wolf ‮"
+  windows:
+    # Linux username for WSL Ubuntu (cloud-init user, wsl.conf default). Lowercase. Required on Windows; bootstrap/WSL scripts fail apply if empty.
+    wslUser: "wolf"

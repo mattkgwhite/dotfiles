@@ -1,0 +1,4 @@
+# Chocofile.ignore — managed by chezmoi
+#
+# One package id per line, e.g.:
+# chocolatey

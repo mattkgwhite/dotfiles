@@ -1,6 +1,6 @@
 {{- $workChromeProfile := "chipwolf.uk" -}}
 {{- if ne (env "DOTFILES_SKIP_BITWARDEN") "1" -}}
-{{- $workChromeProfile = (bitwarden "item" "work-domain").name -}}
+  {{- $workChromeProfile = (bitwarden "item" "work-domain").name -}}
 {{- end -}}
 // ~/.finicky.js
 

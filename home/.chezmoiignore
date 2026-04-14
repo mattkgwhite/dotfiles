@@ -1,5 +1,6 @@
 # .chezmoiignore — source-dir-only files that should not be applied to ~/
 Brewfile.ignore
+Chocofile.ignore
 
 {{ if eq .chezmoi.os "windows" }}
 # Unix-only targets — not applicable on Windows

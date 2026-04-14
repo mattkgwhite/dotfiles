@@ -15,7 +15,7 @@
 {{- $seen := dict -}}
 
 {{- if and (hasKey $ "brew") (hasKey $.brew "overlays") -}}
-{{- range $overlayName := (keys $.brew.overlays | sortAlpha) -}}
+  {{- range $overlayName := (keys $.brew.overlays | sortAlpha) -}}
     {{- $overlay := index $.brew.overlays $overlayName -}}
     {{- $overlayEnabled := true -}}
     {{- if and (hasKey $overlay "conditions") $overlay.conditions -}}
@@ -72,7 +72,7 @@
         {{- $_ = set $sections $pkg.type (append $sectionLines $line) -}}
       {{- end -}}
     {{- end -}}
-{{- end -}}
+  {{- end -}}
 {{- end -}}
 
 {{- range $line := sortAlpha (index $sections "tap") }}

@@ -1,0 +1,20 @@
+{{- /* One-time: seed WSL ~/.local/share/chezmoi from Windows source. If that path already exists, do nothing (manage dotfiles in WSL). */ -}}
+set -euo pipefail
+CHEZMOI_SRC={{ printf "%q" .wslChezmoiSource }}
+dest="$HOME/.local/share/chezmoi"
+if [ -d "$dest" ]; then
+  echo "chezmoi source already exists at $dest; skipping copy and init - use chezmoi inside WSL from here on." >&2
+  exit 0
+fi
+mkdir -p "$HOME/.local/share"
+cp -a "$CHEZMOI_SRC" "$dest"
+if [ ! -x "$HOME/.local/bin/chezmoi" ] && ! command -v chezmoi >/dev/null 2>&1; then
+  curl -fsLS get.chezmoi.io -o /tmp/install-chezmoi.sh
+  sh /tmp/install-chezmoi.sh -- -b "$HOME/.local/bin"
+fi
+PATH="$HOME/.local/bin:$PATH"
+if ! WSL_DISTRO_NAME="${WSL_DISTRO_NAME:-Ubuntu}" DOTFILES_SKIP_BITWARDEN=1 "$HOME/.local/bin/chezmoi" init --apply \
+    --guess-repo-url=false --source="$dest" --exclude=externals; then
+  echo "Initial chezmoi init --apply failed (e.g. state DB lock). Run it manually in WSL when ready." >&2
+  exit 1
+fi

@@ -1,0 +1,38 @@
+# cloud-init user-data for WSL Ubuntu first boot (written to %USERPROFILE%\.cloud-init\Ubuntu.user-data).
+# Placeholders: __WSL_USER__ (profile.windows.wslUser), __WSL_CHEZMOI_SOURCE__ (Windows chezmoi source as /mnt/<drive>/... path, baked in at apply).
+# Seeds WSL once from the Windows chezmoi source (cp from drvfs). If ~/.local/share/chezmoi already exists, skips copy and init.
+windowsWsl:
+  ubuntuCloudInitUserData: |
+    #cloud-config
+    users:
+    - name: __WSL_USER__
+      groups: [adm,dialout,cdrom,floppy,sudo,audio,dip,video,plugdev,netdev]
+      sudo: ALL=(ALL) NOPASSWD:ALL
+      shell: /bin/bash
+
+    write_files:
+    - path: /etc/wsl.conf
+      append: true
+      content: |
+        [user]
+        default=__WSL_USER__
+
+    runcmd:
+      - |
+        sudo -u __WSL_USER__ bash -lc '
+          if [ -d /home/__WSL_USER__/.local/share/chezmoi ]; then
+            exit 0
+          fi
+
+          mkdir -p /home/__WSL_USER__/.local/share
+          cp -a __WSL_CHEZMOI_SOURCE__ /home/__WSL_USER__/.local/share/chezmoi
+
+          if ! command -v chezmoi >/dev/null 2>&1; then
+            sh -c "`$(curl -fsLS get.chezmoi.io)" -- -b "`$HOME/.local/bin"
+          fi
+
+          PATH="`$HOME/.local/bin:`$PATH"
+          WSL_DISTRO_NAME="${WSL_DISTRO_NAME:-Ubuntu}" DOTFILES_SKIP_BITWARDEN=1 \
+            "`$HOME/.local/bin/chezmoi" init --apply --guess-repo-url=false \
+            --source="`$HOME/.local/share/chezmoi" --exclude=externals
+        '

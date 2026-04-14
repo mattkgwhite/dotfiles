@@ -66,6 +66,12 @@ if ! grep -E '^brew "neovim"' "$BREWFILE_RENDERED" >/dev/null 2>&1; then
   exit 1
 fi
 
+# Detect WSL robustly (env can be missing in cloud-init subprocesses).
+is_wsl=0
+if [ -n "${WSL_DISTRO_NAME:-}" ] || [ -n "${WSL_INTEROP:-}" ] || grep -qi microsoft /proc/version 2>/dev/null; then
+  is_wsl=1
+fi
+
 if [ -n "${CI:-}" ]; then
   export HOMEBREW_CI="${HOMEBREW_CI:-1}"
 fi
@@ -74,6 +80,8 @@ if [ -n "${CODESPACES:-}" ]; then
   CODESPACES=1 brew bundle -q --file="$BREWFILE_RENDERED" || true
 elif [ -n "${CI:-}" ] || [ -n "${HOMEBREW_CI:-}" ]; then
   CI=1 HOMEBREW_CI=1 brew bundle -q --no-upgrade --file="$BREWFILE_RENDERED"
+elif [ "$is_wsl" -eq 1 ]; then
+  WSL=1 brew bundle -q --file="$BREWFILE_RENDERED"
 elif [ -n "${PRIVATE:-}" ]; then
   PRIVATE=1 brew bundle -q --file="$BREWFILE_RENDERED"
 else

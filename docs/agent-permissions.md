@@ -108,3 +108,4 @@ In this repo, Atlassian-specific permission keys live in `home/.chezmoidata/agen
 1. Render OpenCode config with `chezmoi execute-template`.
 2. Run test suite (`tests/source/chezmoi.bats`).
 3. Run `pre-commit run --all-files` before commit.
+

@@ -42,7 +42,7 @@ render_bootstrap_template_ci() {
   render_brewfile_to_tmp
   local failed=0
   while IFS= read -r line; do
-    if ! echo "$line" | grep -q 'if OS\.mac?'; then
+    if ! echo "$line" | grep -Eq 'if .*\bOS\.mac\?'; then
       echo "Missing OS.mac? guard: $line"
       failed=1
     fi

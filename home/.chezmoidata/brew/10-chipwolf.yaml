@@ -14,10 +14,12 @@ brew:
           name: aws-vault
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: PRIVATE, op: unset }
         - type: brew
           name: awscli
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: PRIVATE, op: unset }
         - type: brew
           name: bitwarden-cli
           conditions:
@@ -30,6 +32,7 @@ brew:
           name: btop
           conditions:
             - { kind: env, name: CODESPACES, op: unset }
+            - { kind: env, name: WSL, op: unset }
         - type: brew
           name: cbonsai
           conditions:

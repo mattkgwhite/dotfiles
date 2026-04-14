@@ -1,36 +1,21 @@
-{{- $chocoPackages := list
-  "bat"
-  "bitwarden-cli"
-  "discord"
-  "eza"
-  "fd"
-  "fzf"
-  "gnupg"
-  "jq"
-  "mise"
-  "nerd-fonts-FiraCode"
-  "neovim"
-  "obsidian"
-  "oh-my-posh"
-  "opencode"
-  "powershell-core"
-  "powertoys"
-  "ripgrep"
-  "sysinternals"
-  "tree-sitter"
-  "treesizefree"
-  "wingetui"
-  "winlibs"
-  "wezterm"
--}}
-{{- $wingetPackages := list
-  "Wakatime.CLIWakatime"
-  "Wakatime.DesktopWakatime"
--}}
-{{- $dotfilesRepoUser := .profile.git.githubUser -}}
-{{- $dotfilesRepoName := .profile.git.githubRepo -}}
-{{- $dotfilesRepoUrl := printf "https://github.com/%s/%s" $dotfilesRepoUser $dotfilesRepoName -}}
-{{ if eq .chezmoi.os "windows" -}}
+{{- $chocoPackages := list -}}
+{{- if and (hasKey . "chocolatey") (hasKey .chocolatey "overlays") -}}
+  {{- range $name := keys .chocolatey.overlays | sortAlpha -}}
+    {{- $ov := index $.chocolatey.overlays $name -}}
+    {{- $chocoPackages = concat $chocoPackages (default (list) $ov.packages) -}}
+  {{- end -}}
+{{- end -}}
+{{- $wingetPackages := list -}}
+{{- if and (hasKey . "winget") (hasKey .winget "overlays") -}}
+  {{- range $name := keys .winget.overlays | sortAlpha -}}
+    {{- $ov := index $.winget.overlays $name -}}
+    {{- $wingetPackages = concat $wingetPackages (default (list) $ov.packages) -}}
+  {{- end -}}
+{{- end -}}
+{{- if eq .chezmoi.os "windows" -}}
+  {{- $wslWin := fromJson (includeTemplate ".chezmoitemplates/wsl-windows-script-context.json.tmpl" . | trim) -}}
+  {{- $wslLinuxUser := index $wslWin "linuxUser" -}}
+  {{- $wslChezmoiSource := index $wslWin "chezmoiSourceMount" -}}
 # Chocolatey package list hash (triggers re-run when this list changes):
 # {{ join " " $chocoPackages | sha256sum }}
 # Winget package list hash (triggers re-run when this list changes):
@@ -81,27 +66,13 @@ $elevatedScript = {
     if (Get-Command wsl -ErrorAction SilentlyContinue) {
         $distros = wsl --list --quiet 2>$null
         if ($distros -notcontains "Ubuntu") {
-            $wslUser = $env:USERNAME.ToLower()
+            $wslUser = '{{ $wslLinuxUser }}'
             $cloudInitDir = "$env:USERPROFILE\.cloud-init"
-            if (-not (Test-Path $cloudInitDir)) { New-Item -ItemType Directory -Path $cloudInitDir | Out-Null }
+            if (-not (Test-Path $cloudInitDir)) {
+                New-Item -ItemType Directory -Path $cloudInitDir | Out-Null
+            }
             $cloudConfig = @"
-#cloud-config
-users:
-- name: $wslUser
-  groups: [adm,dialout,cdrom,floppy,sudo,audio,dip,video,plugdev,netdev]
-  sudo: ALL=(ALL) NOPASSWD:ALL
-  shell: /bin/bash
-
-write_files:
-- path: /etc/wsl.conf
-  append: true
-  content: |
-    [user]
-    default=$wslUser
-
-runcmd:
-  - sudo -u $wslUser git clone {{ $dotfilesRepoUrl }} /home/$wslUser/.local/share/chezmoi
-  - sudo -u $wslUser bash -lc 'if ! command -v chezmoi >/dev/null 2>&1; then sh -c "`$(curl -fsLS get.chezmoi.io)" -- -b "`$HOME/.local/bin"; fi; PATH="`$HOME/.local/bin:`$PATH"; DOTFILES_SKIP_BITWARDEN=1 "`$HOME/.local/bin/chezmoi" init --apply --source="`$HOME/.local/share/chezmoi" --exclude=externals -R never'
+{{ .windowsWsl.ubuntuCloudInitUserData | replace "__WSL_CHEZMOI_SOURCE__" $wslChezmoiSource | replace "__WSL_USER__" $wslLinuxUser }}
 "@
             [System.IO.File]::WriteAllText("$cloudInitDir\Ubuntu.user-data", $cloudConfig)
 
@@ -126,7 +97,7 @@ runcmd:
                 Write-Host "WSL provisioning complete." -ForegroundColor Green
             }
         } else {
-            $wslUser = $env:USERNAME.ToLower()
+            $wslUser = '{{ $wslLinuxUser }}'
             $wslUserExists = (wsl -d Ubuntu -- bash -lc "id -u $wslUser >/dev/null 2>&1 && echo yes || echo no" 2>$null) -match "yes"
             if (-not $wslUserExists) {
                 Write-Host "WSL user '$wslUser' is missing in Ubuntu. Existing distro detected; skipping automatic user recreation." -ForegroundColor Yellow
@@ -135,7 +106,7 @@ runcmd:
                 Write-Host "  chezmoi apply" -ForegroundColor Yellow
             }
 
-            # Ensure Ubuntu starts as the expected Windows-derived user.
+            # Existing Ubuntu only (fresh installs get [user]/default from cloud-init). Align default login with profile.windows.wslUser.
             wsl -d Ubuntu -- bash -lc @"
 if ! grep -q '^\[user\]' /etc/wsl.conf 2>/dev/null; then
   printf '\n[user]\ndefault=$wslUser\n' | sudo tee -a /etc/wsl.conf >/dev/null
@@ -143,18 +114,21 @@ elif ! grep -q '^default=$wslUser$' /etc/wsl.conf 2>/dev/null; then
   sudo sed -i '/^\[user\]/,/^\[/ s/^default=.*/default=$wslUser/' /etc/wsl.conf
 fi
 "@
+            if ($wslUserExists) {
+                Write-Host "WSL default user may still be root until you run 'wsl --shutdown' once; using --user $wslUser for dotfiles update." -ForegroundColor DarkGray
+            }
 
             Write-Host "Updating dotfiles in WSL..."
-            wsl -d Ubuntu -- bash -lc '
-              if [ ! -d ~/.local/share/chezmoi ]; then
-                git clone {{ $dotfilesRepoUrl }} ~/.local/share/chezmoi
-              fi
-              cd ~/.local/share/chezmoi && git pull
-              if ! command -v chezmoi >/dev/null 2>&1; then
-                sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
-              fi
-              PATH="$HOME/.local/bin:$PATH" DOTFILES_SKIP_BITWARDEN=1 ~/.local/bin/chezmoi init --apply --source="$HOME/.local/share/chezmoi" --exclude=externals -R never
-            '
+            # Single-quoted here-string: bash expands $HOME; elevated ScriptBlock does not parse $(...) as PowerShell.
+            $wslUpdateBash = @'
+{{ includeTemplate ".chezmoitemplates/wsl-update-dotfiles-bash.sh.tmpl" (dict "wslChezmoiSource" $wslChezmoiSource) }}
+'@
+            if ($wslUserExists) {
+                $wslUpdateBash | wsl -d Ubuntu --user $wslUser -- bash -s
+            } else {
+                Write-Host "Running WSL update as default user (root); dotfiles copy will live under /root until user '$wslUser' exists and you re-apply." -ForegroundColor Yellow
+                $wslUpdateBash | wsl -d Ubuntu -- bash -s
+            }
         }
     }
 }

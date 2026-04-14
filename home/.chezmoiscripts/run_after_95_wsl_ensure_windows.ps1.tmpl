@@ -1,7 +1,7 @@
-{{- $dotfilesRepoUser := .profile.git.githubUser -}}
-{{- $dotfilesRepoName := .profile.git.githubRepo -}}
-{{- $dotfilesRepoUrl := printf "https://github.com/%s/%s" $dotfilesRepoUser $dotfilesRepoName -}}
-{{ if eq .chezmoi.os "windows" -}}
+{{- if eq .chezmoi.os "windows" -}}
+  {{- $wslWin := fromJson (includeTemplate ".chezmoitemplates/wsl-windows-script-context.json.tmpl" . | trim) -}}
+  {{- $wslLinuxUser := index $wslWin "linuxUser" -}}
+  {{- $wslChezmoiSource := index $wslWin "chezmoiSourceMount" -}}
 $ErrorActionPreference = "Stop"
 {{ includeTemplate ".chezmoitemplates/windows-elevation.ps1.tmpl" . }}
 
@@ -29,27 +29,13 @@ $elevatedScript = {
         return
     }
 
-    $wslUser = $env:USERNAME.ToLower()
+    $wslUser = '{{ $wslLinuxUser }}'
     $cloudInitDir = "$env:USERPROFILE\.cloud-init"
-    if (-not (Test-Path $cloudInitDir)) { New-Item -ItemType Directory -Path $cloudInitDir | Out-Null }
+    if (-not (Test-Path $cloudInitDir)) {
+        New-Item -ItemType Directory -Path $cloudInitDir | Out-Null
+    }
     $cloudConfig = @"
-#cloud-config
-users:
-- name: $wslUser
-  groups: [adm,dialout,cdrom,floppy,sudo,audio,dip,video,plugdev,netdev]
-  sudo: ALL=(ALL) NOPASSWD:ALL
-  shell: /bin/bash
-
-write_files:
-- path: /etc/wsl.conf
-  append: true
-  content: |
-    [user]
-    default=$wslUser
-
-runcmd:
-  - sudo -u $wslUser git clone {{ $dotfilesRepoUrl }} /home/$wslUser/.local/share/chezmoi
-  - sudo -u $wslUser bash -lc 'if ! command -v chezmoi >/dev/null 2>&1; then sh -c "`$(curl -fsLS get.chezmoi.io)" -- -b "`$HOME/.local/bin"; fi; PATH="`$HOME/.local/bin:`$PATH"; DOTFILES_SKIP_BITWARDEN=1 "`$HOME/.local/bin/chezmoi" init --apply --source="`$HOME/.local/share/chezmoi" --exclude=externals -R never'
+{{ .windowsWsl.ubuntuCloudInitUserData | replace "__WSL_CHEZMOI_SOURCE__" $wslChezmoiSource | replace "__WSL_USER__" $wslLinuxUser }}
 "@
     [System.IO.File]::WriteAllText("$cloudInitDir\Ubuntu.user-data", $cloudConfig)
 
@@ -62,6 +48,27 @@ runcmd:
 
     Write-Host "Launching Ubuntu for cloud-init provisioning..."
     wsl -d Ubuntu -- true
+    $prevLine = ""
+    $deadline = (Get-Date).AddMinutes(10)
+    do {
+        Start-Sleep -Seconds 5
+        $status = (wsl -d Ubuntu -- cloud-init status 2>$null) -replace '^\s+',''
+        $tail = wsl -d Ubuntu -- bash -c "tail -1 /var/log/cloud-init-output.log 2>/dev/null" 2>$null
+        if ($tail -and $tail -ne $prevLine) {
+            Write-Host "  [$status] $tail"
+            $prevLine = $tail
+        }
+        if ((Get-Date) -ge $deadline -and $status -match "running") {
+            Write-Host "cloud-init still running after 10 minutes. Let it finish, then rerun 'chezmoi apply'." -ForegroundColor Yellow
+            return
+        }
+    } while ($status -match "running")
+
+    if ($status -match "error") {
+        Write-Host "cloud-init finished with errors. Run 'wsl -d Ubuntu -- cat /var/log/cloud-init.log' for details." -ForegroundColor Yellow
+    } else {
+        Write-Host "WSL provisioning complete." -ForegroundColor Green
+    }
 }
 
 Invoke-ElevatedWithLog `
@@ -69,4 +76,4 @@ Invoke-ElevatedWithLog `
     -ScriptBlock $elevatedScript `
     -StatusMessage "Elevating for WSL provisioning..." `
     -FailureMessage "Elevated WSL provisioning failed"
-{{- end }}
+  {{- end }}

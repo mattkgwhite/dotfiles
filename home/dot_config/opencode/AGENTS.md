@@ -72,6 +72,7 @@ When updating any memory file: review nearby rules for contradictions, duplicati
 - Keep source edits, `chezmoi apply`, and git operations as separate commands unless a later step strictly depends on the previous one within the same concern.
 - Destructive or policy-sensitive actions should be isolated so intent is easy to inspect.
 - Do not check whether a directory exists before using it. Attempt the operation; create the directory if it fails.
+- On Windows, when admin rights are required, launch elevated commands with `Start-Process -Verb RunAs` instead of failing back to manual instructions.
 
 ---
 

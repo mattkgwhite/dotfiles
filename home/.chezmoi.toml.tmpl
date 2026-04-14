@@ -1,10 +1,12 @@
 {{- $codespaces:= env "CODESPACES" | not | not -}}
 {{- $ci := env "CI" | not | not -}}
+{{- $wsl := env "WSL_DISTRO_NAME" | not | not -}}
 {{- $private := or (eq .chezmoi.os "windows") (stat (joinPath .chezmoi.homeDir ".private") | not | not) -}}
 {{- $obsidianVaultPath := joinPath .chezmoi.homeDir "Documents" "Obsidian" "Vault" -}}
 [data]
     codespaces = {{ $codespaces }}
     ci = {{ $ci }}
+    wsl = {{ $wsl }}
     private = {{ $private }}
     obsidianVaultPath = {{ $obsidianVaultPath | quote }}
 

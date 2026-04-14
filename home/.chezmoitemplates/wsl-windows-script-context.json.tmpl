@@ -1,0 +1,7 @@
+{{- /* JSON object for Windows WSL PowerShell scripts: linuxUser, chezmoiSourceMount. Parse with fromJson in parent. */ -}}
+{{- $linuxUser := dig "windows" "wslUser" "" .profile | trim | lower -}}
+{{- if not $linuxUser -}}
+  {{- fail "profile.windows.wslUser must be set (non-empty) for Windows WSL scripts" -}}
+{{- end -}}
+{{- $chezmoiSourceMount := includeTemplate ".chezmoitemplates/wsl-windows-chezmoi-source-mount-path.tmpl" . | trim -}}
+{{- dict "linuxUser" $linuxUser "chezmoiSourceMount" $chezmoiSourceMount | toJson -}}

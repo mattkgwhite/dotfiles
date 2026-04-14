@@ -1,0 +1,29 @@
+# Chocolatey packages for Windows bootstrap (`run_onchange_after_bootstrap_windows.ps1.tmpl`).
+# Same overlay idea as `home/.chezmoidata/brew/`: add `10-*.yaml` files; each overlay's `packages` list is concatenated in lexical overlay name order.
+chocolatey:
+  overlays:
+    base:
+      packages:
+        - bat
+        - bitwarden-cli
+        - discord
+        - eza
+        - fd
+        - fzf
+        - gnupg
+        - jq
+        - mise
+        - nerd-fonts-FiraCode
+        - neovim
+        - obsidian
+        - oh-my-posh
+        - opencode
+        - powershell-core
+        - powertoys
+        - ripgrep
+        - sysinternals
+        - tree-sitter
+        - treesizefree
+        - wingetui
+        - winlibs
+        - wezterm

@@ -1,0 +1,9 @@
+{{- /* WSL path to the Windows chezmoi source dir (drvfs). Only use when .chezmoi.os is "windows". */ -}}
+{{- $n := .chezmoi.sourceDir | replace "/" "\\" -}}
+{{- if not (regexMatch "^[A-Za-z]:\\\\" $n) -}}
+  {{- fail (printf "chezmoi.sourceDir must be a Windows path (C:\\...) to copy into WSL; got %q" $n) -}}
+{{- end -}}
+{{- $parts := splitList ":" $n -}}
+{{- $d := index $parts 0 | lower -}}
+{{- $tail := trimPrefix "\\" (index $parts 1) | replace "\\" "/" -}}
+{{- printf "/mnt/%s/%s" $d $tail -}}

@@ -2,9 +2,9 @@
 [user]
   name = {{ .name }}
   email = {{ .email }}
-{{- if hasKey . "signingKey" }}
+  {{- if hasKey . "signingKey" }}
   #signingkey = {{ .signingKey }}
-{{- end }}
+  {{- end }}
 [color]
   ui = true
 [core]

@@ -133,6 +133,20 @@ setup() {
   grep -q 'bw unlock --passwordenv BW_PASSWORD --raw' "$REPO_ROOT/install.sh.tmpl"
 }
 
+@test "bootstrap_windows: elevated block installs Chocolatey packages and provisions WSL" {
+  grep -q 'choco install' "$REPO_ROOT/home/.chezmoiscripts/run_onchange_after_bootstrap_windows.ps1.tmpl"
+  grep -q 'wsl --install' "$REPO_ROOT/home/.chezmoiscripts/run_onchange_after_bootstrap_windows.ps1.tmpl"
+}
+
+@test "bootstrap_windows: choco review run_onchange exists" {
+  grep -q 'choco-review' "$REPO_ROOT/home/.chezmoiscripts/run_onchange_after_choco_review_windows.ps1.tmpl"
+  grep -q 'UserInteractive' "$REPO_ROOT/home/.chezmoiscripts/run_onchange_after_choco_review_windows.ps1.tmpl"
+}
+
+@test "bootstrap_windows: Chocofile ignore is source-only" {
+  grep -q 'Chocofile.ignore' "$REPO_ROOT/home/.chezmoiignore"
+}
+
 @test "install.sh: skips bw setup when non-interactive unless forced" {
   grep -q '\[ ! -t 0 \] || \[ ! -t 1 \]' "$REPO_ROOT/install.sh.tmpl"
   grep -q 'DOTFILES_FORCE_BITWARDEN' "$REPO_ROOT/install.sh.tmpl"
@@ -154,8 +168,8 @@ setup() {
   grep -A2 'mise install' "$REPO_ROOT/home/.chezmoiscripts/run_onchange_after_bootstrap_windows.ps1.tmpl" | grep -q 'LASTEXITCODE'
 }
 
-@test "bootstrap_windows: gnupg in choco package list" {
-  grep -q '"gnupg"' "$REPO_ROOT/home/.chezmoiscripts/run_onchange_after_bootstrap_windows.ps1.tmpl"
+@test "bootstrap_windows: gnupg in chocolatey chezmoidata" {
+  grep -q 'gnupg' "$REPO_ROOT/home/.chezmoidata/chocolatey/00-base.yaml"
 }
 
 # --- CI workflows: bot skip conditions ---

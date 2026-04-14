@@ -1,0 +1,8 @@
+# Winget package ids for Windows bootstrap (`run_onchange_after_bootstrap_windows.ps1.tmpl`).
+# Overlay merge matches `home/.chezmoidata/brew/` and chocolatey: each overlay contributes a `packages` list, concatenated in lexical overlay name order.
+winget:
+  overlays:
+    base:
+      packages:
+        - Wakatime.CLIWakatime
+        - Wakatime.DesktopWakatime
