@@ -116,6 +116,20 @@ setup() {
 
 # --- install.sh.tmpl: bitwarden prereqs ---
 
+@test "setup.sh: only runs in codespaces" {
+  run sh "$REPO_ROOT/setup.sh"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"CODESPACES=true"* ]]
+}
+
+@test "setup.sh: renders install.sh from template via chezmoi" {
+  grep -q 'execute-template --file "${script_dir}/install.sh.tmpl"' "$REPO_ROOT/setup.sh"
+}
+
+@test "setup.sh: executes generated install.sh" {
+  grep -q 'exec "${install_script}"' "$REPO_ROOT/setup.sh"
+}
+
 @test "install.sh: installs bitwarden-cli via brew (non-codespaces)" {
   grep -q 'brew install bitwarden-cli' "$REPO_ROOT/install.sh.tmpl"
 }

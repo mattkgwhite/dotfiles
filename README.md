@@ -140,7 +140,9 @@ pre-commit install
 
 ## Codespaces
 
-When you set a personal dotfiles repo in your [GitHub Codespaces settings](https://github.com/settings/codespaces), GitHub clones this repo into each new codespace and runs `install.sh`.
+When you set a personal dotfiles repo in your [GitHub Codespaces settings](https://github.com/settings/codespaces), set the install script to `setup.sh`. GitHub clones this repo into each new codespace and runs that script.
+
+`setup.sh` is a lightweight Codespaces-only shim: it renders `install.sh` from [`install.sh.tmpl`](install.sh.tmpl) with `chezmoi execute-template`, then executes the generated installer.
 
 This repo ships a pre-baked [overlay container image](https://ghcr.io/chipwolf/dotfiles) on GHCR. When `install.sh` detects `CODESPACES=1`, it pulls only the overlay layers that differ from the base devcontainer image and extracts them directly, skipping the full bootstrap.
 
