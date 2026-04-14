@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>com.chipwolf.alfred.ghostty-redirect</string>
+	<key>category</key>
+	<string>Tools</string>
+	<key>connections</key>
+	<dict>
+		<key>A1B2C3D4-E5F6-7890-ABCD-EF1234567890</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>F0E1D2C3-B4A5-9687-7654-321FEDCBA098</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitowards</key>
+				<string></string>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>ChipWolf</string>
+	<key>description</key>
+	<string>Redirects iTerm searches to launch Ghostty</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>iTerm → Ghostty</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>keyword</key>
+				<string>iterm</string>
+				<key>subtext</key>
+				<string>Opens Ghostty (iTerm2 has been replaced)</string>
+				<key>text</key>
+				<string>Launch Ghostty</string>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>A1B2C3D4-E5F6-7890-ABCD-EF1234567890</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>app</key>
+				<string>/Applications/Ghostty.app</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.launchapp</string>
+			<key>uid</key>
+			<string>F0E1D2C3-B4A5-9687-7654-321FEDCBA098</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string></string>
+	<key>uidata</key>
+	<dict>
+		<key>A1B2C3D4-E5F6-7890-ABCD-EF1234567890</key>
+		<dict>
+			<key>xpos</key>
+			<integer>150</integer>
+			<key>ypos</key>
+			<integer>50</integer>
+		</dict>
+		<key>F0E1D2C3-B4A5-9687-7654-321FEDCBA098</key>
+		<dict>
+			<key>xpos</key>
+			<integer>450</integer>
+			<key>ypos</key>
+			<integer>50</integer>
+		</dict>
+	</dict>
+	<key>version</key>
+	<string>1.0.0</string>
+	<key>webaddress</key>
+	<string></string>
+</dict>
+</plist>

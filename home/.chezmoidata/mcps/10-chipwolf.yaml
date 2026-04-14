@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=../../../schemas/mcp-servers.schema.json
 mcp:
   serversById:

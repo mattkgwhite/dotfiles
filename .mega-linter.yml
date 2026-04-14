@@ -1,6 +1,11 @@
+---
+# Bundled MegaLinter pylint rc is incompatible with pylint 4.x (removed options).
 DISABLE:
   - COPYPASTE
   - SPELL
+
+DISABLE_LINTERS:
+  - PYTHON_PYLINT
 
 SARIF_REPORTER: true
 

@@ -20,39 +20,48 @@ import base64
 import json
 import os
 import sys
-import urllib.request
 import urllib.error
+import urllib.request
 
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hmac as crypto_hmac
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDFExpand
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import hashes, hmac as crypto_hmac
 
 
 def derive_master_key(password: str, email: str, iterations: int = 600000) -> bytes:
     kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(), length=32,
-        salt=email.lower().encode(), iterations=iterations,
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=email.lower().encode(),
+        iterations=iterations,
     )
     return kdf.derive(password.encode())
 
 
 def derive_master_password_hash(master_key: bytes, password: str) -> str:
     kdf = PBKDF2HMAC(
-        algorithm=hashes.SHA256(), length=32,
-        salt=password.encode(), iterations=1,
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=password.encode(),
+        iterations=1,
     )
     return base64.b64encode(kdf.derive(master_key)).decode()
 
 
 def stretch_key(master_key: bytes) -> tuple[bytes, bytes]:
-    enc_key = HKDFExpand(algorithm=hashes.SHA256(), length=32, info=b"enc").derive(master_key)
-    mac_key = HKDFExpand(algorithm=hashes.SHA256(), length=32, info=b"mac").derive(master_key)
+    enc_key = HKDFExpand(algorithm=hashes.SHA256(), length=32, info=b"enc").derive(
+        master_key
+    )
+    mac_key = HKDFExpand(algorithm=hashes.SHA256(), length=32, info=b"mac").derive(
+        master_key
+    )
     return enc_key, mac_key
 
 
 def encrypt_symmetric_key(enc_key: bytes, mac_key: bytes) -> str:
-    """Generate a random 64-byte symmetric key and encrypt it (Bitwarden type-2 format)."""
+    """Encrypt a random symmetric key (Bitwarden type-2 format)."""
     sym_key = os.urandom(64)
     iv = os.urandom(16)
     cipher = Cipher(algorithms.AES(enc_key), modes.CBC(iv))
@@ -63,7 +72,10 @@ def encrypt_symmetric_key(enc_key: bytes, mac_key: bytes) -> str:
     h = crypto_hmac.HMAC(mac_key, hashes.SHA256())
     h.update(iv + ct)
     mac = h.finalize()
-    return f"2.{base64.b64encode(iv).decode()}|{base64.b64encode(ct).decode()}|{base64.b64encode(mac).decode()}"
+    iv_b64 = base64.b64encode(iv).decode()
+    ct_b64 = base64.b64encode(ct).decode()
+    mac_b64 = base64.b64encode(mac).decode()
+    return f"2.{iv_b64}|{ct_b64}|{mac_b64}"
 
 
 def api_request(url: str, data: dict | None = None, token: str | None = None) -> dict:
@@ -73,7 +85,7 @@ def api_request(url: str, data: dict | None = None, token: str | None = None) ->
     body = json.dumps(data).encode() if data else None
     req = urllib.request.Request(url, data=body, headers=headers)
     try:
-        with urllib.request.urlopen(req) as resp:
+        with urllib.request.urlopen(req) as resp:  # nosec B310
             return json.loads(resp.read().decode()) if resp.status != 204 else {}
     except urllib.error.HTTPError as e:
         body_text = e.read().decode()
@@ -121,7 +133,10 @@ def register(server: str, email: str, password: str) -> str:
 
 def main() -> None:
     if len(sys.argv) != 5:
-        print(f"Usage: {sys.argv[0]} <server_url> <email> <password> <items_json>", file=sys.stderr)
+        print(
+            f"Usage: {sys.argv[0]} <server_url> <email> <password> <items_json>",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     server, email, password, items_json = sys.argv[1:]

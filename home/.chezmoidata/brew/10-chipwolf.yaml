@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=../../../schemas/brew-overlays.schema.json
 brew:
   overlays:
@@ -52,10 +53,11 @@ brew:
           conditions:
             - { kind: os, op: is, value: mac }
         - type: cask
-          name: lookaway # screen breaks
+          name: lookaway  # screen breaks
           conditions:
             - { kind: os, op: is, value: mac }
 
+        # yamllint disable comments-indentation
         # Disabled/optional packages carried from legacy Brewfile comments.
         # - type: brew
         #   name: age-plugin-yubikey
@@ -107,3 +109,4 @@ brew:
         #   name: zoom
         #   conditions:
         #     - { kind: os, op: is, value: mac }
+        # yamllint enable comments-indentation
