@@ -5,6 +5,15 @@
 $ErrorActionPreference = "Stop"
 {{ includeTemplate ".chezmoitemplates/windows-elevation.ps1.tmpl" . }}
 
+$wslCmd = Get-Command wsl -ErrorAction SilentlyContinue
+if ($wslCmd) {
+    $distros = wsl --list --quiet 2>$null
+    if ($LASTEXITCODE -eq 0 -and $distros -contains "Ubuntu") {
+        Write-Host "WSL Ubuntu already installed; skipping provisioning."
+        return
+    }
+}
+
 $elevatedScript = {
     $ErrorActionPreference = "Stop"
 

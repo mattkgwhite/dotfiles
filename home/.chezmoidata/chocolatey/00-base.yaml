@@ -11,6 +11,7 @@ chocolatey:
         - fd
         - fzf
         - gnupg
+        - glazewm
         - jq
         - mise
         - nerd-fonts-FiraCode
@@ -27,4 +28,5 @@ chocolatey:
         - treesizefree
         - wingetui
         - winlibs
+        - yasb
         - wezterm

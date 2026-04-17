@@ -1,0 +1,74 @@
+{{ if eq .chezmoi.os "windows" -}}
+# GlazeWM config hash (triggers re-run when config changes):
+# {{ include "dot_glzr/glazewm/config.yaml" | sha256sum }}
+
+$ErrorActionPreference = "Stop"
+
+function Resolve-GlazeExePath {
+    $glazeCmd = Get-Command glazewm.exe -ErrorAction SilentlyContinue
+    if (-not $glazeCmd) {
+        $glazeCmd = Get-Command glazewm -ErrorAction SilentlyContinue
+    }
+    if ($glazeCmd -and -not [string]::IsNullOrWhiteSpace($glazeCmd.Source)) {
+        return $glazeCmd.Source
+    }
+
+    $candidatePaths = @(
+        "$env:ChocolateyInstall\bin\glazewm.exe",
+        "$env:ProgramData\chocolatey\bin\glazewm.exe",
+        (Join-Path ([Environment]::GetFolderPath("CommonApplicationData")) "chocolatey\bin\glazewm.exe")
+    )
+    $candidatePath = $candidatePaths | Where-Object {
+        -not [string]::IsNullOrWhiteSpace($_) -and (Test-Path $_)
+    } | Select-Object -First 1
+    if ($candidatePath) {
+        return $candidatePath
+    }
+
+    $whereLines = where.exe glazewm.exe 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        $wherePath = $whereLines | Where-Object { -not [string]::IsNullOrWhiteSpace($_) -and (Test-Path $_) } | Select-Object -First 1
+        if ($wherePath) {
+            return $wherePath.Trim()
+        }
+    }
+
+    $processPath = (Get-Process -Name "glazewm" -ErrorAction SilentlyContinue | Select-Object -First 1).Path
+    if (-not [string]::IsNullOrWhiteSpace($processPath) -and (Test-Path $processPath)) {
+        return $processPath
+    }
+
+    $cimPath = Get-CimInstance Win32_Process -Filter "Name='glazewm.exe'" -ErrorAction SilentlyContinue |
+        Select-Object -ExpandProperty ExecutablePath -First 1
+    if (-not [string]::IsNullOrWhiteSpace($cimPath) -and (Test-Path $cimPath)) {
+        return $cimPath
+    }
+
+    return $null
+}
+
+$glazeExePath = Resolve-GlazeExePath
+
+if (Get-Process -Name "glazewm" -ErrorAction SilentlyContinue) {
+    if (-not $glazeExePath) {
+        # Retry once in case the process started after initial path resolution.
+        $glazeExePath = Resolve-GlazeExePath
+    }
+    if (-not $glazeExePath) {
+        Write-Host "GlazeWM process found but executable path could not be resolved; skipping reload." -ForegroundColor DarkGray
+        return
+    }
+
+    Write-Host "Reloading GlazeWM config..."
+    & $glazeExePath command wm-reload-config
+    if ($LASTEXITCODE -ne 0) {
+        throw "GlazeWM reload failed (exit code $LASTEXITCODE)."
+    }
+} else {
+    if (-not $glazeExePath) {
+        Write-Host "GlazeWM not found; skipping reload." -ForegroundColor DarkGray
+        return
+    }
+    Write-Host "GlazeWM is installed but not running; skipping reload." -ForegroundColor DarkGray
+}
+{{- end }}

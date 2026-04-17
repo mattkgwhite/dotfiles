@@ -1,0 +1,229 @@
+:root {
+  --base: #1e1e2e;
+  --mantle: #181825;
+  --surface0: #313244;
+  --surface1: #45475a;
+  --overlay0: #6c7086;
+  --overlay1: #7f849c;
+  --text: #cdd6f4;
+  --lavender: #b4befe;
+  --blue: #89b4fa;
+  --sky: #89dceb;
+  --teal: #94e2d5;
+  --green: #a6e3a1;
+  --yellow: #f9e2af;
+  --red: #f38ba8;
+  --mauve: #cba6f7;
+}
+
+* {
+  font-size: 13px;
+  font-family: "FiraCode Nerd Font Mono";
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.yasb-bar {
+  background-color: #181825d9;
+  border-bottom: 1px solid #b4befe0f;
+  padding-top: 2px;
+}
+
+.container-left,
+.container-center,
+.container-right {
+  margin: 0;
+  padding: 0;
+}
+
+.widget {
+  padding: 0 5px;
+}
+
+.widget .widget-container {
+  border-radius: 8px;
+  padding: 2px 4px;
+}
+
+.widget .label,
+.widget .icon {
+  color: var(--text);
+  padding: 0 3px;
+  font-weight: 500;
+}
+
+.widget .icon {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.tooltip {
+  background-color: var(--surface0);
+  border: 1px solid var(--surface1);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.context-menu {
+  background-color: var(--surface0);
+  border: none;
+  padding: 5px 0;
+  font-size: 12px;
+  color: var(--text);
+  border-radius: 8px;
+}
+
+.context-menu::item {
+  background-color: transparent;
+  padding: 7px 12px;
+  margin: 3px 6px;
+  border-radius: 5px;
+  min-width: 90px;
+}
+
+.context-menu::item:selected {
+  background-color: var(--surface1);
+  color: var(--text);
+}
+
+.clock-widget .icon {
+  color: var(--blue);
+}
+
+.cpu-widget .icon {
+  color: var(--mauve);
+}
+
+.gpu-widget .icon {
+  color: #f5c2e7;
+}
+
+.memory-widget .icon {
+  color: var(--blue);
+}
+
+.disk-widget .icon {
+  color: #74c7ec;
+}
+
+.wifi-widget .icon {
+  color: var(--sky);
+}
+
+.bluetooth-widget .icon {
+  color: var(--blue);
+}
+
+.open-meteo-widget .icon {
+  color: #ffffffd9;
+}
+
+.pomodoro-widget .label.work,
+.pomodoro-widget .icon.work {
+  color: var(--green);
+}
+
+.pomodoro-widget .label.break,
+.pomodoro-widget .icon.break {
+  color: var(--blue);
+}
+
+.pomodoro-widget .label.paused,
+.pomodoro-widget .icon.paused {
+  color: var(--overlay1);
+}
+
+.notes-widget .icon,
+.notes-widget .label {
+  color: var(--yellow);
+}
+
+.todo-widget .icon {
+  color: var(--teal);
+}
+
+.glazewm-workspaces .ws-btn {
+  font-size: 13px;
+  background-color: transparent;
+  border: none;
+  padding: 4px 8px;
+  margin: 0 3px;
+  color: var(--overlay1);
+  border-radius: 6px;
+}
+
+.glazewm-workspaces .ws-btn.populated {
+  color: #bac2de;
+}
+
+.glazewm-workspaces .ws-btn.active_populated,
+.glazewm-workspaces .ws-btn.active_empty {
+  color: var(--lavender);
+  background-color: #b4befe26;
+  font-weight: 600;
+}
+
+.glazewm-workspaces .ws-btn:hover,
+.glazewm-workspaces .ws-btn.populated:hover {
+  background-color: #ffffff14;
+  color: var(--text);
+}
+
+.brightness-widget .icon {
+  color: var(--yellow);
+}
+
+.volume-widget .icon {
+  color: var(--teal);
+}
+
+.notification-widget .icon.new-notification,
+.notification-widget .label.new-notification {
+  color: var(--blue);
+}
+
+.power-menu-widget .label {
+  color: var(--red);
+}
+
+.cpu-popup,
+.memory-popup,
+.audio-menu,
+.wifi-menu,
+.brightness-menu,
+.gpu-popup,
+.open-meteo-card,
+.pomodoro-menu,
+.notes-menu,
+.todo-menu,
+.clock-popup.calendar,
+.power-menu-popup {
+  background-color: #181825e6;
+  border: 1px solid #b4befe14;
+  border-radius: 10px;
+}
+
+.systray {
+  background: transparent;
+  border: none;
+}
+
+.systray .button {
+  border-radius: 4px;
+  padding: 2px;
+}
+
+.systray .button:hover {
+  background: #ffffff1a;
+}
+
+.systray .label,
+.systray .icon {
+  color: var(--mauve);
+}

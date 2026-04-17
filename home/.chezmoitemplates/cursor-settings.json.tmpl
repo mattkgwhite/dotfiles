@@ -1,3 +1,7 @@
+{{- $obsidianVaultPath := joinPath .chezmoi.homeDir "Documents" "Obsidian" "Vault" -}}
+{{- if hasKey . "obsidianVaultPath" -}}
+{{- $obsidianVaultPath = index . "obsidianVaultPath" -}}
+{{- end -}}
 {
     "window.commandCenter": true,
     "editor.fontFamily": "'FiraCode Nerd Font Mono', Menlo, Monaco, 'Courier New', monospace",
@@ -5,8 +9,7 @@
     "workbench.colorTheme": "Catppuccin Mocha",
     "workbench.iconTheme": "catppuccin-mocha",
     "cursor.composer.usageSummaryDisplay": "always",
-    "cursor.general.enableShadowWorkspace": true,
-    "obsidianPreview.vaultPath": "{{ if hasKey . `obsidianVaultPath` }}{{ index . `obsidianVaultPath` }}{{ else }}{{ .chezmoi.homeDir }}/Documents/Obsidian/Vault{{ end }}",
+    "obsidianPreview.vaultPath": {{ $obsidianVaultPath | toJson }},
     "update.releaseTrack": "prerelease",
     "terminal.integrated.fontFamily": "FiraCode Nerd Font Mono",
     "terminal.integrated.defaultProfile.linux": "zsh",

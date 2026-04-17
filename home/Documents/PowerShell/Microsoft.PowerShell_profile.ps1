@@ -25,3 +25,72 @@ if (Get-Command mise -ErrorAction SilentlyContinue) {
     $miseInitScript = mise activate pwsh | Out-String
     . ([ScriptBlock]::Create($miseInitScript))
 }
+
+function bw-unlock {
+    if (-not (Get-Command bw -ErrorAction SilentlyContinue)) {
+        Write-Error "Bitwarden CLI (bw) not found in PATH."
+        return
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($env:BW_SESSION)) {
+        bw sync --session $env:BW_SESSION --quiet 2>$null | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "Bitwarden is already unlocked for this shell."
+            return
+        }
+
+        Remove-Item Env:BW_SESSION -ErrorAction SilentlyContinue
+    }
+
+    $session = bw unlock --raw
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($session)) {
+        Write-Error "Failed to unlock Bitwarden."
+        return
+    }
+
+    $env:BW_SESSION = $session.Trim()
+    Write-Host "Bitwarden unlocked for this shell session."
+}
+
+function Ensure-BitwardenForChezmoi {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object[]]$Arguments
+    )
+
+    if (-not [string]::IsNullOrWhiteSpace($env:DOTFILES_SKIP_BITWARDEN)) {
+        return
+    }
+
+    if ($Arguments.Count -eq 0) {
+        return
+    }
+
+    $subcommand = "$($Arguments[0])".ToLowerInvariant()
+    $isApply = $subcommand -eq "apply"
+    $isInitApply = $subcommand -eq "init" -and ($Arguments -contains "--apply" -or $Arguments -contains "-a")
+    if (-not ($isApply -or $isInitApply)) {
+        return
+    }
+
+    bw-unlock
+    if ([string]::IsNullOrWhiteSpace($env:BW_SESSION)) {
+        throw "Bitwarden unlock is required to run chezmoi apply."
+    }
+}
+
+function chezmoi {
+    param(
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [object[]]$Arguments
+    )
+
+    $chezmoiCmd = Get-Command chezmoi -CommandType Application -ErrorAction SilentlyContinue
+    if (-not $chezmoiCmd) {
+        Write-Error "chezmoi executable not found in PATH."
+        return
+    }
+
+    Ensure-BitwardenForChezmoi -Arguments $Arguments
+    & $chezmoiCmd.Source @Arguments
+}

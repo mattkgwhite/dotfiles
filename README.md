@@ -35,6 +35,8 @@ Opinionated dotfiles managed with [chezmoi](https://chezmoi.io). One repo config
 | **mise**                | Runtime manager (node, python, go, etc.) |   x   |   x   |    x    |     x      |
 | **Finicky**             | Default browser router                   |   x   |       |         |            |
 | **Sysinternals**        | Windows diagnostics utilities            |       |       |    x    |            |
+| **GlazeWM**             | Windows tiling window manager            |       |       |    x    |            |
+| **YASB**                | Windows status bar                       |       |       |    x    |            |
 | **WinLibs (GCC)**       | C compiler toolchain (Windows)           |       |       |    x    |            |
 
 ---
@@ -81,7 +83,7 @@ irm https://github.com/chipwolf/dotfiles/releases/download/v1.6.2/install.ps1 | 
 
 1. Installs Chocolatey (if missing) and chezmoi.
 2. `chezmoi init --apply` clones this repo and writes configs to `~/`.
-3. `choco install` installs packages (Neovim, WezTerm, mise, Oh My Posh, and others).
+3. `choco install` installs packages (Neovim, WezTerm, GlazeWM, YASB, mise, Oh My Posh, and others).
 4. Provisions WSL with Ubuntu via cloud-init: creates a user, clones this repo inside WSL, and runs the Linux bootstrap. If Ubuntu is already installed, it pulls and re-applies instead.
 5. mise installs managed runtimes. Neovim syncs plugins.
 

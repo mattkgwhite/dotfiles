@@ -16,7 +16,9 @@ Chocofile.ignore
 {{ if ne .chezmoi.os "windows" }}
 # Windows-only targets — not applicable on Unix
 .config/wezterm
+.config/yasb
 .config/oh-my-posh
+.glzr
 AppData
 Documents
 {{ end }}

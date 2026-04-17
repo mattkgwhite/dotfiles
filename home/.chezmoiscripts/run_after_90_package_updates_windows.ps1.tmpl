@@ -1,9 +1,112 @@
+{{- $chocoPackages := list -}}
+{{- if and (hasKey . "chocolatey") (hasKey .chocolatey "overlays") -}}
+  {{- range $name := keys .chocolatey.overlays | sortAlpha -}}
+    {{- $ov := index $.chocolatey.overlays $name -}}
+    {{- $chocoPackages = concat $chocoPackages (default (list) $ov.packages) -}}
+  {{- end -}}
+{{- end -}}
+{{- $wingetPackages := list -}}
+{{- if and (hasKey . "winget") (hasKey .winget "overlays") -}}
+  {{- range $name := keys .winget.overlays | sortAlpha -}}
+    {{- $ov := index $.winget.overlays $name -}}
+    {{- $wingetPackages = concat $wingetPackages (default (list) $ov.packages) -}}
+  {{- end -}}
+{{- end -}}
 {{ if eq .chezmoi.os "windows" -}}
 $ErrorActionPreference = "Stop"
 {{ includeTemplate ".chezmoitemplates/windows-elevation.ps1.tmpl" . }}
 
 if (-not [string]::IsNullOrWhiteSpace($env:CI)) {
     Write-Host "Skipping package upgrades in CI." -ForegroundColor Yellow
+    return
+}
+
+$needsChocoUpdates = $false
+$needsWingetUpdates = $false
+$wingetBenignExitCodes = @(
+    # APPINSTALLER_CLI_ERROR_UPDATE_NOT_APPLICABLE
+    -1978335189
+)
+$managedChocoUpdates = @()
+$managedWingetUpdates = @()
+
+if (Get-Command choco -ErrorAction SilentlyContinue) {
+    Write-Host "Checking Chocolatey for available upgrades..."
+    $chocoPackages = "{{ join " " $chocoPackages }}".Split(" ", [System.StringSplitOptions]::RemoveEmptyEntries)
+    if ($chocoPackages.Count -gt 0) {
+        $chocoOutdatedRaw = choco outdated $chocoPackages --limit-output --no-color 2>$null
+    } else {
+        $chocoOutdatedRaw = @()
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw "choco outdated failed with exit code $LASTEXITCODE."
+    }
+
+    $chocoOutdatedLines = @("$chocoOutdatedRaw" -split "`r?`n")
+    foreach ($line in $chocoOutdatedLines) {
+        if ($line -notmatch '^[^|]+\|[^|]+\|[^|]+') {
+            continue
+        }
+
+        $parts = $line.Split('|')
+        if ($parts.Count -lt 3) {
+            continue
+        }
+
+        $pkgId = $parts[0].Trim()
+        $currentVersion = $parts[1].Trim()
+        $availableVersion = $parts[2].Trim()
+        if (
+            $chocoPackages -contains $pkgId -and
+            -not [string]::IsNullOrWhiteSpace($availableVersion) -and
+            $availableVersion -ne $currentVersion
+        ) {
+            $managedChocoUpdates += $pkgId
+        }
+    }
+
+    $managedChocoUpdates = $managedChocoUpdates | Sort-Object -Unique
+    $needsChocoUpdates = $managedChocoUpdates.Count -gt 0
+}
+
+if (Get-Command winget -ErrorAction SilentlyContinue) {
+    Write-Host "Checking Winget for available upgrades..."
+    $wingetPackages = "{{ join " " $wingetPackages }}".Split(" ", [System.StringSplitOptions]::RemoveEmptyEntries)
+    foreach ($wingetPackage in $wingetPackages) {
+        $installed = winget list --id $wingetPackage --exact --accept-source-agreements --disable-interactivity 2>$null | Out-String
+        $wingetListExitCode = $LASTEXITCODE
+        if ($wingetListExitCode -ne 0) {
+            Write-Host "Winget list check failed for $wingetPackage (exit $wingetListExitCode); skipping." -ForegroundColor Yellow
+            continue
+        }
+        if ($installed -notmatch [Regex]::Escape($wingetPackage)) {
+            continue
+        }
+
+        $upgradeCheck = winget upgrade --id $wingetPackage --exact --accept-package-agreements --accept-source-agreements --disable-interactivity 2>$null | Out-String
+        $wingetUpgradeQueryExitCode = $LASTEXITCODE
+        if ($wingetUpgradeQueryExitCode -ne 0) {
+            if ($wingetBenignExitCodes -contains $wingetUpgradeQueryExitCode) {
+                continue
+            }
+            Write-Host "Winget upgrade query failed for $wingetPackage (exit $wingetUpgradeQueryExitCode); skipping." -ForegroundColor Yellow
+            continue
+        }
+        if (
+            $upgradeCheck -match [Regex]::Escape($wingetPackage) -and
+            $upgradeCheck -notmatch 'No available upgrade found'
+        ) {
+            $managedWingetUpdates += $wingetPackage
+            $needsWingetUpdates = $true
+        }
+    }
+}
+
+$managedWingetUpdates = $managedWingetUpdates | Sort-Object -Unique
+$needsWingetUpdates = $managedWingetUpdates.Count -gt 0
+
+if (-not ($needsChocoUpdates -or $needsWingetUpdates)) {
+    Write-Host "No package updates detected; skipping elevation." -ForegroundColor DarkGray
     return
 }
 
@@ -21,14 +124,38 @@ $elevatedScript = {
 
     if (Get-Command choco -ErrorAction SilentlyContinue) {
         Write-Host "Updating Chocolatey packages..."
-        choco upgrade all -y --no-progress
-        Assert-LastExitCode "choco upgrade all"
+        choco upgrade {{ join " " $chocoPackages }} -y --no-progress
+        Assert-LastExitCode "choco upgrade managed packages"
     }
 
     if (Get-Command winget -ErrorAction SilentlyContinue) {
         Write-Host "Updating Winget packages..."
-        winget upgrade --all --silent --accept-package-agreements --accept-source-agreements
-        Assert-LastExitCode "winget upgrade --all"
+        $wingetPackages = "{{ join " " $wingetPackages }}".Split(" ", [System.StringSplitOptions]::RemoveEmptyEntries)
+        $wingetBenignExitCodes = @(
+            # APPINSTALLER_CLI_ERROR_UPDATE_NOT_APPLICABLE
+            -1978335189
+        )
+        foreach ($wingetPackage in $wingetPackages) {
+            $installed = winget list --id $wingetPackage --exact --accept-source-agreements --disable-interactivity 2>$null | Out-String
+            $wingetListExitCode = $LASTEXITCODE
+            if ($wingetListExitCode -ne 0) {
+                Write-Host "Winget list check failed for $wingetPackage (exit $wingetListExitCode); skipping." -ForegroundColor Yellow
+                continue
+            }
+            if ($installed -notmatch [Regex]::Escape($wingetPackage)) {
+                continue
+            }
+
+            winget upgrade --id $wingetPackage --exact --silent --accept-package-agreements --accept-source-agreements --disable-interactivity
+            $wingetUpgradeExitCode = $LASTEXITCODE
+            if ($wingetUpgradeExitCode -ne 0) {
+                if ($wingetBenignExitCodes -contains $wingetUpgradeExitCode) {
+                    Write-Host "No applicable Winget update for $wingetPackage." -ForegroundColor DarkGray
+                    continue
+                }
+                throw "winget upgrade ($wingetPackage) failed with exit code $wingetUpgradeExitCode."
+            }
+        }
     }
 }
 

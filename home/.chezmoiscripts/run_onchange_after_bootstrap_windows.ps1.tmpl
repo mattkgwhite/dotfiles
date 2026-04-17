@@ -179,4 +179,54 @@ if (Get-Command nvim -ErrorAction SilentlyContinue) {
         throw "Neovim plugin sync failed (exit code $LASTEXITCODE)."
     }
 }
+
+# Configure GlazeWM to autostart at Windows login and start it now.
+$glazeCmd = Get-Command glazewm.exe -ErrorAction SilentlyContinue
+if ($glazeCmd) {
+    $runKeyPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
+    if (-not (Test-Path $runKeyPath)) {
+        New-Item -Path $runKeyPath -Force | Out-Null
+    }
+
+    $glazeRunValue = '"' + $glazeCmd.Source + '" start'
+    $currentGlazeRunValue = (Get-ItemProperty -Path $runKeyPath -Name "GlazeWM" -ErrorAction SilentlyContinue).GlazeWM
+    if ($currentGlazeRunValue -ne $glazeRunValue) {
+        Set-ItemProperty -Path $runKeyPath -Name "GlazeWM" -Value $glazeRunValue
+        Write-Host "Configured GlazeWM autostart."
+    } else {
+        Write-Host "GlazeWM autostart already configured."
+    }
+
+    if (-not (Get-Process -Name "glazewm" -ErrorAction SilentlyContinue)) {
+        Write-Host "Starting GlazeWM..."
+        Start-Process -FilePath $glazeCmd.Source -ArgumentList "start"
+    } else {
+        Write-Host "GlazeWM is already running."
+    }
+}
+
+# Configure YASB to autostart at Windows login and start it now.
+$yasbCmd = Get-Command yasb -ErrorAction SilentlyContinue
+if ($yasbCmd) {
+    $runKeyPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
+    if (-not (Test-Path $runKeyPath)) {
+        New-Item -Path $runKeyPath -Force | Out-Null
+    }
+
+    $yasbRunValue = '"' + $yasbCmd.Source + '"'
+    $currentYasbRunValue = (Get-ItemProperty -Path $runKeyPath -Name "YASB" -ErrorAction SilentlyContinue).YASB
+    if ($currentYasbRunValue -ne $yasbRunValue) {
+        Set-ItemProperty -Path $runKeyPath -Name "YASB" -Value $yasbRunValue
+        Write-Host "Configured YASB autostart."
+    } else {
+        Write-Host "YASB autostart already configured."
+    }
+
+    if (-not (Get-Process -Name "yasb" -ErrorAction SilentlyContinue)) {
+        Write-Host "Starting YASB..."
+        Start-Process -FilePath $yasbCmd.Source
+    } else {
+        Write-Host "YASB is already running."
+    }
+}
 {{- end }}
