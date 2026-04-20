@@ -8,15 +8,6 @@ set -eu
 set -x
 {{- end }}
 
-{{ if .codespaces -}}
-cat <<EOF >"$HOME/.gitconfig.overrides"
-[user]
-	name = {{ .profile.codespaces.gitName }}
-[gpg]
-	program = /.codespaces/bin/gh-gpgsign
-EOF
-{{ end -}}
-
 {{ if eq .chezmoi.os "linux" -}}
 PKGS="build-essential procps curl file git libffi-dev libyaml-dev zlib1g-dev"
 if ! dpkg -s $PKGS &>/dev/null; then

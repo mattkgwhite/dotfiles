@@ -30,3 +30,8 @@ Documents
 .config/finicky.js
 Library
 {{ end }}
+
+{{ if not .codespaces }}
+# Codespaces-only targets — not applicable outside Codespaces
+.gitconfig.overrides
+{{ end }}
