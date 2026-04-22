@@ -180,26 +180,12 @@ if (Get-Command nvim -ErrorAction SilentlyContinue) {
     }
 }
 
-# Configure GlazeWM to autostart at Windows login and start it now.
+# Let GlazeWM manage its own startup preference; only start it now if needed.
 $glazeCmd = Get-Command glazewm.exe -ErrorAction SilentlyContinue
 if ($glazeCmd) {
-    $runKeyPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
-    if (-not (Test-Path $runKeyPath)) {
-        New-Item -Path $runKeyPath -Force | Out-Null
-    }
-
-    $glazeRunValue = '"' + $glazeCmd.Source + '" start'
-    $currentGlazeRunValue = (Get-ItemProperty -Path $runKeyPath -Name "GlazeWM" -ErrorAction SilentlyContinue).GlazeWM
-    if ($currentGlazeRunValue -ne $glazeRunValue) {
-        Set-ItemProperty -Path $runKeyPath -Name "GlazeWM" -Value $glazeRunValue
-        Write-Host "Configured GlazeWM autostart."
-    } else {
-        Write-Host "GlazeWM autostart already configured."
-    }
-
     if (-not (Get-Process -Name "glazewm" -ErrorAction SilentlyContinue)) {
         Write-Host "Starting GlazeWM..."
-        Start-Process -FilePath $glazeCmd.Source -ArgumentList "start"
+        Start-Process -FilePath $glazeCmd.Source
     } else {
         Write-Host "GlazeWM is already running."
     }

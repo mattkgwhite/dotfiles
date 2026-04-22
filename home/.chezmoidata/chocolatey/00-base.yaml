@@ -23,7 +23,9 @@ chocolatey:
         - powertoys
         - rancher-desktop
         - ripgrep
+        - steam
         - sysinternals
+        - tailscale
         - tree-sitter
         - treesizefree
         - wingetui

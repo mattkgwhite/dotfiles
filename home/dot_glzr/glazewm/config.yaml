@@ -12,12 +12,12 @@ general:
 
 gaps:
   scale_with_dpi: true
-  inner_gap: 16px
+  inner_gap: 8px
   outer_gap:
-    top: 8px
-    right: 8px
-    bottom: 8px
-    left: 8px
+    top: 4px
+    right: 4px
+    bottom: 4px
+    left: 4px
 
 window_effects:
   focused_window:
@@ -34,7 +34,7 @@ window_behavior:
   state_defaults:
     floating:
       centered: true
-      shown_on_top: false
+      shown_on_top: true
     fullscreen:
       maximized: false
       shown_on_top: false

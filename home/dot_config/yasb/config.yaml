@@ -10,7 +10,7 @@ glazewm:
   reload_command: "glazewm.exe command wm-exit && glazewm.exe start"
 
 bars:
-  main-bar:
+  primary-bar:
     enabled: true
     screens: ["*"]
     class_name: "yasb-bar"
@@ -23,7 +23,7 @@ bars:
       dark_mode: true
       round_corners: true
       round_corners_type: "normal"
-      border_color: "None"
+      border_color: "#a6e3a1"
     window_flags:
       always_on_top: false
       windows_app_bar: true
@@ -33,441 +33,134 @@ bars:
       width: "100%"
       height: 36
     padding:
-      top: 3
-      left: 6
+      top: 4
+      left: 3
       bottom: 0
-      right: 6
-    animation:
-      enabled: true
-      duration: 500
+      right: 19
     widgets:
-      left: ["power_menu", "glazewm_workspaces", "notes", "todo"]
-      center: ["cpu", "gpu", "memory", "disk", "pomodoro"]
+      left: ["home", "glazewm_workspaces"]
+      center: ["clock"]
       right:
         [
-          "systray",
-          "brightness",
-          "bluetooth",
+          "glazewm_binding_mode",
+          "memory",
+          "disk",
           "wifi",
-          "open_meteo",
           "volume",
-          "clock",
+          "bluetooth",
+          "battery",
           "notifications",
+          "power_menu",
         ]
 
 widgets:
-  systray:
-    type: "yasb.systray.SystrayWidget"
+  home:
+    type: "yasb.home.HomeWidget"
     options:
-      class_name: "systray"
-      label_collapsed: ""
-      label_expanded: "󰁨"
-      label_position: "left"
-      icon_size: 16
-      pin_click_modifier: "alt"
-      show_unpinned: true
-      show_unpinned_button: true
-      show_battery: false
-      show_volume: false
-      show_network: true
-      tooltip: true
-
-  power_menu:
-    type: "yasb.power_menu.PowerMenuWidget"
-    options:
-      label: "  "
-      uptime: true
-      show_user: true
-      blur: false
-      blur_background: true
-      animation_duration: 120
-      button_row: 3
-      profile_image_size: 80
-      buttons:
-        lock: ["", "Lock"]
-        sleep: ["⏾", "Sleep"]
-        restart: ["", "Restart"]
-        shutdown: ["", "Shut Down"]
-        signout: ["󰍃", "Sign out"]
-        cancel: ["󰜺", "Cancel"]
+      label: " 󰝜 "
+      menu_list:
+        - { title: "Home", path: "~" }
+        - { title: "Downloads", path: "~\\Downloads" }
+        - { title: "Documents", path: "~\\Documents" }
+        - { title: "Pictures", path: "~\\Pictures" }
+        - { title: "Videos", path: "~\\Videos" }
+      system_menu: true
+      power_menu: false
+      blur: true
+      round_corners: true
+      round_corners_type: "normal"
+      border_color: "#DAF7A6"
+      alignment: "left"
+      offset_left: 4
+      offset_top: 0
 
   glazewm_workspaces:
     type: "glazewm.workspaces.GlazewmWorkspacesWidget"
     options:
-      offline_label: "GlazeWM Offline"
+      offline_label: "GWM Offline"
       hide_empty_workspaces: true
-      hide_if_offline: false
-      monitor_exclusive: true
-      enable_scroll_switching: true
-      animation: true
+      hide_if_offline: true
 
-  notes:
-    type: "yasb.notes.NotesWidget"
+  glazewm_binding_mode:
+    type: "glazewm.binding_mode.GlazewmBindingModeWidget"
     options:
-      label: " 󱓌 {count}"
-      label_alt: "{count} notes"
-      menu:
-        blur: true
-        round_corners: true
-        round_corners_type: "normal"
-        border_color: "System"
-        alignment: "center"
-        direction: "down"
-        offset_top: 6
-        offset_left: 0
-        max_title_size: 150
-        show_date_time: true
+      hide_if_no_active: true
+      label_if_no_active: "NBM"
+      default_icon: ""
       icons:
-        note: "󱓌"
-        delete: ""
-        copy: ""
-        float_on: "󰐬"
-        float_off: "󰐩"
-        close: ""
+        none: ""
+        resize: ""
+        pause: ""
+      binding_modes_to_cycle_through: ["none", "resize", "pause"]
       callbacks:
-        on_left: "toggle_menu"
-        on_middle: "do_nothing"
-        on_right: "toggle_label"
-      animation:
-        enabled: true
-        type: "fadeInOut"
-        duration: 200
-
-  todo:
-    type: "yasb.todo.TodoWidget"
-    options:
-      label: "  {count}"
-      label_alt: "  {completed}/{count} done"
-      menu:
-        blur: true
-        round_corners: true
-        round_corners_type: "normal"
-        border_color: "system"
-        alignment: "center"
-        direction: "down"
-        offset_top: 6
-        offset_left: 0
-      icons:
-        add: " New Task"
-        edit: "Edit"
-        delete: "Delete"
-        date: ""
-        category: ""
-        checked: "󰄴"
-        unchecked: "󰄰"
-        sort: ""
-        no_tasks: ""
-      categories:
-        default:
-          label: "General"
-        soon:
-          label: "Complete soon"
-        today:
-          label: "End of day"
-        urgent:
-          label: "Urgent"
-        important:
-          label: "Important"
-      callbacks:
-        on_left: "toggle_menu"
-        on_middle: "do_nothing"
-        on_right: "toggle_label"
-      animation:
-        enabled: true
-        type: "fadeInOut"
-        duration: 200
-
-  clock:
-    type: "yasb.clock.ClockWidget"
-    options:
-      label: "  {%H:%M}"
-      label_alt: "  {%A, %d %B %Y}"
-      locale: ""
-      update_interval: 1000
-      tooltip: true
-      calendar:
-        blur: true
-        round_corners: true
-        round_corners_type: "normal"
-        border_color: "system"
-        alignment: "center"
-        direction: "down"
-        offset_top: 6
-        offset_left: 0
-        show_week_numbers: false
-        show_years: true
-      callbacks:
-        on_left: "toggle_label"
-        on_middle: "do_nothing"
-        on_right: "toggle_calendar"
-      animation:
-        enabled: true
-        type: "fadeInOut"
-        duration: 200
-
-  pomodoro:
-    type: "yasb.pomodoro.PomodoroWidget"
-    options:
-      label: " {icon} {remaining}"
-      label_alt: " {icon} {session}/{total_sessions} - {status}"
-      work_duration: 25
-      break_duration: 5
-      long_break_duration: 15
-      long_break_interval: 4
-      auto_start_breaks: true
-      auto_start_work: true
-      sound_notification: true
-      show_notification: true
-      hide_on_break: false
-      session_target: 8
-      icons:
-        work: ""
-        break: ""
-        paused: ""
-      menu:
-        blur: true
-        round_corners: true
-        round_corners_type: "normal"
-        border_color: "System"
-        alignment: "center"
-        direction: "down"
-        offset_top: 6
-        offset_left: 0
-        circle_background_color: "#1e1e2e"
-        circle_work_progress_color: "#cba6f7"
-        circle_break_progress_color: "#a6e3a1"
-        circle_thickness: 8
-        circle_size: 160
-      callbacks:
-        on_left: "toggle_menu"
-        on_middle: "reset_timer"
-        on_right: "toggle_label"
-      animation:
-        enabled: true
-        type: "fadeInOut"
-        duration: 200
-
-  cpu:
-    type: "yasb.cpu.CpuWidget"
-    options:
-      label: "  {info[percent][total]}%"
-      label_alt: "  {info[freq][current]} MHz"
-      update_interval: 2000
-      cpu_thresholds:
-        low: 25
-        medium: 50
-        high: 90
-      callbacks:
-        on_left: "toggle_menu"
-        on_middle: "do_nothing"
-        on_right: "exec cmd /c Taskmgr"
-      menu:
-        enabled: true
-        blur: true
-        round_corners: true
-        round_corners_type: "normal"
-        border_color: "System"
-        alignment: "right"
-        direction: "down"
-        offset_top: 6
-        offset_left: 0
-        show_graph: true
-        show_graph_grid: false
-        graph_history_size: 60
-      animation:
-        enabled: true
-        type: "fadeInOut"
-        duration: 200
-
-  gpu:
-    type: "yasb.gpu.GpuWidget"
-    options:
-      label: " 󰢮 {info[utilization]}%"
-      label_alt: " 󰢮 {info[temp]}°C | {info[mem_used]}"
-      gpu_index: 0
-      update_interval: 2000
-      gpu_thresholds:
-        low: 25
-        medium: 50
-        high: 90
-      callbacks:
-        on_left: "toggle_menu"
-        on_middle: "do_nothing"
-        on_right: "toggle_label"
-      menu:
-        enabled: true
-        blur: true
-        round_corners: true
-        round_corners_type: "normal"
-        border_color: "System"
-        alignment: "right"
-        direction: "down"
-        offset_top: 6
-        offset_left: 0
-        show_graph: true
-        show_graph_grid: false
-        graph_history_size: 60
-      animation:
-        enabled: true
-        type: "fadeInOut"
-        duration: 200
+        on_left: "next_binding_mode"
+        on_middle: "toggle_label"
+        on_right: "disable_binding_mode"
 
   memory:
     type: "yasb.memory.MemoryWidget"
     options:
-      label: "  {virtual_mem_percent}%"
-      label_alt: "  {virtual_mem_used}/{virtual_mem_total}"
-      update_interval: 5000
+      label: "  {virtual_mem_percent}%"
+      label_alt: "  {virtual_mem_outof}"
+      update_interval: 10000
+      hide_decimal: true
       memory_thresholds:
         low: 25
         medium: 50
         high: 90
       callbacks:
-        on_left: "toggle_menu"
-        on_middle: "do_nothing"
-        on_right: "toggle_label"
-      menu:
-        enabled: true
-        blur: true
-        round_corners: true
-        round_corners_type: "normal"
-        border_color: "System"
-        alignment: "right"
-        direction: "down"
-        offset_top: 6
-        offset_left: 0
-        show_graph: true
-        show_graph_grid: false
-        graph_history_size: 60
-      animation:
-        enabled: true
-        type: "fadeInOut"
-        duration: 200
+        on_right: "exec cmd /c Taskmgr"
 
   disk:
     type: "yasb.disk.DiskWidget"
     options:
-      label: "  {space[used][percent]}"
-      label_alt: "  {space[used][gb]} / {space[total][gb]}"
-      volume_label: "C"
+      label: "  "
+      label_alt: "  "
+      decimal_display: 0
       update_interval: 60
-      disk_thresholds:
-        low: 50
-        medium: 75
-        high: 90
       group_label:
-        volume_labels: ["C"]
-        show_label_name: true
+        volume_labels: ["C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+        show_label_name: false
         blur: true
         round_corners: true
-        round_corners_type: "normal"
-        border_color: "System"
-        alignment: "right"
-        direction: "down"
+        round_corners_type: "small"
+        border_color: "#DAF7A6"
+        alignment: "center"
       callbacks:
-        on_left: "toggle_label"
-        on_middle: "do_nothing"
-        on_right: "toggle_label"
-      animation:
-        enabled: true
-        type: "fadeInOut"
-        duration: 200
+        on_left: "toggle_group"
 
-  brightness:
-    type: "yasb.brightness.BrightnessWidget"
+  clock:
+    type: "yasb.clock.ClockWidget"
     options:
-      label: " {icon} "
-      label_alt: "Brightness {percent}%"
-      tooltip: true
-      hide_unsupported: true
-      brightness_toggle_level: [0, 50, 100]
-      brightness_icons: ["󰃞", "󰃝", "󰃟", "󰃠"]
-      brightness_menu:
+      label: "{%a, %d-%b %I:%M:%S %p}"
+      label_alt: "{%A, %B %d. %Y %H:%M}"
+      timezones: []
+      calendar:
         blur: true
         round_corners: true
-        round_corners_type: "normal"
-        border_color: "System"
-        alignment: "right"
+        round_corners_type: "small"
+        border_color: "#DAF7A6"
+        alignment: "center"
         direction: "down"
-        offset_top: 6
+        offset_top: 0
         offset_left: 0
-      callbacks:
-        on_left: "toggle_label"
-        on_middle: "do_nothing"
-        on_right: "toggle_brightness_menu"
-      animation:
-        enabled: true
-        type: "fadeInOut"
-        duration: 200
-
-  bluetooth:
-    type: "yasb.bluetooth.BluetoothWidget"
-    options:
-      label: " {icon} "
-      label_alt: "{device_name}"
-      label_no_device: "No devices"
-      label_device_separator: ", "
-      tooltip: true
-      icons:
-        bluetooth_on: "󰂯"
-        bluetooth_off: "󰂲"
-        bluetooth_connected: "󰂱"
-      callbacks:
-        on_left: "toggle_label"
-        on_right: "exec cmd.exe /c start ms-settings:bluetooth"
-        on_middle: "do_nothing"
-      animation:
-        enabled: true
-        type: "fadeInOut"
-        duration: 200
-
-  volume:
-    type: "yasb.volume.VolumeWidget"
-    options:
-      label: " {icon} {level}"
-      label_alt: "Vol {volume}"
-      volume_icons: ["", "", "", "", ""]
-      scroll_step: 2
-      slider_beep: false
-      tooltip: true
-      audio_menu:
-        blur: true
-        round_corners: true
-        round_corners_type: "normal"
-        border_color: "system"
-        alignment: "right"
-        direction: "down"
-        offset_top: 6
-        offset_left: 0
-        show_apps: true
-        show_app_labels: false
-        show_app_icons: true
-        show_apps_expanded: false
-      callbacks:
-        on_left: "toggle_volume_menu"
-        on_middle: "do_nothing"
-        on_right: "toggle_mute"
-      animation:
-        enabled: true
-        type: "fadeInOut"
-        duration: 200
+        show_holidays: true
+        show_week_numbers: true
 
   wifi:
     type: "yasb.wifi.WifiWidget"
     options:
-      label: " {wifi_icon} "
-      label_alt: "{wifi_name} {wifi_strength}%"
-      update_interval: 5000
-      wifi_icons: ["󰤮", "󰤟", "󰤢", "󰤥", "󰤨"]
-      ethernet_icon: ""
+      label: "{wifi_icon}"
+      label_alt: " {wifi_icon} {wifi_name} {wifi_strength}%"
       ethernet_label: " {wifi_icon} "
-      ethernet_label_alt: " {wifi_icon} {ip_addr}"
-      hide_if_ethernet: true
-      get_exact_wifi_strength: false
+      ethernet_label_alt: " {wifi_icon} {wifi_name}"
+      ethernet_icon: ""
+      update_interval: 32000
+      wifi_icons: ["󰤮", "󰤟", "󰤢", "󰤥", "󰤨"]
       callbacks:
-        on_left: "toggle_label"
-        on_middle: "exec cmd.exe /c start ms-settings:network"
-        on_right: "toggle_menu"
+        on_left: "do_nothing"
+        on_middle: "do_nothing"
+        on_right: "exec cmd.exe /c start ms-settings:network"
       menu_config:
         blur: true
         round_corners: true
@@ -477,65 +170,88 @@ widgets:
         direction: "down"
         offset_top: 6
         offset_left: 0
-      animation:
-        enabled: true
-        type: "fadeInOut"
-        duration: 200
 
-  open_meteo:
-    type: "yasb.open_meteo.OpenMeteoWidget"
+  volume:
+    type: "yasb.volume.VolumeWidget"
     options:
-      label: " {icon} {feelslike}"
-      label_alt: "{location}: {min_temp}↓ {max_temp}↑"
-      tooltip: true
-      update_interval: 600
-      hide_decimal: true
-      units: "metric"
-      callbacks:
-        on_left: "toggle_label"
-        on_middle: "do_nothing"
-        on_right: "toggle_card"
-      animation:
-        enabled: true
-        type: "fadeInOut"
-        duration: 200
-      weather_card:
+      label: " {icon}  {level}"
+      label_alt: "{volume}"
+      volume_icons: ["🔇", "", "", "", ""]
+      audio_menu:
         blur: true
         round_corners: true
-        round_corners_type: "normal"
-        border_color: "none"
-        alignment: "right"
+        round_corners_type: "small"
+        border_color: "#DAF7A6"
+        alignment: "center"
         direction: "down"
-        icon_size: 48
-        show_hourly_forecast: true
-        time_format: "12h"
-        hourly_point_spacing: 76
-        hourly_icon_size: 24
-        icon_smoothing: true
-        temp_line_width: 2
-        current_line_color: "#8EAEE8"
-        current_line_width: 1
-        current_line_style: "dot"
-        hourly_gradient:
-          enabled: false
-          top_color: "#8EAEE8"
-          bottom_color: "#2A3E68"
+        offset_top: 0
+        show_apps: true
+        show_app_labels: false
+        show_app_icons: true
+        show_apps_expanded: false
+      callbacks:
+        on_right: "toggle_mute"
+
+  bluetooth:
+    type: "yasb.bluetooth.BluetoothWidget"
+    options:
+      label: " {icon} "
+      label_alt: "{device_name}"
+      label_no_device: "NDC"
+      label_device_separator: ", "
+      icons:
+        bluetooth_on: "󰂯"
+        bluetooth_off: "󰂲"
+        bluetooth_connected: "󰂱"
+      callbacks:
+        on_right: "exec cmd.exe /c start ms-settings:bluetooth"
+
+  battery:
+    type: "yasb.battery.BatteryWidget"
+    options:
+      label: " {icon} {percent}%"
+      label_alt: " {icon} {percent}% | time: {time_remaining}"
+      hide_unsupported: true
+      update_interval: 60000
+      status_thresholds:
+        critical: 10
+        low: 25
+        medium: 75
+        high: 95
+        full: 100
+      status_icons:
+        icon_charging: ""
+        icon_critical: ""
+        icon_low: ""
+        icon_medium: ""
+        icon_high: ""
+        icon_full: ""
 
   notifications:
     type: "yasb.notifications.NotificationsWidget"
     options:
-      label: " 󰂚 {count}"
+      label: "  {count}"
       label_alt: "{count} notifications"
       hide_empty: true
-      tooltip: true
-      icons:
-        new: "󰂚"
-        default: "󰂜"
+      tooltip: false
       callbacks:
         on_left: "toggle_notification"
-        on_middle: "do_nothing"
-        on_right: "toggle_label"
-      animation:
-        enabled: true
-        type: "fadeInOut"
-        duration: 200
+        on_right: "clear_notifications"
+        on_middle: "toggle_label"
+
+  power_menu:
+    type: "yasb.power_menu.PowerMenuWidget"
+    options:
+      label: ""
+      uptime: true
+      blur: false
+      blur_background: true
+      animation_duration: 200
+      button_row: 5
+      buttons:
+        shutdown: ["", "Shut Down"]
+        restart: ["", "Restart"]
+        signout: ["󰍃", "Sign out"]
+        hibernate: ["", "Hibernate"]
+        sleep: ["⏾", "Sleep"]
+        cancel: ["", "Cancel"]
