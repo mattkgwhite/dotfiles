@@ -6,3 +6,4 @@ winget:
       packages:
         - Wakatime.CLIWakatime
         - Wakatime.DesktopWakatime
+        - WinSCP.WinSCP
