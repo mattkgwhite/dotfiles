@@ -27,7 +27,7 @@
   {{- if and $server.enabled $opencodeEnabled $conditionsMatch -}}
     {{- if $first }}{{- $first = false }}{{ else }},{{ end }}
     "{{ $serverId }}": {
-      {{- if hasKey $server "local" }}
+      {{- if hasKey $server "local" -}}
         {{- $openCodeCommandName := $server.local.command -}}
         {{- $openCodeCommandArgs := list -}}
         {{- range $arg := $server.local.args -}}
@@ -40,14 +40,14 @@
           {{- end -}}
           {{- $openCodeCommandArgs = append $openCodeCommandArgs $resolvedArg -}}
         {{- end -}}
-        {{- $openCodeCommand := prepend $openCodeCommandArgs $openCodeCommandName -}}
-      "type": "local",
-      "command": {{ $openCodeCommand | toPrettyJson "      " }},
+        {{- $openCodeCommand := prepend $openCodeCommandArgs $openCodeCommandName }}
+      "type": {{ "local" | toJson }},
+      "command": {{ $openCodeCommand | toPrettyJson | indent 6 | trim }},
       {{- else if hasKey $server "remote" }}
-      "type": "remote",
-      "url": "{{ $server.remote.url }}",
+      "type": {{ "remote" | toJson }},
+      "url": {{ $server.remote.url | toJson }},
       {{- end }}
-      "enabled": {{ $server.enabled | toPrettyJson }}
+      "enabled": {{ $server.enabled | toJson }}
     }
   {{- end -}}
 {{- end }}

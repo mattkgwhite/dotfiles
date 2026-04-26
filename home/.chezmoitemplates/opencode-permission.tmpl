@@ -44,6 +44,7 @@
       {{- end -}}
 
       {{- if and $conditionsMatch (eq $rule.kind $kindName) -}}
+        {{- $pattern := replace "{{ .chezmoi.homeDir }}" $.chezmoi.homeDir $rule.pattern -}}
         {{- $supportsMatchMode := false -}}
         {{- if hasKey $kindCfg "supportsMatchMode" -}}
           {{- $supportsMatchMode = $kindCfg.supportsMatchMode -}}
@@ -64,15 +65,15 @@
 
           {{- if or (eq $matchMode "exact") (eq $matchMode "exactAndWithArgs") -}}
             {{- if $firstEntry }}{{- $firstEntry = false }}{{ else }},{{ end }}
-      "{{ $rule.pattern }}": "{{ $rule.op }}"
+      {{ $pattern | toJson }}: {{ $rule.op | toJson }}
           {{- end -}}
           {{- if or (eq $matchMode "withArgs") (eq $matchMode "exactAndWithArgs") -}}
             {{- if $firstEntry }}{{- $firstEntry = false }}{{ else }},{{ end }}
-      "{{ $rule.pattern }}{{ $wildcardSuffix }}": "{{ $rule.op }}"
+      {{ printf "%s%s" $pattern $wildcardSuffix | toJson }}: {{ $rule.op | toJson }}
           {{- end -}}
         {{- else -}}
           {{- if $firstEntry }}{{- $firstEntry = false }}{{ else }},{{ end }}
-      "{{ $rule.pattern }}": "{{ $rule.op }}"
+      {{ $pattern | toJson }}: {{ $rule.op | toJson }}
         {{- end -}}
       {{- end -}}
     {{- end }}
@@ -96,7 +97,8 @@
     {{- $kindCfg = index $kinds $rule.kind -}}
   {{- end -}}
   {{- if and $conditionsMatch (eq (default "" (index $kindCfg "destinationType")) "top_level") -}}
+    {{- $pattern := replace "{{ .chezmoi.homeDir }}" $.chezmoi.homeDir $rule.pattern -}}
     {{- if $firstField }}{{- $firstField = false }}{{ else }},{{ end }}
-    "{{ $rule.pattern }}": "{{ $rule.op }}"
+    {{ $pattern | toJson }}: {{ $rule.op | toJson }}
   {{- end -}}
 {{- end }}

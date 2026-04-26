@@ -7,7 +7,7 @@
   "model": "github-copilot/claude-sonnet-4.6",
 
   "permission": {
-{{- includeTemplate ".chezmoitemplates/opencode-permission.tmpl" . }}
+{{- includeTemplate ".chezmoitemplates/opencode-permission.tmpl" . | trimSuffix "\n" }}
   },
 
   "plugin": [
@@ -16,6 +16,6 @@
   ],
 
   "mcp": {
-{{- includeTemplate ".chezmoitemplates/opencode-mcp.jsonc.tmpl" . }}
+{{- includeTemplate ".chezmoitemplates/opencode-mcp.jsonc.tmpl" . | trimSuffix "\n" }}
   }
 }
