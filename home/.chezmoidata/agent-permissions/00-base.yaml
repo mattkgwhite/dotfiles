@@ -324,6 +324,217 @@ agentPermissions:
       op: allow
       bashMatchMode: exactAndWithArgs
 
+    # Allows from GitHub Codespaces default chat.tools.terminal.autoApprove
+    - kind: bash
+      pattern: "cd"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "findstr"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "tr"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "cmp"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "basename"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "dirname"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "sleep"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "tree"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "gh run list"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "git revert"
+      op: allow
+      bashMatchMode: withArgs
+
+    # PowerShell read-only / safe cmdlets (Codespaces defaults)
+    - kind: bash
+      pattern: "Get-ChildItem"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "Get-Content"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "Get-Date"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "Get-Random"
+      op: allow
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "Get-Location"
+      op: allow
+      bashMatchMode: exact
+    - kind: bash
+      pattern: "Write-Host"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "Write-Output"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "Split-Path"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "Join-Path"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "Start-Sleep"
+      op: allow
+      bashMatchMode: withArgs
+    - kind: bash
+      pattern: "Where-Object"
+      op: allow
+      bashMatchMode: withArgs
+
+    # Denies from GitHub Codespaces default chat.tools.terminal.autoApprove
+    # Destructive file/dir operations
+    - kind: bash
+      pattern: "rm"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "rmdir"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "del"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "Remove-Item"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "ri"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "rd"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "erase"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "dd"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    # Process control
+    - kind: bash
+      pattern: "kill"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "top"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "Stop-Process"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "spps"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "taskkill"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "taskkill.exe"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    # Network fetchers (exfiltration risk)
+    - kind: bash
+      pattern: "curl"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "wget"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "Invoke-RestMethod"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "Invoke-WebRequest"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "irm"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "iwr"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    # Permission/ACL changes
+    - kind: bash
+      pattern: "chmod"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "chown"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "Set-ItemProperty"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "sp"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "Set-Acl"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    # Arbitrary execution shells
+    - kind: bash
+      pattern: "xargs"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "eval"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "Invoke-Expression"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+    - kind: bash
+      pattern: "iex"
+      op: deny
+      bashMatchMode: exactAndWithArgs
+
     - kind: external_directory
       pattern: "~/.local/share/chezmoi/**"
       op: allow

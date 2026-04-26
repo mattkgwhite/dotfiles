@@ -1,0 +1,47 @@
+{{- /* Render bash permission rules as Cursor chat.tools.terminal.autoApprove (allow=true, deny=false) */ -}}
+{{- $permission := dict -}}
+{{- if hasKey . "agentPermissions" -}}
+  {{- $permission = .agentPermissions -}}
+{{- end -}}
+{{- $rules := list -}}
+{{- if hasKey $permission "rules" -}}
+  {{- $rules = concat $rules (default (list) (index $permission "rules")) -}}
+{{- end -}}
+{{- $ruleSets := default (dict) (index $permission "ruleSets") -}}
+{{- range $setName := (keys $ruleSets | sortAlpha) -}}
+  {{- $ruleSet := index $ruleSets $setName -}}
+  {{- $setEnabled := true -}}
+  {{- if hasKey $ruleSet "conditions" -}}
+    {{- range $ck, $cv := $ruleSet.conditions -}}
+      {{- if and (hasKey $ $ck) (ne (index $ $ck) $cv) -}}
+        {{- $setEnabled = false -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if $setEnabled -}}
+    {{- $rules = concat $rules (default (list) (index $ruleSet "rules")) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $first := true -}}
+{{- range $rule := $rules -}}
+  {{- if and (eq $rule.kind "bash") (ne $rule.pattern "*") -}}
+    {{- $value := "" -}}
+    {{- if eq $rule.op "allow" -}}{{- $value = "true" -}}{{- end -}}
+    {{- if eq $rule.op "deny" -}}{{- $value = "false" -}}{{- end -}}
+    {{- if ne $value "" -}}
+      {{- $conditionsMatch := true -}}
+      {{- if hasKey $rule "conditions" -}}
+        {{- range $ck, $cv := $rule.conditions -}}
+          {{- if and (hasKey $ $ck) (ne (index $ $ck) $cv) -}}
+            {{- $conditionsMatch = false -}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+      {{- if $conditionsMatch -}}
+        {{- if $first }}{{- $first = false }}{{ else }},{{ end }}
+        "{{ $rule.pattern }}": {{ $value }}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end }}
