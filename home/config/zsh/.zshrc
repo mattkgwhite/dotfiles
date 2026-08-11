@@ -90,7 +90,7 @@ zsh-completions
 )
 
 #oh-my-posh
-eval "$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/mattkgwhite/dotfiles2/refs/heads/main/files/omp-configs/easy-term.omp.json')"
+eval "$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/mattkgwhite/dotfiles/refs/heads/main/files/omp-configs/easy-term.omp.json')"
 # to test configuration enable this and copy config locally and reference location. 
 # eval "$(oh-my-posh init zsh --config '')"
 
