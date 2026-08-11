@@ -3,7 +3,7 @@
 # Lazy-load (autoload) ZSH fucntions files from a directory
 ZFUNCDIR=${ZDOTDIR:-$HOME}/.zfunctions
 fpath=($ZFUNCDIR $fpath)
-autoload -Uz $ZFUNCDIR/*(.:t)
+# autoload -Uz $ZFUNCDIR/*(.:t)
 
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH

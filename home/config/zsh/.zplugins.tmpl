@@ -56,9 +56,10 @@ ohmyzsh/ohmyzsh path:plugins/ansible
 # ohmyzsh/ohmyzsh path:plugins/salt # saltstack
 
 # Add macOS specific plugins
-ohmyzsh/ohmyzsh path:plugins/brew conditional:is-macos
-ohmyzsh/ohmyzsh path:plugins/iterm2 conditional:is-macos
-ohmyzsh/ohmyzsh path:plugins/macos conditional:is-macos
+# need to investigate why the conditional below does not work
+#ohmyzsh/ohmyzsh path:plugins/brew conditional:is-macos
+#ohmyzsh/ohmyzsh path:plugins/iterm2 conditional:is-macos
+#ohmyzsh/ohmyzsh path:plugins/macos conditional:is-macos
 
 # Clone tmux dotfiles and plugins
 tmux-plugins/tmux-resurrect kind:clone
