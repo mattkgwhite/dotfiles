@@ -94,6 +94,9 @@ eval "$(oh-my-posh init zsh --config 'https://raw.githubusercontent.com/mattkgwh
 # to test configuration enable this and copy config locally and reference location. 
 # eval "$(oh-my-posh init zsh --config '')"
 
+## mise
+eval "$(mise activate zsh)"
+
 # Personal Functions
 
 ## pyenv
@@ -102,6 +105,8 @@ export PYENV_ROOT="$HOME/.pyenv"
 eval "$(pyenv init -)"
 
 ## 1pass - eval signin
+
+
 
 
 
