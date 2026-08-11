@@ -1,2 +1,52 @@
-[tools]
-gh = "2.89.0"
+# `exclude` on symlink-each entries landed in 2026.7.16; older releases ignore it
+# silently and deploy the excluded files.
+min_version = "2026.8.3"
+
+[settings]
+# toggle this on and off for testing new features as required.
+# caution behaviour and features are likely to change or possibly disappear when this is enabled.
+experimental = true
+
+[vars]
+git_name = "kaygee"
+git_email = ""
+github_user = "mattkgwhite"
+
+# home/config mirrors ~/.config exactly. Templates will be alongside their rendered targets, if used or enabled.
+# Templates are NOT part of symlink by `exclude`, which needs mise 2026.7.16 (see min_version). Specific machine
+# configs can be found under /home/<machine>, should it be required. 
+# Caution - linux "fedora" for example and macos each need a different brewfile at the same ~/.config/brewfile path.
+
+[dotfiles]
+"~/.config" = { source = "~/.dotfiles/home/config", mode = "symlink-each", exclude = ["*.tmpl"] }
+"~/.gitconfig" = { source = "~/.dotfiles/home/gitconfig.tmpl", mode = "template" }
+"~/.gitignore_global" = { source = "~/.dotfiles/home/gitignore_global", mode = "symlink" }
+# "~/.ssh/config" = { source = "~/.dotfiles/home/ssh/config.tmpl", mode = "template" } # needs configuring to pull secrets at execution / apply of configuration.
+#"~/.claude/CLAUDE.md" = { source = "~/.dotfiles/home/config/agents/AGENTS.md", mode = "symlink" }
+"~/.codex/AGENTS.md" = { source = "~/.dotfiles/home/config/agents/AGENTS.md", mode = "symlink" }
+# codex persists machine-local state into config.toml (per-project trust_level,
+# notice.*, tui.*), so manage only a marker block instead of the whole file.
+# Dotted keys, not [analytics]/[otel] headers: codex appends new tables at EOF,
+# so a block that opens a table scope swallows whatever codex writes next and
+# the next apply deletes it. Keep these markers above the first table header.
+"~/.codex/config.toml/telemetry" = { block = '''
+analytics.enabled = false
+otel.exporter = "none"
+otel.metrics_exporter = "none"
+otel.trace_exporter = "none"
+otel.log_user_prompt = false
+''' }
+# Each mise.<machine>.toml overlay symlinks only itself into ~/.config/mise,
+# so hosts don't carry (and warn about) the other machines' overlays.
+"~/.config/mise/config.toml" = { source = "~/.dotfiles/mise.toml", mode = "symlink" }
+"~/.config.
+
+# TODO to bootstrap parts of the ssh config.
+# reference: https://mise.jdx.dev/bootstrap/secrets.html
+# [bootstrap.secrets]
+
+# TODO investigate and configure as required.
+#[bootstrap.repos]
+
+# TODO investigate and configure as required.
+#[tasks.bootstrap]
