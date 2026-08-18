@@ -36,6 +36,8 @@ otel.metrics_exporter = "none"
 otel.trace_exporter = "none"
 otel.log_user_prompt = false
 ''' }
+## Codex Skills
+"~/.codex/skills" = { source = "~/.dotfiles/home/config/skills/", mode = "symlink" }
 # Each mise.<machine>.toml overlay symlinks only itself into ~/.config/mise,
 # so hosts don't carry (and warn about) the other machines' overlays.
 "~/.config/mise/config.toml" = { source = "~/.dotfiles/mise.toml", mode = "symlink" }
