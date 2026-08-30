@@ -27,7 +27,7 @@ These rules bias toward caution over speed; use judgment on trivial tasks.
 
 ## Environment & Shell
 
-- **Shell**: The user uses `fish` on this machine. ALWAYS generate fish-compatible commands if a command is intended to be run by the user. Shell scripts can use bash/sh syntax.
+- **Shell**: The user uses `zsh` on this machine. ALWAYS generate zsh-compatible commands if a command is intended to be run by the user. Shell scripts can use bash/sh syntax.
   - Use `(cmd)` for substitution, not `$(cmd)`.
   - Use `set -gx VAR val` for exports.
   - Use `and`/`or` for logic.
