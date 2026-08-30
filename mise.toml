@@ -22,7 +22,7 @@ github_user = "mattkgwhite"
 "~/.gitconfig" = { source = "~/.dotfiles/home/gitconfig.tmpl", mode = "template" }
 "~/.gitignore_global" = { source = "~/.dotfiles/home/gitignore_global", mode = "symlink" }
 # "~/.ssh/config" = { source = "~/.dotfiles/home/ssh/config.tmpl", mode = "template" } # needs configuring to pull secrets at execution / apply of configuration.
-#"~/.claude/CLAUDE.md" = { source = "~/.dotfiles/home/config/agents/AGENTS.md", mode = "symlink" }
+"~/.claude/CLAUDE.md" = { source = "~/.dotfiles/home/config/agents/AGENTS.md", mode = "symlink" }
 "~/.codex/AGENTS.md" = { source = "~/.dotfiles/home/config/agents/AGENTS.md", mode = "symlink" }
 # codex persists machine-local state into config.toml (per-project trust_level,
 # notice.*, tui.*), so manage only a marker block instead of the whole file.
