@@ -1,0 +1,9 @@
+[vars]
+machine = "windows"
+
+[dotfiles]
+"~/.config/mise/mise.windows.toml" = { source = "~/.dotfiles/mise.windows.toml", mode = "symlink" }
+
+# Runs after the dotfiles phase so the brewfile symlink exists on first run.
+[bootstrap.hooks.post-dotfiles]
+run = "brew bundle --no-upgrade --file=$HOME/.config/homebrew/brewfile"
