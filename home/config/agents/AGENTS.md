@@ -56,8 +56,6 @@ The following modern tools are available and preferred over their traditional co
 | Global cross-tools skills | `~/.agents/skills` |
 | Project rules | `~/.AGENTS.md` (project root or nearest ancestor)
 
-
-
 ## Git
 
 - Never `git commit`, `git push`, or open a PR unless asked.
