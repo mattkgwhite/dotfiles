@@ -48,6 +48,16 @@ The following modern tools are available and preferred over their traditional co
 - **DNS Resolving**: `doggo` instead of `dig`
 - **Web Search**: `kagi` (kagi-cli) instead of built-in web search when available. `kagi search "query"` and `kagi quick "question"` output JSON by default (pipe to `jq`); `kagi summarize --subscriber --url <url>` summarizes a page. Some features are also exposed as MCP tools (server: `kagi`).
 
+## Memory
+
+| Scope | Deployed path |
+| --- | --- |
+| Global cross-tool rules | `~/.agents/AGENTS.md` |
+| Global cross-tools skills | `~/.agents/skills` |
+| Project rules | `~/.AGENTS.md` (project root or nearest ancestor)
+
+
+
 ## Git
 
 - Never `git commit`, `git push`, or open a PR unless asked.
@@ -55,3 +65,8 @@ The following modern tools are available and preferred over their traditional co
 - Use Conventional Commits: `type(scope): summary` (types: feat, fix, chore, ci, docs, refactor, perf, test, build, style, revert).
 - Do not mention Claude, Codex, or AI in commit messages, PR descriptions, or code comments. No "Generated with" trailers.
 - Prefer `--force-with-lease` over `--force` when force-pushing.
+
+## Toolchain
+
+- When a CLI can be managed by `mise`, run it through `mise x -- <command>`. Do not invoke managed tools directly.
+- When entering a new worktree that has a `mise.toml` or `.mise.toml`, run `mise trust <worktree-path>/{mise,.mise}.toml` (or the specific file present) before any `mise x --` call. Otherwise every mise invocation fails with `Config files in <path> are not trusted`
